@@ -6,12 +6,25 @@ toc: false
 
 # Performances
 
+**NOTE**: This data was truncated at 50,000 results and does not represent the full dataset.
+
 <!-- Load and transform the data -->
 
 ```js
 const plays = FileAttachment("play_data.csv").csv({typed: true});
 ```
 
+```js
+const searchResults = view(Inputs.search(plays, {
+  placeholder: "Search plays"
+}));
+
+```
+
+```js
+const playsTable = view(Inputs.table(searchResults));
+
+```
 <!-- A shared color scale for consistency, sorted by the number of plays per genre -->
 
 ```js
@@ -49,7 +62,7 @@ function genreChart(data, {width}) {
 
 <div class="grid grid-cols-1">
   <div class="card">
-    ${resize((width) => genreChart(plays, {width}))}
+    ${resize((width) => genreChart(searchResults, {width}))}
   </div>
 </div>
 
@@ -75,7 +88,7 @@ function actsByGenre(data, {width}) {
 
 <div class="grid grid-cols-1">
   <div class="card">
-    ${resize((width) => actsByGenre(plays, {width}))}
+    ${resize((width) => actsByGenre(searchResults, {width}))}
   </div>
 </div>
 
@@ -101,6 +114,6 @@ function daysByGenre(data, {width}) {
 
 <div class="grid grid-cols-1">
   <div class="card">
-    ${resize((width) => daysByGenre(plays, {width}))}
+    ${resize((width) => daysByGenre(searchResults, {width}))}
   </div>
 </div>
