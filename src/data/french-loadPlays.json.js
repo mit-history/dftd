@@ -1,14 +1,14 @@
 import fs from 'fs/promises';
 import path from 'path';
 
-const filePath = path.join(process.cwd(), 'src/data/plays.json');
+const filePath = path.join(process.cwd(), 'src/data/french-plays.json');
 
 export async function load() {
   try {
     // console.log("🟢 Running loadPlays.js...");
 
     // Read the JSON file
-    const data = await fs.readFile(filePath, 'utf-8');
+    const data = await fs.readFile('src/data/french-plays.json', 'utf-8');
     // console.log("📂 Successfully read file.");
 
     const plays = JSON.parse(data).plays;
