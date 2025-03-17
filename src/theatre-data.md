@@ -5,35 +5,13 @@ toc: false
 ---
 
 ```js
-// import {pie} from "./components/theatre.js";
-// import {format} from "./components/format.js";
+const theatre = FileAttachment("data/danish-performances.csv").csv({typed: true});
 ```
 
-```js
-const theatre = FileAttachment("data/performances.csv").csv({typed: true});
-```
-
-# Performances, 1748-1778
+# Danish Performances, 1748-1778
 
 ```js
 Inputs.table(theatre)
-```
-
-# Formatted
-
-
-```js
-// display(pie(theatre, {width:600, height: 600}))
-```
-
-```js
-// const color = Plot.scale({
-//   color: {
-//     type: "categorical",
-//     domain: d3.groupSort(formatted, (D) => -D.length, (d) => d.title),
-//     unknown: "var(--theme-foreground-muted)"
-//   }
-// });
 ```
 
 ```js
