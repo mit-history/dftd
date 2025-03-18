@@ -5,6 +5,7 @@ toc: false
 ---
 
 ```js
+import { createComedyPerformanceChart } from './components/comedy combined.js';
 const danish_data = FileAttachment("data/danish-performances.csv").csv({typed: true});
 const french_data = FileAttachment("data/french-performances.json").json();
 ```
@@ -62,4 +63,10 @@ function compareYearsChart(data) {
 }
 
 display(compareYearsChart(combined_data))
+```
+
+# Comparing number of comedies
+
+```js
+display(createComedyPerformanceChart(french_data, danish_data))
 ```
