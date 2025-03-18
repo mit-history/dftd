@@ -21,8 +21,20 @@ export async function load() {
       year: new Date(p.date).getFullYear()
     }));
 
+    // filter to get one performance per day
+    const dates = new Set();
+
+    const filteredPlays = formattedPlays.filter(play => {
+      if (dates.has(play.date.getTime())) {
+        return false;
+      }
+
+      dates.add(play.date.getTime());
+      return true;
+    });
+
     // console.log("✅ Formatted Plays (First 5 Records):", formattedPlays.slice(0, 5));
-    return formattedPlays;
+    return filteredPlays;
   } catch (error) {
     console.error("❌ Error loading plays:", error);
     return [];
