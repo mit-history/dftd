@@ -31,47 +31,6 @@
 ];
 
 
-    // previous attempt for french + dutch data, will modyfy/check later
-
-// const fetchDutchData = async () => {
-//   const endpoint = "https://lod.uba.uva.nl/CREATE/ONSTAGE/sparqlShare";
-//   const query = `
-//     PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-//     PREFIX onstage: <http://lod.uba.uva.nl/CREATE/ONSTAGE/>
-
-//     SELECT ?performance ?title ?date
-//     WHERE {
-//       ?performance rdf:type onstage:Performance .
-//       ?performance onstage:title ?title .
-//       ?performance onstage:date ?date .
-//     }
-//     LIMIT 100
-//   `;
-
-//   for (const proxy of proxyUrls) {
-//     const url = `${proxy}${encodeURIComponent(endpoint)}?query=${encodeURIComponent(query)}&format=json`;
-
-//     try {
-//       const response = await fetch(url);
-//       if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-
-//       const result = await response.json();
-
-//       // If using allorigins, data is wrapped in 'contents'
-//       const data = result.contents ? JSON.parse(result.contents) : result;
-
-//       return data.results.bindings.map(d => ({
-//         title: d.title.value,
-//         performance_date: d.date.value
-//       }));
-//     } catch (error) {
-//       console.warn(`Proxy failed: ${proxy}`, error);
-//     }
-//   }
-
-//   console.error("All proxy attempts failed.");
-//   return [];
-// };
 
 // currently only using french data, will add dutch back in later once data loader figured out
 
