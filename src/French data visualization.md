@@ -1,7 +1,7 @@
 # Data visualization
 
 ```js
-const plays = FileAttachment("./data/loadPlays.json").json();
+const plays = FileAttachment("./data/french-loadPlays.json").json();
 ```
 
 ```js
@@ -48,7 +48,7 @@ const cutoff = 3;
 The following graph shows the number of plays by genre for all genres that applied to at least ${cutoff} plays in the dataset.
 
 ```js
-genrePlot(plays, cutoff)
+genrePlot(plays, cutoff);
 ```
 
 ```jsx
@@ -70,6 +70,7 @@ display(listData(plays));
 ```
 
 // 🔸 Author Plot
+
 ```js
 function countByAuthor(data) {
   const authorCounts = {};
@@ -77,7 +78,10 @@ function countByAuthor(data) {
     const author = play.author || "Unknown";
     authorCounts[author] = (authorCounts[author] || 0) + 1;
   });
-  return Object.entries(authorCounts).map(([author, count]) => ({ author, count }));
+  return Object.entries(authorCounts).map(([author, count]) => ({
+    author,
+    count,
+  }));
 }
 
 function authorPlot(data) {
@@ -99,21 +103,26 @@ function authorPlot(data) {
   });
 }
 ```
+
 ```js
-authorPlot(plays)
+authorPlot(plays);
 ```
 
 ---
 
 // 🔸 Prologue Plot
+
 ```js
 function countByPrologue(data) {
   const result = { "With Prologue": 0, "Without Prologue": 0 };
-  data.forEach(play => {
+  data.forEach((play) => {
     if (play.prologue) result["With Prologue"]++;
     else result["Without Prologue"]++;
   });
-  return Object.entries(result).map(([prologue, count]) => ({ prologue, count }));
+  return Object.entries(result).map(([prologue, count]) => ({
+    prologue,
+    count,
+  }));
 }
 
 function prologuePlot(data) {
@@ -128,23 +137,25 @@ function prologuePlot(data) {
         x: "prologue",
         y: "count",
         fill: "purple",
-        tip: true
-      })
-    ]
+        tip: true,
+      }),
+    ],
   });
 }
 ```
+
 ```js
-prologuePlot(plays)
+prologuePlot(plays);
 ```
 
 ---
 
 // 🔸 Musique / Danse / Machine Plot
+
 ```js
 function countByMusique(data) {
   const result = { "With Effects": 0, "Without Effects": 0 };
-  data.forEach(play => {
+  data.forEach((play) => {
     if (play.musique_danse_machine) result["With Effects"]++;
     else result["Without Effects"]++;
   });
@@ -163,14 +174,15 @@ function musiquePlot(data) {
         x: "type",
         y: "count",
         fill: "teal",
-        tip: true
-      })
-    ]
+        tip: true,
+      }),
+    ],
   });
 }
 ```
+
 ```js
-musiquePlot(plays)
+musiquePlot(plays);
 ```
 
 ---
