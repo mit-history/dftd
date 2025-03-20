@@ -79,7 +79,10 @@ display(compareYearsChart(combined_data));
 
 ```js
 const danish_comedy = danish_data.filter(
-  (d) => d.genre && d.genre.includes("comedy")
+  (d) =>
+    d.genre &&
+    (d.genre.toLowerCase().includes("comed") ||
+      d.genre.toLowerCase().includes("coméd"))
 );
 display(yearChart(danish_comedy));
 ```
