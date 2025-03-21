@@ -1,7 +1,7 @@
 # Data visualization
 
 ```js
-const plays = FileAttachment("./data/loadPlays.json").json();
+const plays = FileAttachment("./data/french-loadPlays.json").json();
 ```
 
 ```js
