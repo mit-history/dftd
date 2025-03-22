@@ -1,7 +1,8 @@
 ---
-title: french + dutch theater visualizations
+theme: dashboard
+title: French, Dutch and Danish theater visualizations
 layout: sidebar
-toc: true
+toc: True
 ---
 
 # French + Dutch + Danish Theater visualizations!
