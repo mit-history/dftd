@@ -1,5 +1,7 @@
 import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 
+//  add in all three lines, make it so lines grow simultaneously. maybe also add in on option to select by dataset
+
 export function createAnimatedLineChart(data, { width = 900, height = 500, duration = 1000 } = {}) {
   const container = document.getElementById("chart-container");
   const computedWidth = width || container.clientWidth || 900;
@@ -183,9 +185,9 @@ export function createAnimatedLineChart(data, { width = 900, height = 500, durat
   return svg.node();
 }
 
+// add in functionality to select a heatmap for eveery dataset, though a tab selection
 
-
-export function createHeatmap(data, { width = 900, height = 500 } = {}) {
+export function frenchHeatmap(data, { width = 900, height = 500 } = {}) {
   const container = document.getElementById("map-container");
   const computedWidth = width || container.clientWidth || 900;
 
@@ -346,7 +348,4 @@ export function createHeatmap(data, { width = 900, height = 500 } = {}) {
 
   return svg.node();
 }
-
-
-
 
