@@ -9,6 +9,7 @@ const danish_data = FileAttachment("data/danish-performances.csv").csv({
   typed: true,
 });
 const french_data = FileAttachment("data/french-performances.json").json();
+const dutch_data = FileAttachment("data/dutch-performances.csv").csv({typed: true});
 ```
 
 ```js
@@ -39,13 +40,21 @@ display(yearChart(danish_data));
 display(yearChart(french_data));
 ```
 
+# Dutch Performances, 1748-1778
+
+```js
+display(yearChart(dutch_data))
+```
+
 # Comparative Performances, 1748-1778
 
 ```js
 const combined_data = danish_data
-  .map((d) => ({ ...d, origin: "danish" }))
-  .concat(french_data.map((d) => ({ ...d, origin: "french" })))
-  .map((d) => ({ ...d, year: String(d.year) }));
+    .map(d => ({...d, origin: "danish"}))
+    .concat(french_data.map(d => ({...d, origin: "french"})))
+    .map(d => ({...d, year: String(d.year)}))
+    .concat(dutch_data.map(d => ({...d, origin: "dutch"})))
+    .map(d => ({...d, year: String(d.year)}));
 ```
 
 ```js
@@ -58,15 +67,9 @@ function compareYearsChart(data) {
     color: { legend: true },
     width: 1000,
     marks: [
-      Plot.barY(
-        data,
-        Plot.groupX(
-          { y2: "count" },
-          { x: "origin", fx: "year", fill: "origin" }
-        )
-      ),
-      Plot.ruleY([0]),
-    ],
+      Plot.barY(data, Plot.groupX({y2: "count"}, {x: "origin", fx: "year", fill: "origin", tip: true})),
+      Plot.ruleY([0])
+    ]
   });
 }
 
