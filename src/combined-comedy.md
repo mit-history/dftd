@@ -4,6 +4,10 @@ title: Comedy Performances
 toc: true
 ---
 
+# Comedy Performance Dates 
+
+The following graphs show number of comedy performances per year.
+
 ```js
 import { filterComedyPerformances } from "./components/comedyCharts.js"; // [Added]
 

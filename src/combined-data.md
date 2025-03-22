@@ -1,8 +1,12 @@
 ---
 theme: dashboard
-title: combined dashboard
+title: Performances
 toc: false
 ---
+
+# Performance Dates 
+
+The following graphs show number of performance days per year.
 
 ```js
 const danish_data = FileAttachment("data/danish-performances.csv").csv({
@@ -28,25 +32,25 @@ function yearChart(data) {
 }
 ```
 
-# Danish Performances, 1748-1778
+## Danish Performances, 1748-1778
 
 ```js
 display(yearChart(danish_data));
 ```
 
-# French Performances, 1748-1778
+## French Performances, 1748-1778
 
 ```js
 display(yearChart(french_data));
 ```
 
-# Dutch Performances, 1748-1778
+## Dutch Performances, 1748-1778
 
 ```js
 display(yearChart(dutch_data))
 ```
 
-# Comparative Performances, 1748-1778
+## Comparative Performances, 1748-1778
 
 ```js
 const combined_data = danish_data
@@ -55,6 +59,15 @@ const combined_data = danish_data
     .map(d => ({...d, year: String(d.year)}))
     .concat(dutch_data.map(d => ({...d, origin: "dutch"})))
     .map(d => ({...d, year: String(d.year)}));
+```
+
+```js
+const start_date = view(Inputs.date({label: "Start", value: "1748-01-01"}));
+const end_date = view(Inputs.date({label: "End", value: "1778-12-31"}));
+```
+
+```js
+const formatted_data = combined_data.filter(d => (new Date(d.date) > start_date) && (new Date(d.date) <= end_date));
 ```
 
 ```js
@@ -73,5 +86,5 @@ function compareYearsChart(data) {
   });
 }
 
-display(compareYearsChart(combined_data));
+display(compareYearsChart(formatted_data))
 ```
