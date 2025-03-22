@@ -1,10 +1,12 @@
 ---
 theme: dashboard
-title: combined dashboard
-toc: false
+title: Comedy Performances
+toc: true
 ---
 
 ```js
+import { filterComedyPerformances } from "./components/comedyCharts.js"; // [Added]
+
 const danish_data = FileAttachment("data/danish-performances.csv").csv({
   typed: true,
 });
@@ -27,26 +29,26 @@ function yearChart(data) {
 }
 ```
 
-# Danish Performances, 1748-1778
+# Danish Comedy Performances, 1748-1778
 
 ```js
-display(yearChart(danish_data));
+const danish_comedy = danish_data.filter(
+  (d) =>
+    d.genre &&
+    (d.genre.toLowerCase().includes("comed") ||
+      d.genre.toLowerCase().includes("coméd"))
+);
+display(yearChart(danish_comedy));
 ```
 
-# French Performances, 1748-1778
+# French Comedy Performances, 1748-1778
 
 ```js
-display(yearChart(french_data));
+const french_comedy = filterComedyPerformances(french_data);
+display(yearChart(french_comedy));
 ```
 
-# Comparative Performances, 1748-1778
-
-```js
-const combined_data = danish_data
-  .map((d) => ({ ...d, origin: "danish" }))
-  .concat(french_data.map((d) => ({ ...d, origin: "french" })))
-  .map((d) => ({ ...d, year: String(d.year) }));
-```
+# Comparative Comedy Performances, 1748-1778
 
 ```js
 function compareYearsChart(data) {
@@ -69,6 +71,13 @@ function compareYearsChart(data) {
     ],
   });
 }
+```
 
-display(compareYearsChart(combined_data));
+```js
+const combined_comedy_data = danish_comedy
+  .map((d) => ({ ...d, origin: "danish" }))
+  .concat(french_comedy.map((d) => ({ ...d, origin: "french" })))
+  .map((d) => ({ ...d, year: String(d.year) }));
+
+display(compareYearsChart(combined_comedy_data));
 ```
