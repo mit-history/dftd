@@ -5,22 +5,25 @@ toc: false
 ---
 
 ```js
-const danish_data = FileAttachment("data/danish-performances.csv").csv({typed: true});
+const danish_data = FileAttachment("data/danish-performances.csv").csv({
+  typed: true,
+});
 const french_data = FileAttachment("data/french-performances.json").json();
 const dutch_data = FileAttachment("data/dutch-performances.csv").csv({typed: true});
 ```
 
 ```js
+// Yearly Performance Chart Function
 function yearChart(data) {
   return Plot.plot({
     title: "Performances by year",
-    x: {label: "Year"},
-    y: {grid: true, label: "Performances"},
+    x: { label: "Year" },
+    y: { grid: true, label: "Performances" },
     width: 1000,
     marks: [
-      Plot.barY(data, Plot.groupX({y: "count"}, {x: "year", fill: "year"})),
-      Plot.ruleY([0])
-    ]
+      Plot.barY(data, Plot.groupX({ y: "count" }, { x: "year", fill: "year" })),
+      Plot.ruleY([0]),
+    ],
   });
 }
 ```
@@ -28,13 +31,13 @@ function yearChart(data) {
 # Danish Performances, 1748-1778
 
 ```js
-display(yearChart(danish_data))
+display(yearChart(danish_data));
 ```
 
 # French Performances, 1748-1778
 
 ```js
-display(yearChart(french_data))
+display(yearChart(french_data));
 ```
 
 # Dutch Performances, 1748-1778
@@ -58,10 +61,10 @@ const combined_data = danish_data
 function compareYearsChart(data) {
   return Plot.plot({
     title: "Compare performances per year",
-    fx: {padding: 0, label: null},
-    x: {axis: null, paddingOuter: 0.2},
-    y: {grid: true, label: "Performances"},
-    color: {legend: true},
+    fx: { padding: 0, label: null },
+    x: { axis: null, paddingOuter: 0.2 },
+    y: { grid: true, label: "Performances" },
+    color: { legend: true },
     width: 1000,
     marks: [
       Plot.barY(data, Plot.groupX({y2: "count"}, {x: "origin", fx: "year", fill: "origin", tip: true})),
@@ -70,5 +73,5 @@ function compareYearsChart(data) {
   });
 }
 
-display(compareYearsChart(combined_data))
+display(compareYearsChart(combined_data));
 ```
