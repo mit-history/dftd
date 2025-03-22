@@ -2,15 +2,15 @@
 data: src/data/plays.js
 ---
 
-# Comédie-Française Play Data 🎭
+# Visualizations of Play Data
 
-## List of Plays
+<!-- ## List of Plays
 
 <ul id="play-list">Loading plays...</ul>
 
 <!-- <script type="module" src="/data/script.js"></script> -->
 
-# Play Data Visualization
+<!-- # Play Data Visualization
 
 ## 1. Plays by Genre
 
@@ -34,4 +34,4 @@ Distribution of plays with or without a prologue.
 
 Distribution of plays with or without musique/danse/machine effects.
 
-<div id="musique-chart">Loading musique chart...</div>
+<div id="musique-chart">Loading musique chart...</div>  -->
