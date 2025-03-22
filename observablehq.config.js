@@ -11,7 +11,7 @@ export default {
       name: "Visualizations",
       pages: [
         {name: "Performances", path: "/combined-data"},
-        {name: "Comedy Performances", path: "/combined-comedy"}
+        {name: "Comedy Performances", path: "/combined-comedy"},
         {name: "Further Visualizations", path: "/visualizations"}
       ]
     }
