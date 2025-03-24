@@ -333,8 +333,9 @@ export function createMultipleAnimatedLines(
 
     paths.forEach(({ path, totalLength }) => {
       path
-        .interrupt()
-        .attr("stroke-dashoffset", totalLength)
+        .interrupt() // stop any previous animation
+        .attr("stroke-dasharray", `${totalLength},${totalLength}`) // RESET this!
+        .attr("stroke-dashoffset", totalLength) // RESET to start
         .transition()
         .duration(duration * 30)
         .ease(d3.easeLinear)
@@ -355,6 +356,7 @@ export function createMultipleAnimatedLines(
 
 
 
+
   function pauseAnimation() {
     paths.forEach(({ path }) => {
       path.interrupt(); // Stop transition
@@ -366,7 +368,7 @@ export function createMultipleAnimatedLines(
   }
 
 
-  //  Play Pause Buttons ---- //
+  //  play pause Buttons //
   const buttonContainer = document.createElement("div");
   buttonContainer.id = "button-container";
   buttonContainer.style.display = "flex";
