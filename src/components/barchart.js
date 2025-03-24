@@ -1,6 +1,6 @@
 import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 
-//  add in all three lines, make it so lines grow simultaneously. maybe also add in on option to select by dataset
+//  fix/add pause play buttons
 
 export function createAnimatedLineChart(
   data,
@@ -109,7 +109,7 @@ export function createAnimatedLineChart(
     .attr("cx", (d) => x(d.year))
     .attr("cy", (d) => y(d.count))
     .attr("r", 5)
-    .attr("fill", "#0000FF")
+    .attr("fill", "#FF0000")
     .attr("opacity", 0)
     .on("mouseover", (event, d) => {
       tooltip
@@ -127,13 +127,18 @@ export function createAnimatedLineChart(
     if (animationRunning) return;
     animationRunning = true;
 
-    path.attr("stroke-dasharray", "0,1000");
+    path.attr("stroke-dasharray", null).attr("stroke-dashoffset", null);
+
+    const totalLength = path.node().getTotalLength();
 
     path
+      .attr("stroke-dasharray", `${totalLength},${totalLength}`)
+      .attr("stroke-dashoffset", totalLength)
       .transition()
       .duration(duration * formattedData.length)
       .ease(d3.easeLinear)
-      .attr("stroke-dasharray", "1000,0");
+      .attr("stroke-dashoffset", 0);
+
 
     circles
       .attr("opacity", 0)
@@ -147,57 +152,57 @@ export function createAnimatedLineChart(
     }, duration * formattedData.length);
   }
 
-  function pauseAnimation() {
-    d3.selectAll("circle").transition().duration(0); // stop circle transitions
-    d3.selectAll("path").transition().duration(0); // stop line animation
-    clearTimeout(animationTimer);
-    animationRunning = false;
-  }
+  // function pauseAnimation() {
+  //   d3.selectAll("circle").transition().duration(0); // stop circle transitions
+  //   d3.selectAll("path").transition().duration(0); // stop line animation
+  //   clearTimeout(animationTimer);
+  //   animationRunning = false;
+  // }
 
-  // create button container
-  const buttonContainer = document.createElement("div");
-  buttonContainer.id = "button-container";
-  buttonContainer.style.display = "flex";
-  buttonContainer.style.justifyContent = "center";
-  buttonContainer.style.marginTop = "10px";
+  // // create button container
+  // const buttonContainer = document.createElement("div");
+  // buttonContainer.id = "button-container";
+  // buttonContainer.style.display = "flex";
+  // buttonContainer.style.justifyContent = "center";
+  // buttonContainer.style.marginTop = "10px";
 
-  // create play button
-  const playButton = document.createElement("button");
-  playButton.textContent = "▶ Play";
-  playButton.style.margin = "5px";
-  playButton.style.padding = "10px 20px";
-  playButton.style.fontSize = "16px";
-  playButton.style.cursor = "pointer";
-  playButton.style.background = "#FF7F7F";
-  playButton.style.color = "white";
-  playButton.style.border = "solid";
-  playButton.style.borderRadius = "5px";
+  // // create play button
+  // const playButton = document.createElement("button");
+  // playButton.textContent = "▶ Play";
+  // playButton.style.margin = "5px";
+  // playButton.style.padding = "10px 20px";
+  // playButton.style.fontSize = "16px";
+  // playButton.style.cursor = "pointer";
+  // playButton.style.background = "#FF7F7F";
+  // playButton.style.color = "white";
+  // playButton.style.border = "solid";
+  // playButton.style.borderRadius = "5px";
 
-  playButton.addEventListener("click", () => {
-    playAnimation();
-  });
+  // playButton.addEventListener("click", () => {
+  //   playAnimation();
+  // });
 
-  // Create pause button
-  const pauseButton = document.createElement("button");
-  pauseButton.textContent = "⏸ Pause";
-  pauseButton.style.margin = "5px";
-  pauseButton.style.padding = "10px 20px";
-  pauseButton.style.fontSize = "16px";
-  pauseButton.style.cursor = "pointer";
-  pauseButton.style.background = "white";
-  pauseButton.style.color = "black";
-  pauseButton.style.border = "solid";
-  pauseButton.style.borderRadius = "5px";
+  // // Create pause button
+  // const pauseButton = document.createElement("button");
+  // pauseButton.textContent = "⏸ Pause";
+  // pauseButton.style.margin = "5px";
+  // pauseButton.style.padding = "10px 20px";
+  // pauseButton.style.fontSize = "16px";
+  // pauseButton.style.cursor = "pointer";
+  // pauseButton.style.background = "white";
+  // pauseButton.style.color = "black";
+  // pauseButton.style.border = "solid";
+  // pauseButton.style.borderRadius = "5px";
 
-  pauseButton.addEventListener("click", () => {
-    pauseAnimation();
-  });
+  // pauseButton.addEventListener("click", () => {
+  //   pauseAnimation();
+  // });
 
-  buttonContainer.appendChild(playButton);
-  buttonContainer.appendChild(pauseButton);
-  if (!document.getElementById("button-container")) {
-    container.appendChild(buttonContainer);
-  }
+  // buttonContainer.appendChild(playButton);
+  // buttonContainer.appendChild(pauseButton);
+  // if (!document.getElementById("button-container")) {
+  //   container.appendChild(buttonContainer);
+  // }
 
   // Start animation on load
   playAnimation();
@@ -205,7 +210,202 @@ export function createAnimatedLineChart(
   return svg.node();
 }
 
-// add in functionality to select a heatmap for eveery dataset, though a tab selection
+
+// for all lines at once
+export function createMultipleAnimatedLines(
+  groups,
+  { width = 900, height = 500, duration = 1000 } = {}
+) {
+  const container = document.getElementById("chart-container");
+  const margin = { top: 20, right: 160, bottom: 60, left: 60 };
+
+  const svg = d3
+    .create("svg")
+    .attr("viewBox", [0, 0, width, height])
+    .style("width", "100%")
+    .style("height", "auto")
+    .style("background", "#F5F5F5");
+
+  const allData = groups.flatMap((g) => g.data);
+  const years = d3.extent(allData, (d) => d.year);
+  const maxY = d3.max(allData, (d) => d.count);
+
+  const x = d3.scaleLinear().domain(years).range([margin.left, width - margin.right]);
+  const y = d3.scaleLinear().domain([0, maxY]).nice().range([height - margin.bottom, margin.top]);
+
+  const line = d3
+    .line()
+    .x((d) => x(d.year))
+    .y((d) => y(d.count))
+    .curve(d3.curveMonotoneX);
+
+  const color = d3
+    .scaleOrdinal()
+    .domain(groups.map((g) => g.label))
+    .range(["red", "blue", "green"]);
+
+  svg
+    .append("g")
+    .attr("transform", `translate(0,${height - margin.bottom})`)
+    .call(d3.axisBottom(x).tickFormat(d3.format("d")))
+    .selectAll("text")
+    .style("fill", "#333")
+    .style("font-size", "12px");
+
+  svg
+    .append("g")
+    .attr("transform", `translate(${margin.left},0)`)
+    .call(d3.axisLeft(y))
+    .selectAll("text")
+    .style("fill", "#333")
+    .style("font-size", "12px");
+
+  const tooltip = d3
+    .select("body")
+    .append("div")
+    .style("position", "absolute")
+    .style("background", "white")
+    .style("padding", "6px")
+    .style("border", "1px solid #ccc")
+    .style("border-radius", "5px")
+    .style("opacity", 0);
+
+  const paths = [];
+
+  groups.forEach(({ label, data }) => {
+    const sorted = data.sort((a, b) => a.year - b.year);
+
+    const path = svg
+      .append("path")
+      .datum(sorted)
+      .attr("fill", "none")
+      .attr("stroke", color(label))
+      .attr("stroke-width", 2.5)
+      .attr("d", line);
+
+    const totalLength = path.node().getTotalLength();
+
+    path
+      .interrupt()
+      .attr("stroke-dasharray", `${totalLength},${totalLength}`)
+      .attr("stroke-dashoffset", totalLength) // Reset before playing
+      .transition()
+      .duration(duration * 30)
+      .ease(d3.easeLinear)
+      .attr("stroke-dashoffset", 0)
+
+
+    paths.push({ path, totalLength });
+
+    svg
+      .append("g")
+      .selectAll("circle")
+      .data(sorted)
+      .join("circle")
+      .attr("cx", (d) => x(d.year))
+      .attr("cy", (d) => y(d.count))
+      .attr("r", 4)
+      .attr("fill", color(label))
+      .attr("opacity", 0)
+      .on("mouseover", (event, d) => {
+        tooltip
+          .style("opacity", 1)
+          .html(`${label}<br>Year: ${d.year}<br>Count: ${d.count}`)
+          .style("left", event.pageX + 10 + "px")
+          .style("top", event.pageY - 10 + "px");
+      })
+      .on("mouseout", () => tooltip.style("opacity", 0))
+      .transition()
+      .delay((d, i) => i * 30)
+      .duration(300)
+      .attr("opacity", 1);
+    });
+
+
+  const legend = svg.append("g").attr("transform", `translate(${width - 120}, 30)`);
+
+  groups.forEach(({ label }, i) => {
+    const g = legend.append("g").attr("transform", `translate(0, ${i * 20})`);
+    g.append("rect").attr("width", 12).attr("height", 12).attr("fill", color(label));
+    g.append("text").attr("x", 18).attr("y", 10).text(label).style("font-size", "12px").style("fill", "#333");
+  });
+
+  // button functionality //
+  let animationRunning = false;
+  let animationTimer = null;
+
+  function playAnimation() {
+    if (animationRunning) return;
+    animationRunning = true;
+
+    paths.forEach(({ path, totalLength }) => {
+      path
+        .interrupt() // stop any previous animation
+        .attr("stroke-dasharray", `${totalLength},${totalLength}`) // RESET this!
+        .attr("stroke-dashoffset", totalLength) // RESET to start
+        .transition()
+        .duration(duration * 30)
+        .ease(d3.easeLinear)
+        .attr("stroke-dashoffset", 0)
+        .on("end", () => {
+          animationRunning = false;
+        });
+    });
+
+    svg.selectAll("circle")
+      .interrupt()
+      .attr("opacity", 0)
+      .transition()
+      .delay((d, i) => i * 30)
+      .duration(300)
+      .attr("opacity", 1);
+  }
+
+
+
+
+  // function pauseAnimation() {
+  //   paths.forEach(({ path }) => {
+  //     path.interrupt(); // Stop transition
+  //     const currentOffset = parseFloat(path.attr("stroke-dashoffset"));
+  //     path.attr("stroke-dashoffset", currentOffset); // Lock position
+  //   });
+  //   clearTimeout(animationTimer);
+  //   animationRunning = false;
+  // }
+
+
+  // //  play pause Buttons //
+  // const buttonContainer = document.createElement("div");
+  // buttonContainer.id = "button-container";
+  // buttonContainer.style.display = "flex";
+  // buttonContainer.style.justifyContent = "center";
+  // buttonContainer.style.marginTop = "10px";
+
+  // const playButton = document.createElement("button");
+  // playButton.textContent = "▶ Play";
+  // playButton.className = "chart-button play";
+
+  // const pauseButton = document.createElement("button");
+  // pauseButton.textContent = "⏸ Pause";
+  // pauseButton.className = "chart-button pause";
+
+  // playButton.addEventListener("click", playAnimation);
+  // pauseButton.addEventListener("click", pauseAnimation);
+
+  // buttonContainer.appendChild(playButton);
+  // buttonContainer.appendChild(pauseButton);
+  // if (!container.querySelector("#button-container")) {
+  //   container.appendChild(buttonContainer);
+  // }
+
+  // start animation
+  playAnimation();
+
+  return svg.node();
+}
+
+
 
 export function createHeatmap(data, { width = 900, height = 500 } = {}) {
   const container = document.getElementById("map-container");
@@ -248,7 +448,7 @@ export function createHeatmap(data, { width = 900, height = 500 } = {}) {
   );
   const months = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
 
-  const margin = { top: 50, right: 60, bottom: 70, left: 70 };
+  const margin = { top: 20, right: 160, bottom: 60, left: 60 };
   const cellSize = 30;
 
   const svg = d3
@@ -261,7 +461,7 @@ export function createHeatmap(data, { width = 900, height = 500 } = {}) {
   const x = d3
     .scaleBand()
     .domain(years)
-    .range([margin.left, computedWidth - margin.right])
+    .range([margin.left, width - margin.right])
     .padding(0.05);
 
   const y = d3
@@ -270,7 +470,7 @@ export function createHeatmap(data, { width = 900, height = 500 } = {}) {
     .range([margin.top, height - margin.bottom])
     .padding(0.05);
 
-  // **New Color Scale (Dark Cool Blue → Yellow → Orange → Red)**
+  // Color Scale (Dark Cool Blue → Yellow → Orange → Red)
   const colorScale = d3
     .scaleSequential()
     .domain([0, d3.max(formattedData, (d) => d.count)])
@@ -339,7 +539,7 @@ export function createHeatmap(data, { width = 900, height = 500 } = {}) {
     .style("border-radius", "5px")
     .style("opacity", 0);
 
-  // **Updated Color Legend**
+  // color legend
   const legendWidth = 300;
   const legendHeight = 20;
   const legendX = computedWidth / 2 - legendWidth / 2;
