@@ -75,7 +75,7 @@ const data =
 <div style="margin-top: 10%;"></div>
 
 
-## Animated Line Chart
+## Animated Line Chart of Days with Performances
 
 <div id="chart-container"></div>
 

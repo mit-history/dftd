@@ -243,13 +243,23 @@ export function createMultipleAnimatedLines(groups, { width = 900, height = 500,
     .domain(groups.map(g => g.label))
     .range(["red", "blue", "green"]);
 
-  svg.append("g")
+    svg.append("g")
     .attr("transform", `translate(0,${height - margin.bottom})`)
-    .call(d3.axisBottom(x).tickFormat(d3.format("d")));
+    .call(d3.axisBottom(x).tickFormat(d3.format("d")))
+    .selectAll("text") // 👈 style the tick labels
+    .style("fill", "#333") // dark text
+    .style("font-size", "12px")
+    .style("font-family", "sans-serif");
 
-  svg.append("g")
+
+    svg.append("g")
     .attr("transform", `translate(${margin.left},0)`)
-    .call(d3.axisLeft(y));
+    .call(d3.axisLeft(y))
+    .selectAll("text")
+    .style("fill", "#333")
+    .style("font-size", "12px")
+    .style("font-family", "sans-serif");
+
 
   // Tooltip container
   const tooltip = d3.select("body")
@@ -447,7 +457,7 @@ export function createHeatmap(data, { width = 900, height = 500 } = {}) {
     .style("border-radius", "5px")
     .style("opacity", 0);
 
-  // **Updated Color Legend**
+  // color legend
   const legendWidth = 300;
   const legendHeight = 20;
   const legendX = computedWidth / 2 - legendWidth / 2;
