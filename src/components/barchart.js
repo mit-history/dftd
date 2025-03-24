@@ -211,58 +211,57 @@ export function createAnimatedLineChart(
 }
 
 
-
 // for all lines at once
-export function createMultipleAnimatedLines(groups, { width = 900, height = 500, duration = 1000 } = {}) {
-  const margin = { top: 20, right: 30, bottom: 60, left: 60 };
-  const svg = d3.create("svg")
+export function createMultipleAnimatedLines(
+  groups,
+  { width = 900, height = 500, duration = 1000 } = {}
+) {
+  const container = document.getElementById("chart-container");
+  const margin = { top: 20, right: 160, bottom: 60, left: 60 };
+
+  const svg = d3
+    .create("svg")
     .attr("viewBox", [0, 0, width, height])
     .style("width", "100%")
     .style("height", "auto")
     .style("background", "#F5F5F5");
 
-  const allData = groups.flatMap(g => g.data);
-  const years = d3.extent(allData, d => d.year);
-  const maxY = d3.max(allData, d => d.count);
+  const allData = groups.flatMap((g) => g.data);
+  const years = d3.extent(allData, (d) => d.year);
+  const maxY = d3.max(allData, (d) => d.count);
 
-  const x = d3.scaleLinear()
-    .domain(years)
-    .range([margin.left, width - margin.right]);
+  const x = d3.scaleLinear().domain(years).range([margin.left, width - margin.right]);
+  const y = d3.scaleLinear().domain([0, maxY]).nice().range([height - margin.bottom, margin.top]);
 
-  const y = d3.scaleLinear()
-    .domain([0, maxY])
-    .nice()
-    .range([height - margin.bottom, margin.top]);
-
-  const line = d3.line()
-    .x(d => x(d.year))
-    .y(d => y(d.count))
+  const line = d3
+    .line()
+    .x((d) => x(d.year))
+    .y((d) => y(d.count))
     .curve(d3.curveMonotoneX);
 
-  const color = d3.scaleOrdinal()
-    .domain(groups.map(g => g.label))
+  const color = d3
+    .scaleOrdinal()
+    .domain(groups.map((g) => g.label))
     .range(["red", "blue", "green"]);
 
-    svg.append("g")
+  svg
+    .append("g")
     .attr("transform", `translate(0,${height - margin.bottom})`)
     .call(d3.axisBottom(x).tickFormat(d3.format("d")))
-    .selectAll("text") // 👈 style the tick labels
-    .style("fill", "#333") // dark text
-    .style("font-size", "12px")
-    .style("font-family", "sans-serif");
+    .selectAll("text")
+    .style("fill", "#333")
+    .style("font-size", "12px");
 
-
-    svg.append("g")
+  svg
+    .append("g")
     .attr("transform", `translate(${margin.left},0)`)
     .call(d3.axisLeft(y))
     .selectAll("text")
     .style("fill", "#333")
-    .style("font-size", "12px")
-    .style("font-family", "sans-serif");
+    .style("font-size", "12px");
 
-
-  // Tooltip container
-  const tooltip = d3.select("body")
+  const tooltip = d3
+    .select("body")
     .append("div")
     .style("position", "absolute")
     .style("background", "white")
@@ -271,10 +270,13 @@ export function createMultipleAnimatedLines(groups, { width = 900, height = 500,
     .style("border-radius", "5px")
     .style("opacity", 0);
 
+  const paths = [];
+
   groups.forEach(({ label, data }) => {
     const sorted = data.sort((a, b) => a.year - b.year);
 
-    const path = svg.append("path")
+    const path = svg
+      .append("path")
       .datum(sorted)
       .attr("fill", "none")
       .attr("stroke", color(label))
@@ -282,23 +284,19 @@ export function createMultipleAnimatedLines(groups, { width = 900, height = 500,
       .attr("d", line);
 
     const totalLength = path.node().getTotalLength();
-
     path
       .attr("stroke-dasharray", `${totalLength},${totalLength}`)
-      .attr("stroke-dashoffset", totalLength)
-      .transition()
-      .duration(duration * sorted.length)
-      .ease(d3.easeLinear)
-      .attr("stroke-dashoffset", 0);
+      .attr("stroke-dashoffset", totalLength);
 
+    paths.push({ path, totalLength });
 
-    // Circles
-    svg.append("g")
+    svg
+      .append("g")
       .selectAll("circle")
       .data(sorted)
       .join("circle")
-      .attr("cx", d => x(d.year))
-      .attr("cy", d => y(d.count))
+      .attr("cx", (d) => x(d.year))
+      .attr("cy", (d) => y(d.count))
       .attr("r", 4)
       .attr("fill", color(label))
       .on("mouseover", (event, d) => {
@@ -308,19 +306,17 @@ export function createMultipleAnimatedLines(groups, { width = 900, height = 500,
           .style("left", event.pageX + 10 + "px")
           .style("top", event.pageY - 10 + "px");
       })
-      .on("mouseout", () => {
-        tooltip.style("opacity", 0);
-      });
+      .on("mouseout", () => tooltip.style("opacity", 0));
   });
 
-  // Legend
   const legend = svg.append("g").attr("transform", `translate(${width - 120}, 30)`);
   groups.forEach(({ label }, i) => {
     const g = legend.append("g").attr("transform", `translate(0, ${i * 20})`);
     g.append("rect").attr("width", 12).attr("height", 12).attr("fill", color(label));
-    g.append("text").attr("x", 18).attr("y", 10).text(label).style("font-size", "12px");
+    g.append("text").attr("x", 18).attr("y", 10).text(label).style("font-size", "12px").style("fill", "#333");
   });
 
+  // button functionality //
   let animationRunning = false;
   let animationTimer = null;
 
@@ -328,76 +324,46 @@ export function createMultipleAnimatedLines(groups, { width = 900, height = 500,
     if (animationRunning) return;
     animationRunning = true;
 
-    path.attr("stroke-dasharray", null).attr("stroke-dashoffset", null);
-
-    const totalLength = path.node().getTotalLength();
-
-    path
-      .attr("stroke-dasharray", `${totalLength},${totalLength}`)
-      .attr("stroke-dashoffset", totalLength)
-      .transition()
-      .duration(duration * formattedData.length)
-      .ease(d3.easeLinear)
-      .attr("stroke-dashoffset", 0);
-
-
-    circles
-      .attr("opacity", 0)
-      .transition()
-      .delay((d, i) => i * duration)
-      .duration(500)
-      .attr("opacity", 1);
+    paths.forEach(({ path, totalLength }) => {
+      path
+        .attr("stroke-dasharray", `${totalLength},${totalLength}`)
+        .attr("stroke-dashoffset", totalLength)
+        .transition()
+        .duration(duration * 30)
+        .ease(d3.easeLinear)
+        .attr("stroke-dashoffset", 0);
+    });
 
     animationTimer = setTimeout(() => {
-      animationRunning = false; // reset when animation completes
-    }, duration * formattedData.length);
+      animationRunning = false;
+    }, duration * 30);
   }
 
   function pauseAnimation() {
-    d3.selectAll("circle").transition().duration(0); // stop circle transitions
-    d3.selectAll("path").transition().duration(0); // stop line animation
+    paths.forEach(({ path }) => {
+      path.interrupt();
+    });
     clearTimeout(animationTimer);
     animationRunning = false;
   }
 
-  // create button container
+  //  Play Pause Buttons ---- //
   const buttonContainer = document.createElement("div");
   buttonContainer.id = "button-container";
   buttonContainer.style.display = "flex";
   buttonContainer.style.justifyContent = "center";
   buttonContainer.style.marginTop = "10px";
 
-  // create play button
   const playButton = document.createElement("button");
   playButton.textContent = "▶ Play";
-  playButton.style.margin = "5px";
-  playButton.style.padding = "10px 20px";
-  playButton.style.fontSize = "16px";
-  playButton.style.cursor = "pointer";
-  playButton.style.background = "#FF7F7F";
-  playButton.style.color = "white";
-  playButton.style.border = "solid";
-  playButton.style.borderRadius = "5px";
+  playButton.className = "chart-button play";
 
-  playButton.addEventListener("click", () => {
-    playAnimation();
-  });
-
-  // Create pause button
   const pauseButton = document.createElement("button");
   pauseButton.textContent = "⏸ Pause";
-  pauseButton.style.margin = "5px";
-  pauseButton.style.padding = "10px 20px";
-  pauseButton.style.fontSize = "16px";
-  pauseButton.style.cursor = "pointer";
-  pauseButton.style.background = "white";
-  pauseButton.style.color = "black";
-  pauseButton.style.border = "solid";
-  pauseButton.style.borderRadius = "5px";
+  pauseButton.className = "chart-button pause";
 
-  pauseButton.addEventListener("click", () => {
-    pauseAnimation();
-  });
+  playButton.addEventListener("click", playAnimation);
+  pauseButton.addEventListener("click", pauseAnimation);
 
   buttonContainer.appendChild(playButton);
   buttonContainer.appendChild(pauseButton);
@@ -405,11 +371,12 @@ export function createMultipleAnimatedLines(groups, { width = 900, height = 500,
     container.appendChild(buttonContainer);
   }
 
-  // Start animation on load
+  // start animation
   playAnimation();
 
   return svg.node();
 }
+
 
 
 export function createHeatmap(data, { width = 900, height = 500 } = {}) {
