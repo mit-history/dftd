@@ -109,7 +109,7 @@ export function createAnimatedLineChart(
     .attr("cx", (d) => x(d.year))
     .attr("cy", (d) => y(d.count))
     .attr("r", 5)
-    .attr("fill", "FF0000")
+    .attr("fill", "#FF0000")
     .attr("opacity", 0)
     .on("mouseover", (event, d) => {
       tooltip
@@ -127,13 +127,18 @@ export function createAnimatedLineChart(
     if (animationRunning) return;
     animationRunning = true;
 
-    path.attr("stroke-dasharray", "0,1000");
+    path.attr("stroke-dasharray", null).attr("stroke-dashoffset", null);
+
+    const totalLength = path.node().getTotalLength();
 
     path
+      .attr("stroke-dasharray", `${totalLength},${totalLength}`)
+      .attr("stroke-dashoffset", totalLength)
       .transition()
       .duration(duration * formattedData.length)
       .ease(d3.easeLinear)
-      .attr("stroke-dasharray", "1000,0");
+      .attr("stroke-dashoffset", 0);
+
 
     circles
       .attr("opacity", 0)
