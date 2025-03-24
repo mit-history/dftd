@@ -277,9 +277,10 @@ export function createMultipleAnimatedLines(groups, { width = 900, height = 500,
       .attr("stroke-dasharray", `${totalLength},${totalLength}`)
       .attr("stroke-dashoffset", totalLength)
       .transition()
-      .duration(duration)
+      .duration(duration * sorted.length)
       .ease(d3.easeLinear)
       .attr("stroke-dashoffset", 0);
+
 
     // Circles
     svg.append("g")
@@ -355,7 +356,7 @@ export function createHeatmap(data, { width = 900, height = 500 } = {}) {
   );
   const months = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
 
-  const margin = { top: 50, right: 60, bottom: 70, left: 70 };
+  const margin = { top: 20, right: 160, bottom: 60, left: 60 };
   const cellSize = 30;
 
   const svg = d3
@@ -368,7 +369,7 @@ export function createHeatmap(data, { width = 900, height = 500 } = {}) {
   const x = d3
     .scaleBand()
     .domain(years)
-    .range([margin.left, computedWidth - margin.right])
+    .range([margin.left, width - margin.right])
     .padding(0.05);
 
   const y = d3
