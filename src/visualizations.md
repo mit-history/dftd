@@ -5,39 +5,40 @@ layout: sidebar
 toc: True
 ---
 
-# French + Dutch + Danish Theater visualizations!
+# Theater visualizations!
 
-## Total Performances by Database from 1748-1778
+## select country
 
 ```js
 const dataset = view(
-  Inputs.select(["french", "danish", "dutch"], {
+  Inputs.select(["French", "Danish", "Dutch"], {
     label: "Choose dataset",
-    value: "french",
+    value: "French",
   })
 );
 ```
 
 ```js
 // Load all three datasets
-const french = await FileAttachment("data/french-performances.json").json();
-const danish = await FileAttachment("data/danish-performances.csv").csv({
+const French = await FileAttachment("data/french-performances.json").json();
+const Danish = await FileAttachment("data/danish-performances.csv").csv({
   typed: true,
 });
-const dutch = await FileAttachment("data/dutch-performances.csv").csv({
+const Dutch = await FileAttachment("data/dutch-performances.csv").csv({
   typed: true,
 });
 ```
 
+
 ```js
 // Choose dataset based on selection
 const rawData =
-  dataset === "french"
-    ? french
-    : dataset === "danish"
-    ? danish
-    : dataset === "dutch"
-    ? dutch
+  dataset === "French"
+    ? French
+    : dataset === "Danish"
+    ? Danish
+    : dataset === "Dutch"
+    ? Dutch
     : null;
 ```
 
@@ -65,7 +66,7 @@ const data =
 
 **Showing:** ${dataset} dataset ${genre !== "All genres" ? "filtered by genre: " + genre : "(all genres)"}.
 
-## visualizations
+## Animated Line Chart
 
 <div id="chart-container"></div>
 
@@ -75,9 +76,16 @@ import {
   createHeatmap,
 } from "./components/barchart.js";
 
+// sort by year first for ltr visualization
+data.sort((a, b) => a.year - b.year);
+
 const chart = display(createAnimatedLineChart(data, { height: 500 }));
 ```
 
+<!-- spacing between charts -->
+<div style="margin-top: 50px;"></div>
+
+## Heatmap of Days with Performances
 ```js
 const heatmap = display(createHeatmap(data, { width: 900, height: 600 }));
 ```

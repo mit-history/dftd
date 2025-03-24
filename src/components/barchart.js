@@ -109,7 +109,7 @@ export function createAnimatedLineChart(
     .attr("cx", (d) => x(d.year))
     .attr("cy", (d) => y(d.count))
     .attr("r", 5)
-    .attr("fill", "#0000FF")
+    .attr("fill", "FF0000")
     .attr("opacity", 0)
     .on("mouseover", (event, d) => {
       tooltip
