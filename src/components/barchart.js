@@ -210,7 +210,143 @@ export function createAnimatedLineChart(
   return svg.node();
 }
 
-// add in functionality to select a heatmap for eveery dataset, though a tab selection
+
+
+// for all lines at once
+export function createMultiLineChart(data, { width = 900, height = 500, duration = 1000 } = {}) {
+  const container = document.getElementById("chart-container");
+
+  const svg = d3
+    .create("svg")
+    .attr("viewBox", [0, 0, width, height])
+    .style("width", "100%")
+    .style("height", "auto")
+    .style("background", "#F5F5F5");
+
+  // and group by dataset
+  const nested = d3.groups(data, d => d.group || "Default");
+
+  // X scale: years
+  const x = d3
+    .scaleLinear()
+    .domain([1748, 1778])
+    .range([60, width - 40]);
+
+  // Y scale: counts
+  const y = d3
+    .scaleLinear()
+    .domain([
+      0,
+      d3.max(nested, ([, values]) =>
+        d3.rollups(values, v => new Set(v.map(d => d.performance_date)).size, d => d.year)
+          .map(d => d[1])
+          .reduce((a, b) => Math.max(a, b), 0)
+      ),
+    ])
+    .nice()
+    .range([height - 50, 30]);
+
+    const color =
+     d3.scaleOrdinal()
+    .domain(["French", "Danish", "Dutch"])
+    .range(["red", "blue", "green"]);
+
+
+  const line = d3.line()
+    .x(d => x(d.year))
+    .y(d => y(d.count))
+    .curve(d3.curveMonotoneX);
+
+  // draw lines for each dataset
+  nested.forEach(([group, values]) => {
+    const yearToDates = d3.rollup(
+      values,
+      v => new Set(v.map(d => d.performance_date)).size,
+      d => d.year
+    );
+
+    const lineData = Array.from(yearToDates, ([year, count]) => ({ year, count }))
+      .sort((a, b) => a.year - b.year);
+
+    const path = svg.append("path")
+      .datum(lineData)
+      .attr("fill", "none")
+      .attr("stroke", color(group))
+      .attr("stroke-width", 3)
+      .attr("stroke-dasharray", "0,1000")
+      .attr("d", line);
+
+    // Draw circles w/ distinct colors
+    svg.append("g")
+    .selectAll("circle")
+    .data(lineData)
+    .join("circle")
+    .attr("cx", d => x(d.year))
+    .attr("cy", d => y(d.count))
+    .attr("r", 4)
+    .attr("fill", color(group))
+    .attr("opacity", 0)
+    .transition()
+    .delay((d, i) => i * 30)
+    .duration(400)
+    .attr("opacity", 1);
+
+
+    const totalLength = path.node().getTotalLength();
+
+    path
+      .attr("stroke-dasharray", `${totalLength},${totalLength}`)
+      .attr("stroke-dashoffset", totalLength)
+      .transition()
+      .duration(duration * 2)
+      .ease(d3.easeLinear)
+      .attr("stroke-dashoffset", 0);
+
+    // Add dataset label
+    svg.append("text")
+      .attr("x", x(lineData[lineData.length - 1].year) + 5)
+      .attr("y", y(lineData[lineData.length - 1].count))
+      .attr("fill", color(group))
+      .style("font-weight", "bold")
+      .style("font-size", "12px")
+      .text(group);
+  });
+
+  // X Axis
+  svg.append("g")
+    .attr("transform", `translate(0,${height - 50})`)
+    .call(d3.axisBottom(x).tickFormat(d3.format("d")));
+
+  // Y Axis
+  svg.append("g")
+    .attr("transform", `translate(60,0)`)
+    .call(d3.axisLeft(y));
+
+  // color legend for countries
+  const legend = svg.append("g")
+  .attr("transform", `translate(${width - 140}, 30)`);
+
+  ["French", "Danish", "Dutch"].forEach((name, i) => {
+  const g = legend.append("g")
+    .attr("transform", `translate(0, ${i * 20})`);
+
+  g.append("rect")
+    .attr("width", 12)
+    .attr("height", 12)
+    .attr("fill", color(name));
+
+  g.append("text")
+    .attr("x", 18)
+    .attr("y", 10)
+    .style("font-size", "12px")
+    .style("fill", "#333")
+    .text(name);
+  });
+
+
+  return svg.node();
+}
+
 
 export function createHeatmap(data, { width = 900, height = 500 } = {}) {
   const container = document.getElementById("map-container");
@@ -275,7 +411,7 @@ export function createHeatmap(data, { width = 900, height = 500 } = {}) {
     .range([margin.top, height - margin.bottom])
     .padding(0.05);
 
-  // **New Color Scale (Dark Cool Blue → Yellow → Orange → Red)**
+  // Color Scale (Dark Cool Blue → Yellow → Orange → Red)
   const colorScale = d3
     .scaleSequential()
     .domain([0, d3.max(formattedData, (d) => d.count)])

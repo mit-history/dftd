@@ -5,15 +5,15 @@ layout: sidebar
 toc: True
 ---
 
-# Theater visualizations!
+# French, Dutch and Danish theater Visualizations
 
-<div style="margin-top: 10%;"></div>
+<div style="margin-top: 8%;"></div>
 
 ## select country
 
 ```js
 const dataset = view(
-  Inputs.select(["French", "Danish", "Dutch"], {
+  Inputs.select(["All", "French", "Danish", "Dutch"], {
     label: "Choose dataset",
     value: "French",
   })
@@ -41,7 +41,9 @@ const rawData =
     ? Danish
     : dataset === "Dutch"
     ? Dutch
-    : null;
+    : [...French.map(d => ({ ...d, group: "French" })),
+       ...Danish.map(d => ({ ...d, group: "Danish" })),
+       ...Dutch.map(d => ({ ...d, group: "Dutch" }))];
 ```
 
 ## select genre
@@ -84,7 +86,11 @@ import {
 // sort by year first for ltr visualization
 data.sort((a, b) => a.year - b.year);
 
-const chart = display(createAnimatedLineChart(data, { height: 500 }));
+const chart = display(
+  dataset === "All"
+    ? createMultiLineChart(data, { height: 500 })
+    : createAnimatedLineChart(data, { height: 500 })
+);
 ```
 
 <details>
