@@ -312,9 +312,11 @@ export function createMultipleAnimatedLines(
       .delay((d, i) => i * 30)
       .duration(300)
       .attr("opacity", 1);
+    });
 
 
   const legend = svg.append("g").attr("transform", `translate(${width - 120}, 30)`);
+
   groups.forEach(({ label }, i) => {
     const g = legend.append("g").attr("transform", `translate(0, ${i * 20})`);
     g.append("rect").attr("width", 12).attr("height", 12).attr("fill", color(label));
