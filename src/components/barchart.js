@@ -1,6 +1,6 @@
 import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 
-//  add in all three lines, make it so lines grow simultaneously. maybe also add in on option to select by dataset
+//  fix/add pause play buttons
 
 export function createAnimatedLineChart(
   data,
@@ -152,57 +152,57 @@ export function createAnimatedLineChart(
     }, duration * formattedData.length);
   }
 
-  function pauseAnimation() {
-    d3.selectAll("circle").transition().duration(0); // stop circle transitions
-    d3.selectAll("path").transition().duration(0); // stop line animation
-    clearTimeout(animationTimer);
-    animationRunning = false;
-  }
+  // function pauseAnimation() {
+  //   d3.selectAll("circle").transition().duration(0); // stop circle transitions
+  //   d3.selectAll("path").transition().duration(0); // stop line animation
+  //   clearTimeout(animationTimer);
+  //   animationRunning = false;
+  // }
 
-  // create button container
-  const buttonContainer = document.createElement("div");
-  buttonContainer.id = "button-container";
-  buttonContainer.style.display = "flex";
-  buttonContainer.style.justifyContent = "center";
-  buttonContainer.style.marginTop = "10px";
+  // // create button container
+  // const buttonContainer = document.createElement("div");
+  // buttonContainer.id = "button-container";
+  // buttonContainer.style.display = "flex";
+  // buttonContainer.style.justifyContent = "center";
+  // buttonContainer.style.marginTop = "10px";
 
-  // create play button
-  const playButton = document.createElement("button");
-  playButton.textContent = "▶ Play";
-  playButton.style.margin = "5px";
-  playButton.style.padding = "10px 20px";
-  playButton.style.fontSize = "16px";
-  playButton.style.cursor = "pointer";
-  playButton.style.background = "#FF7F7F";
-  playButton.style.color = "white";
-  playButton.style.border = "solid";
-  playButton.style.borderRadius = "5px";
+  // // create play button
+  // const playButton = document.createElement("button");
+  // playButton.textContent = "▶ Play";
+  // playButton.style.margin = "5px";
+  // playButton.style.padding = "10px 20px";
+  // playButton.style.fontSize = "16px";
+  // playButton.style.cursor = "pointer";
+  // playButton.style.background = "#FF7F7F";
+  // playButton.style.color = "white";
+  // playButton.style.border = "solid";
+  // playButton.style.borderRadius = "5px";
 
-  playButton.addEventListener("click", () => {
-    playAnimation();
-  });
+  // playButton.addEventListener("click", () => {
+  //   playAnimation();
+  // });
 
-  // Create pause button
-  const pauseButton = document.createElement("button");
-  pauseButton.textContent = "⏸ Pause";
-  pauseButton.style.margin = "5px";
-  pauseButton.style.padding = "10px 20px";
-  pauseButton.style.fontSize = "16px";
-  pauseButton.style.cursor = "pointer";
-  pauseButton.style.background = "white";
-  pauseButton.style.color = "black";
-  pauseButton.style.border = "solid";
-  pauseButton.style.borderRadius = "5px";
+  // // Create pause button
+  // const pauseButton = document.createElement("button");
+  // pauseButton.textContent = "⏸ Pause";
+  // pauseButton.style.margin = "5px";
+  // pauseButton.style.padding = "10px 20px";
+  // pauseButton.style.fontSize = "16px";
+  // pauseButton.style.cursor = "pointer";
+  // pauseButton.style.background = "white";
+  // pauseButton.style.color = "black";
+  // pauseButton.style.border = "solid";
+  // pauseButton.style.borderRadius = "5px";
 
-  pauseButton.addEventListener("click", () => {
-    pauseAnimation();
-  });
+  // pauseButton.addEventListener("click", () => {
+  //   pauseAnimation();
+  // });
 
-  buttonContainer.appendChild(playButton);
-  buttonContainer.appendChild(pauseButton);
-  if (!document.getElementById("button-container")) {
-    container.appendChild(buttonContainer);
-  }
+  // buttonContainer.appendChild(playButton);
+  // buttonContainer.appendChild(pauseButton);
+  // if (!document.getElementById("button-container")) {
+  //   container.appendChild(buttonContainer);
+  // }
 
   // Start animation on load
   playAnimation();
@@ -364,15 +364,15 @@ export function createMultipleAnimatedLines(
 
 
 
-  function pauseAnimation() {
-    paths.forEach(({ path }) => {
-      path.interrupt(); // Stop transition
-      const currentOffset = parseFloat(path.attr("stroke-dashoffset"));
-      path.attr("stroke-dashoffset", currentOffset); // Lock position
-    });
-    clearTimeout(animationTimer);
-    animationRunning = false;
-  }
+  // function pauseAnimation() {
+  //   paths.forEach(({ path }) => {
+  //     path.interrupt(); // Stop transition
+  //     const currentOffset = parseFloat(path.attr("stroke-dashoffset"));
+  //     path.attr("stroke-dashoffset", currentOffset); // Lock position
+  //   });
+  //   clearTimeout(animationTimer);
+  //   animationRunning = false;
+  // }
 
 
   // //  play pause Buttons //
