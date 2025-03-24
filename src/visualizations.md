@@ -5,13 +5,6 @@ layout: sidebar
 toc: True
 ---
 
-```js
-import {viewof dataset} from "./components/visualizations.js"
-```
-## testing dataset
-
-
-
 <!-- styling -->
 
 <style>
@@ -44,13 +37,32 @@ import {viewof dataset} from "./components/visualizations.js"
 
 # French + Dutch + Danish Theater visualizations!
 
-<!-- ## Total Performances by Database from 1748-1778 -->
+## Total Performances by Database from 1748-1778
 
 
 <!-- choosing dataset -->
-
 ```js
-dataset
+  viewof dataset = html`
+  <div class="tab-bar">
+    <button class="tab-button active" data-value="french">🇫🇷 French</button>
+    <button class="tab-button" data-value="danish">🇩🇰 Danish</button>
+    <button class="tab-button" data-value="dutch">🇳🇱 Dutch</button>
+  </div>
+  <input type="hidden" value="french" />
+  <script>
+    const tabs = this.querySelectorAll(".tab-button");
+    const input = this.querySelector("input");
+    tabs.forEach((tab) => {
+      tab.addEventListener("click", () => {
+        tabs.forEach(t => t.classList.remove("active"));
+        tab.classList.add("active");
+        input.value = tab.dataset.value;
+        input.dispatchEvent(new CustomEvent("input"));
+      });
+    });
+  </script>
+`
+
 ```
 
 ```js
