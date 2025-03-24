@@ -7,9 +7,9 @@ toc: True
 
 ```js
 import {viewof dataset} from "./components/visualizations.js"
+const dataset = Generators.input(viewof dataset)
 ```
-## testing dataset
-
+## testing dataset 2
 
 
 <!-- styling -->
@@ -50,7 +50,7 @@ import {viewof dataset} from "./components/visualizations.js"
 <!-- choosing dataset -->
 
 ```js
-dataset
+viewof dataset
 ```
 
 ```js
