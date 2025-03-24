@@ -299,6 +299,11 @@ export function createMultipleAnimatedLines(
       .attr("cy", (d) => y(d.count))
       .attr("r", 4)
       .attr("fill", color(label))
+      .attr("opacity", 0)
+      .transition()
+      .delay((d, i) => i * 30) // stagger timing by data point
+      .duration(300)
+      .attr("opacity", 1)
       .on("mouseover", (event, d) => {
         tooltip
           .style("opacity", 1)
@@ -326,27 +331,38 @@ export function createMultipleAnimatedLines(
 
     paths.forEach(({ path, totalLength }) => {
       path
-        .interrupt() // stop any previous animation
-        .attr("stroke-dashoffset", totalLength) // reset to start
+        .interrupt()
+        .attr("stroke-dashoffset", totalLength)
         .transition()
         .duration(duration * 30)
         .ease(d3.easeLinear)
-        .attr("stroke-dashoffset", 0);
-
+        .attr("stroke-dashoffset", 0)
+        .on("end", () => {
+          animationRunning = false;
+        });
     });
 
-    animationTimer = setTimeout(() => {
-      animationRunning = false;
-    }, duration * 30);
+    svg.selectAll("circle")
+      .interrupt()
+      .attr("opacity", 0)
+      .transition()
+      .delay((d, i) => i * 30)
+      .duration(300)
+      .attr("opacity", 1);
   }
+
+
 
   function pauseAnimation() {
     paths.forEach(({ path }) => {
-      path.interrupt();
+      path.interrupt(); // Stop transition
+      const currentOffset = parseFloat(path.attr("stroke-dashoffset"));
+      path.attr("stroke-dashoffset", currentOffset); // Lock position
     });
     clearTimeout(animationTimer);
     animationRunning = false;
   }
+
 
   //  Play Pause Buttons ---- //
   const buttonContainer = document.createElement("div");
