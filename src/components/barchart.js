@@ -300,10 +300,6 @@ export function createMultipleAnimatedLines(
       .attr("r", 4)
       .attr("fill", color(label))
       .attr("opacity", 0)
-      .transition()
-      .delay((d, i) => i * 30) // stagger timing by data point
-      .duration(300)
-      .attr("opacity", 1)
       .on("mouseover", (event, d) => {
         tooltip
           .style("opacity", 1)
@@ -311,8 +307,12 @@ export function createMultipleAnimatedLines(
           .style("left", event.pageX + 10 + "px")
           .style("top", event.pageY - 10 + "px");
       })
-      .on("mouseout", () => tooltip.style("opacity", 0));
-  });
+      .on("mouseout", () => tooltip.style("opacity", 0))
+      .transition()
+      .delay((d, i) => i * 30)
+      .duration(300)
+      .attr("opacity", 1);
+
 
   const legend = svg.append("g").attr("transform", `translate(${width - 120}, 30)`);
   groups.forEach(({ label }, i) => {
