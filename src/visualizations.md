@@ -36,14 +36,16 @@ const Dutch = await FileAttachment("data/dutch-performances.csv").csv({
 // Choose dataset based on selection
 const rawData =
   dataset === "French"
-    ? French
+    ? French.map(d => ({ ...d, group: "French" }))
     : dataset === "Danish"
-    ? Danish
+    ? Danish.map(d => ({ ...d, group: "Danish" }))
     : dataset === "Dutch"
-    ? Dutch
+    ? Dutch.map(d => ({ ...d, group: "Dutch" }))
     : [...French.map(d => ({ ...d, group: "French" })),
-       ...Danish.map(d => ({ ...d, group: "Danish" })),
-       ...Dutch.map(d => ({ ...d, group: "Dutch" }))];
+        ...Danish.map(d => ({ ...d, group: "Danish" })),
+        ...Dutch.map(d => ({ ...d, group: "Dutch" })),
+      ];
+
 ```
 
 ## select genre
@@ -87,11 +89,33 @@ import {
 // sort by year first for ltr visualization
 data.sort((a, b) => a.year - b.year);
 
+// When dataset === "All", group each dataset into performance counts by year
+function summarize(dataset, label) {
+  const map = new Map();
+  dataset.forEach(d => {
+    const year = d.year;
+    const date = d.performance_date || d.date;
+    if (!map.has(year)) map.set(year, new Set());
+    map.get(year).add(date);
+  });
+  const summary = Array.from(map, ([year, dates]) => ({
+    year,
+    count: dates.size,
+  })).sort((a, b) => a.year - b.year);
+  return { label, data: summary };
+}
+
+const frenchData = summarize(French, "French");
+const danishData = summarize(Danish, "Danish");
+const dutchData = summarize(Dutch, "Dutch");
+
+
 const chart = display(
   dataset === "All"
-    ? createMultiLineChart(data, { height: 500 })
+    ? createMultipleAnimatedLines([frenchData, danishData, dutchData], { height: 500 })
     : createAnimatedLineChart(data, { height: 500 })
 );
+
 ```
 
 <details>
@@ -99,8 +123,7 @@ const chart = display(
     🔍 Click to show explanation
   </summary>
   <p>
-    This animated line chart shows number of performance days across three countries from 1748–1778.
-    Select a country and genre to explore different trends. INSERT CONTEXTUAL INFORMATION
+    +INSERT CONTEXTUAL INFORMATION
   </p>
 </details>
 
@@ -119,7 +142,6 @@ const heatmap = display(createHeatmap(data, { width: 900, height: 600 }));
     🔍 Click to show explanation
   </summary>
   <p>
-    This visualization summarizes performance days across countries from 1748–1778 as a heatmap.
     INSERT CONTEXTUAL INFORMATION HERE
   </p>
 </details>

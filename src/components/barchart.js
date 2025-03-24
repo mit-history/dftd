@@ -213,84 +213,63 @@ export function createAnimatedLineChart(
 
 
 // for all lines at once
-export function createMultiLineChart(data, { width = 900, height = 500, duration = 1000 } = {}) {
-  const container = document.getElementById("chart-container");
-
-  const svg = d3
-    .create("svg")
+export function createMultipleAnimatedLines(groups, { width = 900, height = 500, duration = 1000 } = {}) {
+  const margin = { top: 20, right: 30, bottom: 60, left: 60 };
+  const svg = d3.create("svg")
     .attr("viewBox", [0, 0, width, height])
     .style("width", "100%")
     .style("height", "auto")
     .style("background", "#F5F5F5");
 
-  // and group by dataset
-  const nested = d3.groups(data, d => d.group || "Default");
+  const allData = groups.flatMap(g => g.data);
+  const years = d3.extent(allData, d => d.year);
+  const maxY = d3.max(allData, d => d.count);
 
-  // X scale: years
-  const x = d3
-    .scaleLinear()
-    .domain([1748, 1778])
-    .range([60, width - 40]);
+  const x = d3.scaleLinear()
+    .domain(years)
+    .range([margin.left, width - margin.right]);
 
-  // Y scale: counts
-  const y = d3
-    .scaleLinear()
-    .domain([
-      0,
-      d3.max(nested, ([, values]) =>
-        d3.rollups(values, v => new Set(v.map(d => d.performance_date)).size, d => d.year)
-          .map(d => d[1])
-          .reduce((a, b) => Math.max(a, b), 0)
-      ),
-    ])
+  const y = d3.scaleLinear()
+    .domain([0, maxY])
     .nice()
-    .range([height - 50, 30]);
-
-    const color =
-     d3.scaleOrdinal()
-    .domain(["French", "Danish", "Dutch"])
-    .range(["red", "blue", "green"]);
-
+    .range([height - margin.bottom, margin.top]);
 
   const line = d3.line()
     .x(d => x(d.year))
     .y(d => y(d.count))
     .curve(d3.curveMonotoneX);
 
-  // draw lines for each dataset
-  nested.forEach(([group, values]) => {
-    const yearToDates = d3.rollup(
-      values,
-      v => new Set(v.map(d => d.performance_date)).size,
-      d => d.year
-    );
+  const color = d3.scaleOrdinal()
+    .domain(groups.map(g => g.label))
+    .range(["red", "blue", "green"]);
 
-    const lineData = Array.from(yearToDates, ([year, count]) => ({ year, count }))
-      .sort((a, b) => a.year - b.year);
+  svg.append("g")
+    .attr("transform", `translate(0,${height - margin.bottom})`)
+    .call(d3.axisBottom(x).tickFormat(d3.format("d")));
+
+  svg.append("g")
+    .attr("transform", `translate(${margin.left},0)`)
+    .call(d3.axisLeft(y));
+
+  // Tooltip container
+  const tooltip = d3.select("body")
+    .append("div")
+    .style("position", "absolute")
+    .style("background", "white")
+    .style("padding", "6px")
+    .style("border", "1px solid #ccc")
+    .style("border-radius", "5px")
+    .style("opacity", 0);
+
+  groups.forEach(({ label, data }) => {
+    const sorted = data.sort((a, b) => a.year - b.year);
 
     const path = svg.append("path")
-      .datum(lineData)
+      .datum(sorted)
       .attr("fill", "none")
-      .attr("stroke", color(group))
-      .attr("stroke-width", 3)
-      .attr("stroke-dasharray", "0,1000")
+      .attr("stroke", color(label))
+      .attr("stroke-width", 2.5)
       .attr("d", line);
-
-    // Draw circles w/ distinct colors
-    svg.append("g")
-    .selectAll("circle")
-    .data(lineData)
-    .join("circle")
-    .attr("cx", d => x(d.year))
-    .attr("cy", d => y(d.count))
-    .attr("r", 4)
-    .attr("fill", color(group))
-    .attr("opacity", 0)
-    .transition()
-    .delay((d, i) => i * 30)
-    .duration(400)
-    .attr("opacity", 1);
-
 
     const totalLength = path.node().getTotalLength();
 
@@ -298,51 +277,38 @@ export function createMultiLineChart(data, { width = 900, height = 500, duration
       .attr("stroke-dasharray", `${totalLength},${totalLength}`)
       .attr("stroke-dashoffset", totalLength)
       .transition()
-      .duration(duration * 2)
+      .duration(duration)
       .ease(d3.easeLinear)
       .attr("stroke-dashoffset", 0);
 
-    // Add dataset label
-    svg.append("text")
-      .attr("x", x(lineData[lineData.length - 1].year) + 5)
-      .attr("y", y(lineData[lineData.length - 1].count))
-      .attr("fill", color(group))
-      .style("font-weight", "bold")
-      .style("font-size", "12px")
-      .text(group);
+    // Circles
+    svg.append("g")
+      .selectAll("circle")
+      .data(sorted)
+      .join("circle")
+      .attr("cx", d => x(d.year))
+      .attr("cy", d => y(d.count))
+      .attr("r", 4)
+      .attr("fill", color(label))
+      .on("mouseover", (event, d) => {
+        tooltip
+          .style("opacity", 1)
+          .html(`${label}<br>Year: ${d.year}<br>Count: ${d.count}`)
+          .style("left", event.pageX + 10 + "px")
+          .style("top", event.pageY - 10 + "px");
+      })
+      .on("mouseout", () => {
+        tooltip.style("opacity", 0);
+      });
   });
 
-  // X Axis
-  svg.append("g")
-    .attr("transform", `translate(0,${height - 50})`)
-    .call(d3.axisBottom(x).tickFormat(d3.format("d")));
-
-  // Y Axis
-  svg.append("g")
-    .attr("transform", `translate(60,0)`)
-    .call(d3.axisLeft(y));
-
-  // color legend for countries
-  const legend = svg.append("g")
-  .attr("transform", `translate(${width - 140}, 30)`);
-
-  ["French", "Danish", "Dutch"].forEach((name, i) => {
-  const g = legend.append("g")
-    .attr("transform", `translate(0, ${i * 20})`);
-
-  g.append("rect")
-    .attr("width", 12)
-    .attr("height", 12)
-    .attr("fill", color(name));
-
-  g.append("text")
-    .attr("x", 18)
-    .attr("y", 10)
-    .style("font-size", "12px")
-    .style("fill", "#333")
-    .text(name);
+  // Legend
+  const legend = svg.append("g").attr("transform", `translate(${width - 120}, 30)`);
+  groups.forEach(({ label }, i) => {
+    const g = legend.append("g").attr("transform", `translate(0, ${i * 20})`);
+    g.append("rect").attr("width", 12).attr("height", 12).attr("fill", color(label));
+    g.append("text").attr("x", 18).attr("y", 10).text(label).style("font-size", "12px");
   });
-
 
   return svg.node();
 }
