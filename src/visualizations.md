@@ -80,6 +80,7 @@ const data =
 ```js
 import {
   createAnimatedLineChart,
+  createMultiLineChart,
   createHeatmap,
 } from "./components/barchart.js";
 
