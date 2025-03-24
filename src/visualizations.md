@@ -42,7 +42,6 @@ toc: True
 
 <!-- choosing dataset -->
 ```js
-const dataset = view(
   viewof dataset = html`
   <div class="tab-bar">
     <button class="tab-button active" data-value="french">🇫🇷 French</button>
@@ -64,7 +63,6 @@ const dataset = view(
   </script>
 `
 
-);
 ```
 
 ```js
@@ -130,11 +128,10 @@ data.sort((a, b) => a.year - b.year);
 const chart = display(createAnimatedLineChart(data, { height: 500 }));
 ```
 
-<div id="map-container"></div>
-# Heatmap of Daily Performances
+
+## Heatmap of Daily Performances
 
 ```js
 const heatmap = display(createHeatmap(data, { width: 900, height: 600 }));
 ```
-
 <div id="map-container"></div>
