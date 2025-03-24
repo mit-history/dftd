@@ -26,7 +26,7 @@ function yearChart(data) {
     y: { grid: true, label: "Performances" },
     width: 1000,
     marks: [
-      Plot.barY(data, Plot.groupX({ y: "count" }, { x: "year", fill: "year" })),
+      Plot.barY(data, Plot.groupX({ y: "count" }, { x: "year" })),
       Plot.ruleY([0]),
     ],
   });

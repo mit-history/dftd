@@ -22,10 +22,10 @@ function yearChart(data) {
   return Plot.plot({
     title: "Performances by year",
     x: { label: "Year" },
-    y: { grid: true, label: "Performances" },
+    y: { grid: true, label: "Performances", domain: [0, 366] },
     width: 1000,
     marks: [
-      Plot.barY(data, Plot.groupX({ y: "count" }, { x: "year", fill: "year" })),
+      Plot.barY(data, Plot.groupX({ y: "count" }, { x: "year" })),
       Plot.ruleY([0]),
     ],
   });
@@ -67,7 +67,11 @@ const end_date = view(Inputs.date({label: "End", value: "1778-12-31"}));
 ```
 
 ```js
-const formatted_data = combined_data.filter(d => (new Date(d.date) > start_date) && (new Date(d.date) <= end_date));
+const origins = view(Inputs.checkbox(["danish", "dutch", "french"], {label: "Origin", value: ["danish", "dutch", "french"]}));
+```
+
+```js
+const formatted_data = combined_data.filter(d => (new Date(d.date) > start_date) && (new Date(d.date) <= end_date) && origins.includes(d.origin));
 ```
 
 ```js
@@ -76,7 +80,7 @@ function compareYearsChart(data) {
     title: "Compare performances per year",
     fx: { padding: 0, label: null },
     x: { axis: null, paddingOuter: 0.2 },
-    y: { grid: true, label: "Performances" },
+    y: { grid: true, label: "Performances", domain: [0, 366] },
     color: { legend: true },
     width: 1000,
     marks: [
@@ -86,5 +90,5 @@ function compareYearsChart(data) {
   });
 }
 
-display(compareYearsChart(formatted_data))
+display(formatted_data.length > 0 ? compareYearsChart(formatted_data) : html`<i>No data.</i>`)
 ```
