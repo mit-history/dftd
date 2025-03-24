@@ -326,12 +326,13 @@ export function createMultipleAnimatedLines(
 
     paths.forEach(({ path, totalLength }) => {
       path
-        .attr("stroke-dasharray", `${totalLength},${totalLength}`)
-        .attr("stroke-dashoffset", totalLength)
+        .interrupt() // stop any previous animation
+        .attr("stroke-dashoffset", totalLength) // reset to start
         .transition()
         .duration(duration * 30)
         .ease(d3.easeLinear)
         .attr("stroke-dashoffset", 0);
+
     });
 
     animationTimer = setTimeout(() => {
