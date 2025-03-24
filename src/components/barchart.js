@@ -284,9 +284,16 @@ export function createMultipleAnimatedLines(
       .attr("d", line);
 
     const totalLength = path.node().getTotalLength();
+
     path
+      .interrupt()
       .attr("stroke-dasharray", `${totalLength},${totalLength}`)
-      .attr("stroke-dashoffset", totalLength);
+      .attr("stroke-dashoffset", totalLength) // Reset before playing
+      .transition()
+      .duration(duration * 30)
+      .ease(d3.easeLinear)
+      .attr("stroke-dashoffset", 0)
+
 
     paths.push({ path, totalLength });
 
@@ -388,7 +395,7 @@ export function createMultipleAnimatedLines(
 
   buttonContainer.appendChild(playButton);
   buttonContainer.appendChild(pauseButton);
-  if (!document.getElementById("button-container")) {
+  if (!container.querySelector("#button-container")) {
     container.appendChild(buttonContainer);
   }
 
