@@ -9,7 +9,7 @@ export function createAnimatedLineChart(
   const container = document.getElementById("chart-container");
   const computedWidth = width || 900;
 
-  // console.log("Sample Data:", data.slice(0, 5));
+  console.log("Sample Data:", data.slice(0, 5));
 
   // Normalize dataset; ensure performance_date exists
   data = data.map((d) => ({

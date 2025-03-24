@@ -5,65 +5,16 @@ layout: sidebar
 toc: True
 ---
 
-<!-- styling -->
-
-<style>
-  .tab-bar {
-    display: flex;
-    gap: 10px;
-    margin: 10px 0 20px 0;
-  }
-
-  .tab-button {
-    padding: 8px 16px;
-    border: 1px solid #ccc;
-    background-color: #f4f4f4;
-    border-radius: 6px 6px 0 0;
-    cursor: pointer;
-    font-weight: bold;
-    font-size: 14px;
-    color: #333;
-    transition: all 0.2s ease;
-  }
-
-  .tab-button.active {
-    background-color: #ffffff;
-    border-bottom: 2px solid white;
-    color: #1c7ed6;
-    box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
-  }
-</style>
-
-
 # French + Dutch + Danish Theater visualizations!
 
 ## Total Performances by Database from 1748-1778
 
-
-<!-- choosing dataset -->
 ```js
 const dataset = view(
-  viewof dataset = html`
-  <div class="tab-bar">
-    <button class="tab-button active" data-value="french">🇫🇷 French</button>
-    <button class="tab-button" data-value="danish">🇩🇰 Danish</button>
-    <button class="tab-button" data-value="dutch">🇳🇱 Dutch</button>
-  </div>
-  <input type="hidden" value="french" />
-  <script>
-    const tabs = this.querySelectorAll(".tab-button");
-    const input = this.querySelector("input");
-    tabs.forEach((tab) => {
-      tab.addEventListener("click", () => {
-        tabs.forEach(t => t.classList.remove("active"));
-        tab.classList.add("active");
-        input.value = tab.dataset.value;
-        input.dispatchEvent(new CustomEvent("input"));
-      });
-    });
-  </script>
-`
-
+  Inputs.select(["french", "danish", "dutch"], {
+    label: "Choose dataset",
+    value: "french",
+  })
 );
 ```
 
@@ -114,7 +65,7 @@ const data =
 
 **Showing:** ${dataset} dataset ${genre !== "All genres" ? "filtered by genre: " + genre : "(all genres)"}.
 
-## Animated Line Chart
+## visualizations
 
 <div id="chart-container"></div>
 
@@ -124,14 +75,8 @@ import {
   createHeatmap,
 } from "./components/barchart.js";
 
-// sort data by year first
-data.sort((a, b) => a.year - b.year);
-
 const chart = display(createAnimatedLineChart(data, { height: 500 }));
 ```
-
-<div id="map-container"></div>
-# Heatmap of Daily Performances
 
 ```js
 const heatmap = display(createHeatmap(data, { width: 900, height: 600 }));
