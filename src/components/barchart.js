@@ -375,29 +375,29 @@ export function createMultipleAnimatedLines(
   }
 
 
-  //  play pause Buttons //
-  const buttonContainer = document.createElement("div");
-  buttonContainer.id = "button-container";
-  buttonContainer.style.display = "flex";
-  buttonContainer.style.justifyContent = "center";
-  buttonContainer.style.marginTop = "10px";
+  // //  play pause Buttons //
+  // const buttonContainer = document.createElement("div");
+  // buttonContainer.id = "button-container";
+  // buttonContainer.style.display = "flex";
+  // buttonContainer.style.justifyContent = "center";
+  // buttonContainer.style.marginTop = "10px";
 
-  const playButton = document.createElement("button");
-  playButton.textContent = "▶ Play";
-  playButton.className = "chart-button play";
+  // const playButton = document.createElement("button");
+  // playButton.textContent = "▶ Play";
+  // playButton.className = "chart-button play";
 
-  const pauseButton = document.createElement("button");
-  pauseButton.textContent = "⏸ Pause";
-  pauseButton.className = "chart-button pause";
+  // const pauseButton = document.createElement("button");
+  // pauseButton.textContent = "⏸ Pause";
+  // pauseButton.className = "chart-button pause";
 
-  playButton.addEventListener("click", playAnimation);
-  pauseButton.addEventListener("click", pauseAnimation);
+  // playButton.addEventListener("click", playAnimation);
+  // pauseButton.addEventListener("click", pauseAnimation);
 
-  buttonContainer.appendChild(playButton);
-  buttonContainer.appendChild(pauseButton);
-  if (!container.querySelector("#button-container")) {
-    container.appendChild(buttonContainer);
-  }
+  // buttonContainer.appendChild(playButton);
+  // buttonContainer.appendChild(pauseButton);
+  // if (!container.querySelector("#button-container")) {
+  //   container.appendChild(buttonContainer);
+  // }
 
   // start animation
   playAnimation();
