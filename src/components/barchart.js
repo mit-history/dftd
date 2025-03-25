@@ -4,7 +4,7 @@ import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 
 export function createAnimatedLineChart(
   data,
-  { width = 900, height = 500, duration = 1000 } = {}
+  { width = 900, height = 500, duration = 500 } = {}
 ) {
   const container = document.getElementById("chart-container");
   const computedWidth = width || 900;
@@ -214,7 +214,7 @@ export function createAnimatedLineChart(
 // for all lines at once
 export function createMultipleAnimatedLines(
   groups,
-  { width = 900, height = 500, duration = 1000 } = {}
+  { width = 900, height = 500, duration = 500 } = {}
 ) {
   const container = document.getElementById("chart-container");
   const margin = { top: 20, right: 160, bottom: 60, left: 60 };
