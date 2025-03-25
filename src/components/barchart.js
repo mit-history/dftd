@@ -206,6 +206,7 @@ export function createAnimatedLineChart(
 
   // Start animation on load
   playAnimation();
+  
 
   return svg.node();
 }

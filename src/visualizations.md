@@ -75,6 +75,10 @@ const data =
 <div style="margin-top: 10%;"></div>
 
 
+### Dataset Summary
+<div id="summary-stats" style="font-size: 18px; font-weight: bold; text-align: center; margin-bottom: 16px;"></div>
+
+
 ## Animated Line Chart of Days with Performances
 
 <div id="chart-container"></div>
@@ -88,6 +92,19 @@ import {
 
 // sort by year first for ltr visualization
 data.sort((a, b) => a.year - b.year);
+
+// calculate total performances and number of unique days
+const totalPerformances = data.length;
+
+const uniqueDates = new Set(data.map(d => d.performance_date || d.date));
+const totalUniqueDays = uniqueDates.size;
+
+// Inject summary above chart
+const statsDiv = document.getElementById("summary-stats");
+if (statsDiv) {
+  statsDiv.textContent = `Total Performances: ${totalPerformances} | Unique Days Performed: ${totalUniqueDays}`;
+}
+
 
 // When dataset === "All", group each dataset into performance counts by year
 function summarize(dataset, label) {
