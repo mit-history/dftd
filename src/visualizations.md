@@ -76,12 +76,6 @@ const data =
 
 
 
-### Dataset Summary
-${summaryStats}
-
-<div style="margin-top: 10%;"></div>
-
-
 
 ## Animated Line Chart of Days with Performances
 
@@ -97,50 +91,21 @@ import {
 // sort by year first for ltr visualization
 data.sort((a, b) => a.year - b.year);
 
-summaryStats = (() => {
-  function countUniqueDays(data) {
-    return new Set(
-      data.map((d) => {
-        const raw = d.performance_date || d.date;
-        const dateObj = new Date(raw);
-        return dateObj.toISOString().split("T")[0];
-      })
-    ).size;
-  }
-
-  if (dataset === "All") {
-    const breakdown = [
-      { label: "🇫🇷 French", data: French },
-      { label: "🇩🇰 Danish", data: Danish },
-      { label: "🇳🇱 Dutch", data: Dutch },
-    ].map(({ label, data }) => {
-      const filtered = genre === "All genres" ? data : data.filter((d) => d.genre === genre);
-      return {
-        label,
-        performances: filtered.length,
-        days: countUniqueDays(filtered),
-      };
-    });
-
-    const totalPerformances = breakdown.reduce((sum, d) => sum + d.performances, 0);
-    const totalDays = breakdown.reduce((sum, d) => sum + d.days, 0);
-
-    return html`<div style="text-align: center; font-size: 16px; font-weight: bold; margin-bottom: 16px;">
-      ${breakdown.map(d => html`<div>${d.label}: ${d.performances} performances | ${d.days} unique days</div>`)}
-      <hr style="margin: 10px auto; width: 60%;" />
-      <div>Total: ${totalPerformances} performances | ${totalDays} unique days</div>
-    </div>`;
-  }
-
-  const total = data.length;
-  const unique = countUniqueDays(data);
-
-  return html`<div style="text-align: center; font-size: 18px; font-weight: bold; margin-bottom: 16px;">
-    Total Performances: ${total} | Unique Days Performed: ${unique}
-  </div>`;
-})();
-
-
+// When dataset === "All", group each dataset into performance counts by year
+function summarize(dataset, label) {
+  const map = new Map();
+  dataset.forEach(d => {
+    const year = d.year;
+    const date = d.performance_date || d.date;
+    if (!map.has(year)) map.set(year, new Set());
+    map.get(year).add(date);
+  });
+  const summary = Array.from(map, ([year, dates]) => ({
+    year,
+    count: dates.size,
+  })).sort((a, b) => a.year - b.year);
+  return { label, data: summary };
+}
 
 const frenchData = summarize(French, "French");
 const danishData = summarize(Danish, "Danish");
