@@ -144,7 +144,7 @@ export function createAnimatedLineChart(
       .attr("opacity", 0)
       .transition()
       .delay((d, i) => i * duration)
-      .duration(500)
+      .duration(100)
       .attr("opacity", 1);
 
     animationTimer = setTimeout(() => {
@@ -317,7 +317,7 @@ export function createMultipleAnimatedLines(
       .on("mouseout", () => tooltip.style("opacity", 0))
       .transition()
       .delay((d, i) => i * 30)
-      .duration(300)
+      .duration(100)
       .attr("opacity", 1);
     });
 
@@ -357,7 +357,7 @@ export function createMultipleAnimatedLines(
       .attr("opacity", 0)
       .transition()
       .delay((d, i) => i * 30)
-      .duration(300)
+      .duration(100)
       .attr("opacity", 1);
   }
 
