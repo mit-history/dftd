@@ -97,9 +97,7 @@ import {
 // sort by year first for ltr visualization
 data.sort((a, b) => a.year - b.year);
 
-summaryStats = {
-  // Helper to count unique days from dataset
-  function countUniqueDays(data) {
+function countUniqueDays(data) {
   return new Set(
     data.map((d) => {
       const raw = d.performance_date || d.date;
@@ -108,6 +106,10 @@ summaryStats = {
     })
   ).size;
 }
+
+
+summaryStats = {
+  // Helper to count unique days from dataset
 
 
   // If "All", show per-country breakdown
