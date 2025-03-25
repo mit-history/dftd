@@ -79,6 +79,8 @@ const data =
 ### Dataset Summary
 ${summaryStats}
 
+<div style="margin-top: 10%;"></div>
+
 
 
 ## Animated Line Chart of Days with Performances
@@ -98,8 +100,15 @@ data.sort((a, b) => a.year - b.year);
 summaryStats = {
   // Helper to count unique days from dataset
   function countUniqueDays(data) {
-    return new Set(data.map(d => d.performance_date || d.date)).size;
-  }
+  return new Set(
+    data.map((d) => {
+      const raw = d.performance_date || d.date;
+      const dateObj = new Date(raw);
+      return dateObj.toISOString().split("T")[0]; // Get YYYY-MM-DD
+    })
+  ).size;
+}
+
 
   // If "All", show per-country breakdown
   if (dataset === "All") {
