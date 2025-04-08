@@ -66,6 +66,19 @@ md`**Showing:** ${dataset} dataset ${genres.length > 0 ? `filtered by genres: ${
 md`**Showing:** ${dataset} dataset from ${start_date.toDateString()} to ${end_date.toDateString()}, ${genres.length > 0 ? `filtered by genres: ${genres.join(", ")}` : "(all genres)"}.`
 
 
+<!-- stats graphic -->
+
+<!-- // Count total performances and total unique performance days -->
+const totalPerformances = data.length;
+
+const uniqueDates = new Set(data.map(d => d.performance_date || d.date));
+const totalDaysPerformed = uniqueDates.size;
+
+md`### 🎭 Summary
+- **Total Performances:** ${totalPerformances.toLocaleString()}
+- **Total Days Performed On:** ${totalDaysPerformed.toLocaleString()}`
+
+
 ## visualizations
 
 ```js
