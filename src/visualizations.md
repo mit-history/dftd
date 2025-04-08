@@ -33,20 +33,38 @@ const rawData = {
 ## select genre
 
 ```js
-viewof genre = Inputs.select(
-  ["All genres", ...Array.from(new Set(rawData.map(d => d.genre).filter(Boolean))).sort()],
-  { label: "Filter by genre", value: "All genres" }
+viewof genres = Inputs.selectMultiple(
+  Array.from(new Set(rawData.map(d => d.genre).filter(Boolean))).sort(),
+  { label: "Filter by genres", value: [] }
 )
 ```
 
+## select time period
 ```js
-// Apply genre filter if selected
-const data = genre === "All genres" ? rawData : rawData.filter(d => d.genre === genre);
+viewof start_date = Inputs.date({ label: "Start date", value: new Date("1748-01-01") })
+viewof end_date = Inputs.date({ label: "End date", value: new Date("1778-12-31") })
 ```
 
+
 ```js
-md`**Showing:** ${dataset} dataset ${genre !== "All genres" ? "filtered by genre: " + genre : "(all genres)"}.`
+// Apply genre filter if selected
+const data = genres.length === 0
+  ? rawData
+  : rawData.filter(d => genres.includes(d.genre));
+
+const data = genreFiltered.filter(d => {
+  const date = new Date(d.performance_date || d.date);
+  return date >= start_date && date <= end_date;
 ```
+
+
+
+```js
+md`**Showing:** ${dataset} dataset ${genres.length > 0 ? `filtered by genres: ${genres.join(", ")}` : "(all genres)"}.`
+```
+
+md`**Showing:** ${dataset} dataset from ${start_date.toDateString()} to ${end_date.toDateString()}, ${genres.length > 0 ? `filtered by genres: ${genres.join(", ")}` : "(all genres)"}.`
+
 
 ## visualizations
 
