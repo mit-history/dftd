@@ -92,3 +92,86 @@ function compareYearsChart(data) {
 
 display(formatted_data.length > 0 ? compareYearsChart(formatted_data) : html`<i>No data.</i>`)
 ```
+```js
+// view(Inputs.table(combined_data));
+```
+
+```js
+const author = view(
+  Inputs.select([
+    "No author selected",
+    ...Array.from(
+      new Set([
+        ...french_data.map((d) => d.author.split(" ; ")).flat().filter(Boolean),
+        ...danish_data.map((d) => d.author?.split(",")).flat().filter(Boolean),
+        ...dutch_data.map((d) => d.author).filter(Boolean),
+      ])
+    ).sort(),
+    { label: "Filter by author", value: "No author selected" }
+  ])
+);
+```
+
+```js
+// Apply filter
+const author_filtered_data =
+  author === "No author selected" ? undefined : combined_data.filter((d) => d.author === author || d.author?.includes(author));
+```
+
+```js
+const author_data_combined = author_filtered_data ? author_filtered_data .map((d, i, arr) => {
+    const total = combined_data.filter(f => f.year === d.year && f.origin === d.origin).reduce((a, b) => a + 1, 0);
+    const author = arr.filter(f => f.year === d.year && f.origin === d.origin).reduce((a, b) => a + 1, 0);
+    return {year: d.year, origin: d.origin, percentage: (author / total) };
+  }) : undefined;
+
+const author_data = Array.from(new Set(author_data_combined?.map(JSON.stringify))).map(JSON.parse);
+```
+
+```js
+// display(author_data ? Inputs.table(author_data) : html`<i>No data.</i>`)
+```
+```js
+display(author_data ? percentageYearsChart(author_data) : html`<i>No data.</i>`)
+```
+
+```js
+function percentageYearsChart(data) {
+  return Plot.plot({
+    title: `Compare percentage of performances per year of works by ${author}`,
+    fx: { padding: 0, label: null },
+    x: { axis: null, paddingOuter: 0.2 },
+    y: { grid: true, label: "Percentage" },
+    color: { legend: true },
+    width: 1000,
+    marks: [
+      Plot.barY(data, {x: "origin", y: "percentage", fx: "year", fill: "origin", tip: true}),
+      Plot.ruleY([0])
+    ]
+  });
+}
+```
+
+```js
+// const earthquakes = d3.json("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_week.geojson").then(d => d.features.map(f => {
+//   const c = d3.geoCentroid(f);
+//   return {magnitude: f.properties.mag, longitude: c[0], latitude: c[1]};
+// }))
+```
+
+```js
+// const circle = d3.geoCircle().center([9, 34]).radius(26.3)()
+
+// const world = FileAttachment("countries-110m.json").json()
+// const land = topojson.feature(world, world.objects.land)
+
+// Plot.plot({
+//   projection: {type: "orthographic", rotate: [-2, -30]},
+//   r: {transform: (d) => Math.pow(10, d)}, // convert Richter to amplitude
+//   marks: [
+//     Plot.geo(land, {fill: "currentColor", fillOpacity: 0.2}),
+//     Plot.sphere(),
+//     Plot.dot(earthquakes, {x: "longitude", y: "latitude", r: "magnitude", stroke: "red", fill: "red", fillOpacity: 0.2})
+//   ]
+// })
+```
