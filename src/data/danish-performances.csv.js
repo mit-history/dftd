@@ -28,7 +28,8 @@ await readFile("src/data/danish-works.json", (err, data) => {
                 production: f.production,
                 works: work_objs,
                 genre: work_objs.map(work => work?.genres[0]?.name),
-                place: f.place?.name
+                place: f.place?.name,
+                author: work_objs.map(work => work?.contributors.map(c => c.person?.name))
             }
         });
 
