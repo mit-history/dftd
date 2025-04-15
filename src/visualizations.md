@@ -5,6 +5,10 @@ layout: sidebar
 toc: True
 ---
 
+```js
+import * as Plot from "https://cdn.jsdelivr.net/npm/@observablehq/plot@0.6/+esm";
+```
+
 # French, Dutch and Danish theater Visualizations
 
 <div style="margin-top: 8%;"></div>
@@ -77,7 +81,11 @@ const data =
   genres.length === 0
     ? dateFiltered
     : dateFiltered.filter((d) => genres.includes(d.genre));
+
+
 ```
+
+
 
 **Showing:** ${dataset} dataset
 ${genres.length > 0 ? "filtered by genre(s): " + genres.join(", ") : "(all genres)"}
@@ -98,6 +106,9 @@ import {
   createAnimatedLineChart,
   createMultipleAnimatedLines,
   createHeatmap,
+  createGenreProportionChart,
+  createGenreStackedBar,
+  createGenreStackedBarVertical,
 } from "./components/barchart.js";
 
 // sort by year first for ltr visualization
@@ -145,6 +156,7 @@ const chart = display(
 
 <!-- spacing between charts -->
 <div style="margin-top: 10%;"></div>
+
 
 ## Heatmap of Days with Performances
 ```js

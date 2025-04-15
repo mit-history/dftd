@@ -1,5 +1,6 @@
 import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 
+
 //  fix/add pause play buttons
 
 export function createAnimatedLineChart(
@@ -51,11 +52,11 @@ export function createAnimatedLineChart(
     .domain([1748, 1778])
     .range([margin.left, computedWidth - margin.right]);
 
-  const y = d3
+    const y = d3
     .scaleLinear()
-    .domain([0, d3.max(formattedData, (d) => d.count)])
-    .nice()
+    .domain([0, 366]) // consistent max scale regardless of filtering
     .range([height - margin.bottom, margin.top]);
+
 
   const line = d3
     .line()
@@ -119,6 +120,25 @@ export function createAnimatedLineChart(
         .style("top", event.pageY - 10 + "px");
     })
     .on("mouseout", () => tooltip.style("opacity", 0));
+
+    //  max reference line at 366 days
+    svg.append("line")
+    .attr("x1", margin.left)
+    .attr("x2", computedWidth - margin.right)
+    .attr("y1", y(366))
+    .attr("y2", y(366))
+    .attr("stroke", "gray")
+    .attr("stroke-dasharray", "4,2")
+    .attr("stroke-width", 1.5);
+
+    svg.append("text")
+    .attr("x", computedWidth - margin.right - 5)
+    .attr("y", y(366) - 5)
+    .attr("text-anchor", "end")
+    .attr("fill", "#666")
+    .attr("font-size", "12px")
+    .text("Max: 366 days");
+
 
   let animationRunning = false;
   let animationTimer = null;
@@ -206,7 +226,7 @@ export function createAnimatedLineChart(
 
   // Start animation on load
   playAnimation();
-  
+
 
   return svg.node();
 }
@@ -601,6 +621,179 @@ export function createHeatmap(data, { width = 900, height = 500 } = {}) {
     .attr("font-size", "14px")
     .attr("fill", "#333333")
     .text("Number of Performance Days");
+
+  return svg.node();
+}
+
+
+export function createGenreProportionChart(data, { width = 600, height = 400 } = {}) {
+  const svg = d3.create("svg")
+    .attr("viewBox", [0, 0, width, height])
+    .style("width", "100%")
+    .style("height", "auto")
+    .style("background", "#f9f9f9");
+
+  const genreCounts = Array.from(
+    d3.rollup(data, v => v.length, d => d.genre),
+    ([genre, count]) => ({ genre, count })
+  ).sort((a, b) => d3.descending(a.count, b.count));
+
+  const x = d3.scaleLinear()
+    .domain([0, d3.max(genreCounts, d => d.count)])
+    .range([100, width - 20]);
+
+  const y = d3.scaleBand()
+    .domain(genreCounts.map(d => d.genre))
+    .range([20, height - 30])
+    .padding(0.1);
+
+  svg.append("g")
+    .selectAll("rect")
+    .data(genreCounts)
+    .join("rect")
+    .attr("x", x(0))
+    .attr("y", d => y(d.genre))
+    .attr("width", d => x(d.count) - x(0))
+    .attr("height", y.bandwidth())
+    .attr("fill", "#69b3a2");
+
+  svg.append("g")
+    .selectAll("text")
+    .data(genreCounts)
+    .join("text")
+    .attr("x", d => x(d.count) + 5)
+    .attr("y", d => y(d.genre) + y.bandwidth() / 2)
+    .attr("dominant-baseline", "middle")
+    .attr("fill", "#333")
+    .text(d => d.count);
+
+  svg.append("g")
+    .attr("transform", `translate(${x(0) - 5},0)`)
+    .call(d3.axisLeft(y));
+
+  return svg.node();
+}
+
+export function createGenreStackedBar(data, { width = 600, height = 60 } = {}) {
+  const svg = d3.create("svg")
+    .attr("viewBox", [0, 0, width, height])
+    .style("width", "100%")
+    .style("height", "auto")
+    .style("background", "#fff");
+
+  // Count genre occurrences
+  const genreCounts = Array.from(
+    d3.rollup(data, v => v.length, d => d.genre),
+    ([genre, count]) => ({ genre, count })
+  ).filter(d => d.genre) // remove undefined/null genres
+   .sort((a, b) => d3.descending(a.count, b.count));
+
+  const total = d3.sum(genreCounts, d => d.count);
+
+  const color = d3.scaleOrdinal()
+    .domain(genreCounts.map(d => d.genre))
+    .range(d3.schemeCategory10);
+
+  let cumulative = 0;
+
+  const segments = genreCounts.map(d => {
+    const x0 = cumulative;
+    cumulative += d.count / total;
+    return {
+      genre: d.genre,
+      x0,
+      x1: cumulative,
+      value: d.count
+    };
+  });
+
+  const barHeight = height - 20;
+
+  svg.selectAll("rect")
+    .data(segments)
+    .join("rect")
+    .attr("x", d => d.x0 * width)
+    .attr("y", 10)
+    .attr("width", d => (d.x1 - d.x0) * width)
+    .attr("height", barHeight)
+    .attr("fill", d => color(d.genre));
+
+  svg.selectAll("text")
+    .data(segments)
+    .join("text")
+    .attr("x", d => (d.x0 + d.x1) / 2 * width)
+    .attr("y", height / 2 + 5)
+    .attr("text-anchor", "middle")
+    .attr("fill", "#fff")
+    .attr("font-size", "12px")
+    .text(d => d.value > 0 ? `${d.genre}` : "");
+
+  return svg.node();
+}
+
+export function createGenreStackedBarVertical(data, { width = 120, height = 400 } = {}) {
+  const svg = d3.create("svg")
+    .attr("viewBox", [0, 0, width, height])
+    .style("width", "100%")
+    .style("height", "auto")
+    .style("background", "#fff");
+
+  const genreCounts = Array.from(
+    d3.rollup(data, v => v.length, d => d.genre),
+    ([genre, count]) => ({ genre, count })
+  ).filter(d => d.genre)
+   .sort((a, b) => d3.descending(a.count, b.count));
+
+  const total = d3.sum(genreCounts, d => d.count);
+  if (total === 0) {
+    svg.append("text")
+      .attr("x", width / 2)
+      .attr("y", height / 2)
+      .attr("text-anchor", "middle")
+      .attr("fill", "#999")
+      .text("No data available");
+    return svg.node();
+  }
+
+  const color = d3.scaleOrdinal()
+    .domain(genreCounts.map(d => d.genre))
+    .range(d3.schemeTableau10);
+
+  let cumulative = 0;
+  const segments = genreCounts.map(d => {
+    const y0 = cumulative;
+    const proportion = d.count / total;
+    cumulative += proportion;
+    return {
+      genre: d.genre,
+      y0,
+      y1: cumulative,
+      count: d.count,
+      percent: (proportion * 100).toFixed(1)
+    };
+  });
+
+  const barWidth = width - 30;
+
+  svg.selectAll("rect")
+    .data(segments)
+    .join("rect")
+    .attr("x", (width - barWidth) / 2)
+    .attr("y", d => height - d.y1 * height)
+    .attr("width", barWidth)
+    .attr("height", d => (d.y1 - d.y0) * height)
+    .attr("fill", d => color(d.genre));
+
+  svg.selectAll("text")
+    .data(segments)
+    .join("text")
+    .attr("x", width / 2)
+    .attr("y", d => height - (d.y0 + (d.y1 - d.y0) / 2) * height)
+    .attr("text-anchor", "middle")
+    .attr("fill", "white")
+    .attr("font-size", "11px")
+    .style("font-weight", "bold")
+    .text(d => d.percent >= 5 ? `${d.genre} (${d.percent}%)` : "");
 
   return svg.node();
 }
