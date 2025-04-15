@@ -5,88 +5,160 @@ layout: sidebar
 toc: True
 ---
 
-# French + Dutch + Danish Theater visualizations!
+# French, Dutch and Danish theater Visualizations
 
-## Total Performances by Database from 1748-1778
+<div style="margin-top: 8%;"></div>
 
+## select country and time period
 
 ```js
-viewof dataset = Inputs.select(["french", "danish", "dutch"], { label: "Choose dataset", value: "french" })
+const dataset = view(
+  Inputs.select(["All", "French", "Danish", "Dutch"], {
+    label: "Choose dataset",
+    value: "French",
+  })
+);
 ```
 
 ```js
 // Load all three datasets
-const french = await FileAttachment("data/french-performances.json").json();
-const danish = await FileAttachment("data/danish-performances.csv").csv({ typed: true });
-const dutch = await FileAttachment("data/dutch-performances.csv").csv({ typed: true });
+const French = await FileAttachment("data/french-performances.json").json();
+const Danish = await FileAttachment("data/danish-performances.csv").csv({
+  typed: true,
+});
+const Dutch = await FileAttachment("data/dutch-performances.csv").csv({
+  typed: true,
+});
 ```
+
 
 ```js
 // Choose dataset based on selection
-const rawData = {
-  if (dataset === "french") return french;
-  if (dataset === "danish") return danish;
-  if (dataset === "dutch") return dutch;
-}
+const rawData =
+  dataset === "French"
+    ? French.map(d => ({ ...d, group: "French" }))
+    : dataset === "Danish"
+    ? Danish.map(d => ({ ...d, group: "Danish" }))
+    : dataset === "Dutch"
+    ? Dutch.map(d => ({ ...d, group: "Dutch" }))
+    : [...French.map(d => ({ ...d, group: "French" })),
+        ...Danish.map(d => ({ ...d, group: "Danish" })),
+        ...Dutch.map(d => ({ ...d, group: "Dutch" })),
+      ];
+```
+
+```js
+const start_date = view(Inputs.date({label: "Start", value: "1748-01-01"}));
+const end_date = view(Inputs.date({label: "End", value: "1778-12-31"}));
 ```
 
 ## select genre
 
 ```js
-viewof genres = Inputs.selectMultiple(
-  Array.from(new Set(rawData.map(d => d.genre).filter(Boolean))).sort(),
-  { label: "Filter by genres", value: [] }
-)
+const genres = view(
+  Inputs.checkbox(
+    Array.from(new Set(rawData.map((d) => d.genre).filter(Boolean))).sort(),
+    {
+      label: "Select genre(s)",
+      value: [], // default: all
+    }
+  )
+);
 ```
 
-## select time period
 ```js
-viewof start_date = Inputs.date({ label: "Start date", value: new Date("1748-01-01") })
-viewof end_date = Inputs.date({ label: "End date", value: new Date("1778-12-31") })
-```
-
-
-```js
-// Apply genre filter if selected
-const data = genres.length === 0
-  ? rawData
-  : rawData.filter(d => genres.includes(d.genre));
-
-const data = genreFiltered.filter(d => {
-  const date = new Date(d.performance_date || d.date);
+// Apply genre and/or date filters if selected
+const dateFiltered = rawData.filter(d => {
+  const date = new Date(d.date || d.performance_date);
   return date >= start_date && date <= end_date;
+});
+
+const data =
+  genres.length === 0
+    ? dateFiltered
+    : dateFiltered.filter((d) => genres.includes(d.genre));
 ```
 
+**Showing:** ${dataset} dataset
+${genres.length > 0 ? "filtered by genre(s): " + genres.join(", ") : "(all genres)"}
+from ${start_date.toISOString().slice(0, 10)} to ${end_date.toISOString().slice(0, 10)}.
 
+
+<div style="margin-top: 10%;"></div>
+
+
+
+
+## Animated Line Chart of Days with Performances
+
+<div id="chart-container"></div>
 
 ```js
-md`**Showing:** ${dataset} dataset ${genres.length > 0 ? `filtered by genres: ${genres.join(", ")}` : "(all genres)"}.`
+import {
+  createAnimatedLineChart,
+  createMultipleAnimatedLines,
+  createHeatmap,
+} from "./components/barchart.js";
+
+// sort by year first for ltr visualization
+data.sort((a, b) => a.year - b.year);
+
+// When dataset === "All", group each dataset into performance counts by year
+function summarize(dataset, label) {
+  const map = new Map();
+  dataset.forEach(d => {
+    const year = d.year;
+    const date = d.performance_date || d.date;
+    if (!map.has(year)) map.set(year, new Set());
+    map.get(year).add(date);
+  });
+  const summary = Array.from(map, ([year, dates]) => ({
+    year,
+    count: dates.size,
+  })).sort((a, b) => a.year - b.year);
+  return { label, data: summary };
+}
+
+const frenchData = summarize(French, "French");
+const danishData = summarize(Danish, "Danish");
+const dutchData = summarize(Dutch, "Dutch");
+
+
+const chart = display(
+  dataset === "All"
+    ? createMultipleAnimatedLines([frenchData, danishData, dutchData], { height: 500 })
+    : createAnimatedLineChart(data, { height: 500 })
+);
+
 ```
 
-md`**Showing:** ${dataset} dataset from ${start_date.toDateString()} to ${end_date.toDateString()}, ${genres.length > 0 ? `filtered by genres: ${genres.join(", ")}` : "(all genres)"}.`
+<details>
+  <summary style="cursor: pointer; font-weight: bold; color: #1c7ed6;">
+    🔍 Click to show explanation
+  </summary>
+  <p>
+    +INSERT CONTEXTUAL INFORMATION
+  </p>
+</details>
 
 
-<!-- stats graphic -->
 
-<!-- // Count total performances and total unique performance days -->
-const totalPerformances = data.length;
+<!-- spacing between charts -->
+<div style="margin-top: 10%;"></div>
 
-const uniqueDates = new Set(data.map(d => d.performance_date || d.date));
-const totalDaysPerformed = uniqueDates.size;
-
-md`### 🎭 Summary
-- **Total Performances:** ${totalPerformances.toLocaleString()}
-- **Total Days Performed On:** ${totalDaysPerformed.toLocaleString()}`
-
-
-## visualizations
-
+## Heatmap of Days with Performances
 ```js
-import { createAnimatedLineChart, createHeatmap } from "../../src/components/barchart.js";
-
-viewof chart = createAnimatedLineChart(data, { height: 500 });
+const heatmap = display(createHeatmap(data, { width: 900, height: 600 }));
 ```
 
-```js
-viewof heatmap = createHeatmap(data, { width: 900, height: 600 });
-```
+<details>
+  <summary style="cursor: pointer; font-weight: bold; color: #1c7ed6;">
+    🔍 Click to show explanation
+  </summary>
+  <p>
+    INSERT CONTEXTUAL INFORMATION HERE
+  </p>
+</details>
+
+
+<div id="map-container"></div>
