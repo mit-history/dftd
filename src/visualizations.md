@@ -97,9 +97,22 @@ from ${start_date.toISOString().slice(0, 10)} to ${end_date.toISOString().slice(
 
 
 
-## Animated Line Chart of Days with Performances
+## Animated Line Chart and Heatmap of Days with Performances
 
-<div id="chart-container"></div>
+<div style="
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2rem;
+  max-width: 1500px;
+  margin: auto;
+">
+  <div id="line-chart-container" style="flex: 1 1 500px; min-width: 450px;"></div>
+  <div id="heatmap-container" style="flex: 1 1 500px; min-width: 450px;"></div>
+</div>
+
+
+
 
 ```js
 import {
@@ -134,11 +147,18 @@ const frenchData = summarize(French, "French");
 const danishData = summarize(Danish, "Danish");
 const dutchData = summarize(Dutch, "Dutch");
 
+// clear old charts
+document.getElementById("line-chart-container").innerHTML = "";
+document.getElementById("heatmap-container").innerHTML = "";
 
-const chart = display(
+document.getElementById("line-chart-container").append(
   dataset === "All"
-    ? createMultipleAnimatedLines([frenchData, danishData, dutchData], { height: 500 })
-    : createAnimatedLineChart(data, { height: 500 })
+    ? createMultipleAnimatedLines([frenchData, danishData, dutchData], { width: 700, height: 600 })
+    : createAnimatedLineChart(data, { width: 700, height: 600 })
+);
+
+document.getElementById("heatmap-container").append(
+  createHeatmap(data, { width: 700, height: 600 })
 );
 
 ```
@@ -157,20 +177,3 @@ const chart = display(
 <!-- spacing between charts -->
 <div style="margin-top: 10%;"></div>
 
-
-## Heatmap of Days with Performances
-```js
-const heatmap = display(createHeatmap(data, { width: 900, height: 600 }));
-```
-
-<details>
-  <summary style="cursor: pointer; font-weight: bold; color: #1c7ed6;">
-    🔍 Click to show explanation
-  </summary>
-  <p>
-    INSERT CONTEXTUAL INFORMATION HERE
-  </p>
-</details>
-
-
-<div id="map-container"></div>
