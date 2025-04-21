@@ -41,6 +41,24 @@ export function createAnimatedLineChart(
 
   const x = d3.scaleLinear().domain([1748, 1778]).range([margin.left, computedWidth - margin.right]);
   const y = d3.scaleLinear().domain([0, 366]).range([height - margin.bottom, margin.top]);
+  // Reference line at 366 days
+  svg.append("line")
+  .attr("x1", margin.left)
+  .attr("x2", computedWidth - margin.right)
+  .attr("y1", y(366))
+  .attr("y2", y(366))
+  .attr("stroke", "gray")
+  .attr("stroke-width", 1.5)
+  .attr("stroke-dasharray", "4,4");
+
+  svg.append("text")
+  .attr("x", computedWidth - margin.right - 5)
+  .attr("y", y(366) - 5)
+  .attr("text-anchor", "end")
+  .attr("fill", "#666")
+  .attr("font-size", `${baseFontSize}px`)
+  .text("Max: 366 days");
+
 
   svg
     .append("g")
@@ -140,6 +158,24 @@ export function createMultipleAnimatedLines(groups, { width = 900, height = 500,
 
   const x = d3.scaleLinear().domain(years).range([margin.left, width - margin.right]);
   const y = d3.scaleLinear().domain([0, maxY]).nice().range([height - margin.bottom, margin.top]);
+  // Reference line at 366 days
+  svg.append("line")
+  .attr("x1", margin.left)
+  .attr("x2", computedWidth - margin.right)
+  .attr("y1", y(366))
+  .attr("y2", y(366))
+  .attr("stroke", "gray")
+  .attr("stroke-width", 1.5)
+  .attr("stroke-dasharray", "4,4");
+
+  svg.append("text")
+  .attr("x", computedWidth - margin.right - 5)
+  .attr("y", y(366) - 5)
+  .attr("text-anchor", "end")
+  .attr("fill", "#666")
+  .attr("font-size", `${baseFontSize}px`)
+  .text("Max: 366 days");
+
   const color = d3.scaleOrdinal().domain(groups.map(g => g.label)).range(["red", "blue", "green"]);
 
   const line = d3.line()
@@ -212,6 +248,7 @@ export function createMultipleAnimatedLines(groups, { width = 900, height = 500,
       .duration(100)
       .attr("opacity", 1);
   });
+
 
   const legend = svg.append("g").attr("transform", `translate(${width - 120}, 30)`);
   groups.forEach(({ label }, i) => {
@@ -418,6 +455,8 @@ export function createHeatmap(data, { width = 900, height = 500 } = {}) {
     .attr("font-size", "14px")
     .attr("fill", "#333333")
     .text("Number of Performance Days");
+
+
 
   return svg.node();
 }
