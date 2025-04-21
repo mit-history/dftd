@@ -82,9 +82,7 @@ const data =
     ? dateFiltered
     : dateFiltered.filter((d) => genres.includes(d.genre));
 
-
 ```
-
 
 
 **Showing:** ${dataset} dataset
@@ -93,8 +91,6 @@ from ${start_date.toISOString().slice(0, 10)} to ${end_date.toISOString().slice(
 
 
 <div style="margin-top: 10%;"></div>
-
-
 
 
 ## Animated Line Chart and Heatmap of Days with Performances
@@ -110,8 +106,6 @@ from ${start_date.toISOString().slice(0, 10)} to ${end_date.toISOString().slice(
   <div id="line-chart-container" style="flex: 1 1 500px; min-width: 450px;"></div>
   <div id="heatmap-container" style="flex: 1 1 500px; min-width: 450px;"></div>
 </div>
-
-
 
 
 ```js
@@ -172,8 +166,85 @@ document.getElementById("heatmap-container").append(
   </p>
 </details>
 
+## Proportion of Genres by Dataset
+
+<div style="margin-bottom: 2rem;"></div>
+
+```js
+
+// count genre frequencies
+const genreCounts = d3.rollup(
+  data.filter(d => d.genre),
+  v => v.length,
+  d => d.genre
+);
+
+//  get top 8 genres by count
+const topGenres = new Set(
+  Array.from(genreCounts.entries())
+    .sort((a, b) => d3.descending(a[1], b[1]))
+    .slice(0, 8)
+    .map(([genre]) => genre)
+);
+
+//   3: Replace rare genres with "Other"
+const cleanedData = data
+  .filter(d => d.genre && d.year)
+  .map(d => ({
+    ...d,
+    genre: topGenres.has(d.genre) ? d.genre : "Other"
+  }));
+
+// recalculate stacked proportions by year
+const yearGenreCounts = d3.rollups(
+  cleanedData,
+  v => v.length,
+  d => d.year,
+  d => d.genre
+);
+
+const stackedData = [];
+for (const [year, genreCounts] of yearGenreCounts) {
+  const total = d3.sum(genreCounts, ([_, count]) => count);
+  for (const [genre, count] of genreCounts) {
+    stackedData.push({
+      year: +year,
+      genre,
+      value: count / total
+    });
+  }
+}
+
+// draw stream plot
+display(
+Plot.plot({
+  width: 800,
+  height: 500,
+  x: {
+    label: "Year",
+    tickFormat: "d"
+  },
+  y: {
+    label: "Proportion",
+    grid: true
+  },
+  color: {
+    label: "Genre",
+    scheme: "spectral"
+  },
+  marks: [
+    Plot.areaY(stackedData, Plot.stackY({
+      x: "year",
+      y: "value",
+      fill: "genre",
+      curve: "bump-x",
+      stroke: "white"
+    }))
+  ]
+}));
+
+```
 
 
 <!-- spacing between charts -->
 <div style="margin-top: 10%;"></div>
-

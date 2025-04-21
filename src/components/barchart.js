@@ -161,7 +161,7 @@ export function createMultipleAnimatedLines(groups, { width = 900, height = 500,
   // Reference line at 366 days
   svg.append("line")
   .attr("x1", margin.left)
-  .attr("x2", computedWidth - margin.right)
+  .attr("x2", width - margin.right)
   .attr("y1", y(366))
   .attr("y2", y(366))
   .attr("stroke", "gray")
@@ -169,7 +169,7 @@ export function createMultipleAnimatedLines(groups, { width = 900, height = 500,
   .attr("stroke-dasharray", "4,4");
 
   svg.append("text")
-  .attr("x", computedWidth - margin.right - 5)
+  .attr("x", width - margin.right - 5)
   .attr("y", y(366) - 5)
   .attr("text-anchor", "end")
   .attr("fill", "#666")
