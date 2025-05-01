@@ -35,25 +35,25 @@ const Dutch = await FileAttachment("data/dutch-performances.csv").csv({
 });
 ```
 
-
 ```js
 // Choose dataset based on selection
 const rawData =
   dataset === "French"
-    ? French.map(d => ({ ...d, group: "French" }))
+    ? French.map((d) => ({ ...d, group: "French" }))
     : dataset === "Danish"
-    ? Danish.map(d => ({ ...d, group: "Danish" }))
+    ? Danish.map((d) => ({ ...d, group: "Danish" }))
     : dataset === "Dutch"
-    ? Dutch.map(d => ({ ...d, group: "Dutch" }))
-    : [...French.map(d => ({ ...d, group: "French" })),
-        ...Danish.map(d => ({ ...d, group: "Danish" })),
-        ...Dutch.map(d => ({ ...d, group: "Dutch" })),
+    ? Dutch.map((d) => ({ ...d, group: "Dutch" }))
+    : [
+        ...French.map((d) => ({ ...d, group: "French" })),
+        ...Danish.map((d) => ({ ...d, group: "Danish" })),
+        ...Dutch.map((d) => ({ ...d, group: "Dutch" })),
       ];
 ```
 
 ```js
-const start_date = view(Inputs.date({label: "Start", value: "1748-01-01"}));
-const end_date = view(Inputs.date({label: "End", value: "1778-12-31"}));
+const start_date = view(Inputs.date({ label: "Start", value: "1748-01-01" }));
+const end_date = view(Inputs.date({ label: "End", value: "1778-12-31" }));
 ```
 
 ## select genre
@@ -72,7 +72,7 @@ const genres = view(
 
 ```js
 // Apply genre and/or date filters if selected
-const dateFiltered = rawData.filter(d => {
+const dateFiltered = rawData.filter((d) => {
   const date = new Date(d.date || d.performance_date);
   return date >= start_date && date <= end_date;
 });
@@ -81,17 +81,13 @@ const data =
   genres.length === 0
     ? dateFiltered
     : dateFiltered.filter((d) => genres.includes(d.genre));
-
 ```
-
 
 **Showing:** ${dataset} dataset
 ${genres.length > 0 ? "filtered by genre(s): " + genres.join(", ") : "(all genres)"}
 from ${start_date.toISOString().slice(0, 10)} to ${end_date.toISOString().slice(0, 10)}.
 
-
 <div style="margin-top: 10%;"></div>
-
 
 ## Animated Line Chart and Heatmap of Days with Performances
 
@@ -106,7 +102,6 @@ from ${start_date.toISOString().slice(0, 10)} to ${end_date.toISOString().slice(
   <div id="line-chart-container" style="flex: 1 1 500px; min-width: 450px;"></div>
   <div id="heatmap-container" style="flex: 1 1 500px; min-width: 450px;"></div>
 </div>
-
 
 ```js
 import {
@@ -124,7 +119,7 @@ data.sort((a, b) => a.year - b.year);
 // When dataset === "All", group each dataset into performance counts by year
 function summarize(dataset, label) {
   const map = new Map();
-  dataset.forEach(d => {
+  dataset.forEach((d) => {
     const year = d.year;
     const date = d.performance_date || d.date;
     if (!map.has(year)) map.set(year, new Set());
@@ -147,14 +142,16 @@ document.getElementById("heatmap-container").innerHTML = "";
 
 document.getElementById("line-chart-container").append(
   dataset === "All"
-    ? createMultipleAnimatedLines([frenchData, danishData, dutchData], { width: 700, height: 600 })
+    ? createMultipleAnimatedLines([frenchData, danishData, dutchData], {
+        width: 700,
+        height: 600,
+      })
     : createAnimatedLineChart(data, { width: 700, height: 600 })
 );
 
-document.getElementById("heatmap-container").append(
-  createHeatmap(data, { width: 700, height: 600 })
-);
-
+document
+  .getElementById("heatmap-container")
+  .append(createHeatmap(data, { width: 700, height: 600 }));
 ```
 
 <details>
@@ -171,12 +168,11 @@ document.getElementById("heatmap-container").append(
 <div style="margin-bottom: 2rem;"></div>
 
 ```js
-
 // count genre frequencies
 const genreCounts = d3.rollup(
-  data.filter(d => d.genre),
-  v => v.length,
-  d => d.genre
+  data.filter((d) => d.genre),
+  (v) => v.length,
+  (d) => d.genre
 );
 
 //  get top 8 genres by count
@@ -189,18 +185,18 @@ const topGenres = new Set(
 
 //   3: Replace rare genres with "Other"
 const cleanedData = data
-  .filter(d => d.genre && d.year)
-  .map(d => ({
+  .filter((d) => d.genre && d.year)
+  .map((d) => ({
     ...d,
-    genre: topGenres.has(d.genre) ? d.genre : "Other"
+    genre: topGenres.has(d.genre) ? d.genre : "Other",
   }));
 
 // recalculate stacked proportions by year
 const yearGenreCounts = d3.rollups(
   cleanedData,
-  v => v.length,
-  d => d.year,
-  d => d.genre
+  (v) => v.length,
+  (d) => d.year,
+  (d) => d.genre
 );
 
 const stackedData = [];
@@ -210,41 +206,49 @@ for (const [year, genreCounts] of yearGenreCounts) {
     stackedData.push({
       year: +year,
       genre,
-      value: count / total
+      value: count,
     });
   }
 }
 
 // draw stream plot
 display(
-Plot.plot({
-  width: 800,
-  height: 500,
-  x: {
-    label: "Year",
-    tickFormat: "d"
-  },
-  y: {
-    label: "Proportion",
-    grid: true
-  },
-  color: {
-    label: "Genre",
-    scheme: "spectral"
-  },
-  marks: [
-    Plot.areaY(stackedData, Plot.stackY({
-      x: "year",
-      y: "value",
-      fill: "genre",
-      curve: "bump-x",
-      stroke: "white"
-    }))
-  ]
-}));
-
+  Plot.plot({
+    width: 800,
+    height: 500,
+    x: {
+      label: "Year",
+      tickFormat: "d",
+    },
+    y: {
+      label: "Proportion",
+      grid: true,
+    },
+    color: {
+      label: "Genre",
+      scheme: "spectral",
+      legend: true,
+    },
+    marks: [
+      Plot.rectY(
+        stackedData,
+        Plot.stackY(
+          { offset: "normalize" },
+          {
+            x: "year",
+            y: "value",
+            fill: "genre",
+            sort: "genre",
+            stroke: "white",
+            tip: true,
+          }
+        )
+      ),
+      Plot.ruleY([0]),
+    ],
+  })
+);
 ```
-
 
 <!-- spacing between charts -->
 <div style="margin-top: 10%;"></div>
