@@ -1,3 +1,7 @@
+---
+toc: false
+---
+
 # Visualizations of Play Data
 
 ```js
@@ -47,7 +51,6 @@ function percentageYearsChart(data) {
     x: { axis: null, paddingOuter: 0.2 },
     y: { grid: true, label: "Percentage" },
     color: { legend: true },
-    width: 1000,
     marks: [
       Plot.barY(data, {x: "origin", y: "percentage", fx: "year", fill: "origin", tip: true}),
       Plot.ruleY([0])
@@ -109,6 +112,18 @@ function mapPlot(data) {
 ```
 
 <div>
+
+```js
+const opt = ["Over Time", "By Author", "Days with Performances"];
+const viz = view(Inputs.checkbox(opt, {label: "Visualization", value: opt.filter(o => Math.round(Math.random()))}));
+```
+
+```js
+const overTime = viz.includes("Over Time");
+const byAuthor = viz.includes("By Author");
+const performanceDays = viz.includes("Days with Performances");
+```
+
 <div class="card" style="position:sticky;top:5px;">
 
 <details>
@@ -121,25 +136,26 @@ const end_date = view(Inputs.date({label: "End", value: "1778-12-31"}));
 ```
 
 ```js
-const origins = view(Inputs.checkbox(["danish", "dutch", "french"], {label: "Origin"}));
+const origins = view(Inputs.checkbox(["danish", "dutch", "french"], {label: "Origin", value: ["danish", "dutch", "french"].filter(i => Math.round(Math.random()))}));
 ```
 
 ```js
+const genreOptions = Array.from(new Set(combined_data.filter(d => origins.includes(d.origin)).map((d) => d.genre).filter(Boolean))).sort();
+
 const genres = view(
   Inputs.checkbox(
-    Array.from(new Set(combined_data.filter(d => origins.includes(d.origin)).map((d) => d.genre).filter(Boolean))).sort(),
+    genreOptions,
     {
       label: "Select genre(s)",
-      value: [], // default: all
+      value: genreOptions.filter(i => Math.round(Math.random())), // default: all
     }
   )
 );
 ```
 
 ```js
-const author = view(
-  Inputs.select([
-    "No author selected",
+const authorOptions = [
+    "No author",
     ...Array.from(
       new Set([
         ...french.map((d) => d.author.split(" ; ")).flat().filter(Boolean),
@@ -147,8 +163,10 @@ const author = view(
         ...dutch.map((d) => d.author).filter(Boolean),
       ])
     ).sort()
-    ], { label: "Filter by author", value: "No author selected" }
-  )
+]
+
+const author = view(
+  Inputs.select( authorOptions, { label: "Filter by author", value: authorOptions[Math.floor(Math.random() * authorOptions.length)] })
 );
 ```
 
@@ -160,10 +178,12 @@ const author = view(
 const formatted_data = combined_data.filter(d => (new Date(d.date) > start_date) && (new Date(d.date) <= end_date) && origins.includes(d.origin));
 ```
 
-## Comparative Performances Over Time
+```js
+display(overTime ? html `<h2>Comparative Performances Over Time</h2>` : html`<div></div>`)
+```
 
 ```js
-display(formatted_data.length > 0 ? compareYearsChart(formatted_data) : html`<i>No data.</i>`)
+display(overTime ? (formatted_data.length > 0 ? compareYearsChart(formatted_data) : html`<i>No data.</i>`) : html`<div></div>`)
 ```
 
 ```js
@@ -196,21 +216,30 @@ const author_counts = author_filtered_data ? Object.entries(author_filtered_data
 }) : undefined;
 ```
 
-## Performances by Author
-
-### Percentage by Author
-
 ```js
-display(author_data.length > 0 ? percentageYearsChart(author_data) : html`<i>No data.</i>`)
+display(byAuthor ? html `<h2>Performances by Author</h2>` : html`<div></div>`)
 ```
 
-### Performances by Location
-
 ```js
-display(author_counts ? mapPlot(author_counts) : html`<i>No data.</i>`)
+display(byAuthor ? html `<h3>Percentage by Author</h3>` : html`<div></div>`)
 ```
 
-## Animated Line Chart and Heatmap of Days with Performances
+```js
+display(byAuthor ? author_data.length > 0 ? percentageYearsChart(author_data) : html`<i>No data.</i>` : html`<div></div>`)
+```
+
+```js
+display(byAuthor ? html `<h3>Percentage by Location</h3>` : html`<div></div>`)
+```
+
+```js
+display(byAuthor ? author_counts ? mapPlot(author_counts) : html`<i>No data.</i>` : html`<div></div>`)
+```
+
+```js
+display(performanceDays ? html `<h2>Animated Line Chart and Heatmap of Days with Performances</h2>` : html`<div></div>`)
+display(performanceDays ? html `<p> Selected genres: ${genres.length === 0 ? "None" : genres.join(", ")} </p>` : html`<div></div>`)
+```
 
 ```js
 const genre_data =
@@ -270,11 +299,11 @@ const summarized_data = origins.map(origin => summarize(data_origin.get(origin),
 document.getElementById("line-chart-container").innerHTML = "";
 document.getElementById("heatmap-container").innerHTML = "";
 
-origins.length > 0 ? document.getElementById("line-chart-container").append(
+origins.length > 0 && performanceDays ? document.getElementById("line-chart-container").append(
     createMultipleAnimatedLines(summarized_data, { width: 700, height: 600 })
 ) : html`<i>No data.</i>`
 
-origins.length > 0 ? document.getElementById("heatmap-container").append(
+origins.length > 0 && performanceDays ? document.getElementById("heatmap-container").append(
   createHeatmap(genre_data, { width: 700, height: 600 })
 ) : html`<i>No data.</i>`
 
