@@ -62,10 +62,10 @@
 import {define} from "./_observablehq/client.b1dbc9cc.js";
 import {registerFile} from "./_observablehq/stdlib.78bf8803.js";
 
-registerFile("./data/countries-110m.json", {"name":"./data/countries-110m.json","mimeType":"application/json","path":"./_file/data/countries-110m.2516c915.json","lastModified":1747366582247,"size":107761});
-registerFile("./data/danish-performances.csv", {"name":"./data/danish-performances.csv","mimeType":"text/csv","path":"./_file/data/danish-performances.4497749d.csv","lastModified":1747366629164,"size":699625});
-registerFile("./data/dutch-performances.csv", {"name":"./data/dutch-performances.csv","mimeType":"text/csv","path":"./_file/data/dutch-performances.9fa6624f.csv","lastModified":1747366632356,"size":271876});
-registerFile("./data/french-performances.json", {"name":"./data/french-performances.json","mimeType":"application/json","path":"./_file/data/french-performances.bf109f55.json","lastModified":1747366632217,"size":1243807});
+registerFile("./data/countries-110m.json", {"name":"./data/countries-110m.json","mimeType":"application/json","path":"./_file/data/countries-110m.2516c915.json","lastModified":1747367841163,"size":107761});
+registerFile("./data/danish-performances.csv", {"name":"./data/danish-performances.csv","mimeType":"text/csv","path":"./_file/data/danish-performances.4497749d.csv","lastModified":1747367982703,"size":699625});
+registerFile("./data/dutch-performances.csv", {"name":"./data/dutch-performances.csv","mimeType":"text/csv","path":"./_file/data/dutch-performances.9fa6624f.csv","lastModified":1747367985757,"size":271876});
+registerFile("./data/french-performances.json", {"name":"./data/french-performances.json","mimeType":"application/json","path":"./_file/data/french-performances.bf109f55.json","lastModified":1747367985578,"size":1243807});
 
 define({id: "1ffd4d30", inputs: ["FileAttachment"], outputs: ["danish_data","french_data","dutch_data"], body: (FileAttachment) => {
 const danish_data = FileAttachment("./data/danish-performances.csv").csv({
@@ -340,7 +340,7 @@ display(author_counts ? mapPlot(author_counts) : html`<i>No data.</i>`)
 </main>
 <footer id="observablehq-footer">
 <nav><a rel="prev" href="./"><span>Danish French Theater Data</span></a><a rel="next" href="./combined-comedy"><span>Comedy Performances</span></a></nav>
-<div>Built with <a href="https://observablehq.com/" target="_blank" rel="noopener noreferrer">Observable</a> on <a title="2025-05-15T23:37:00">May 15, 2025</a>.</div>
+<div>Built with <a href="https://observablehq.com/" target="_blank" rel="noopener noreferrer">Observable</a> on <a title="2025-05-15T23:59:32">May 15, 2025</a>.</div>
 </footer>
 </div>
 </body>
