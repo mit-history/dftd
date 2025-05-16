@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="generator" content="Observable Framework v1.13.2">
+<title>Data visualization | Danish French Theater Data</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,200..900;1,8..60,200..900&amp;display=swap" crossorigin>
+<link rel="preload" as="style" href="./_observablehq/theme-air,near-midnight.dcdbf18e.css">
+<link rel="preload" as="style" href="./_observablehq/stdlib/inputs.ea9fd553.css">
+<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,200..900;1,8..60,200..900&amp;display=swap" crossorigin>
+<link rel="stylesheet" type="text/css" href="./_observablehq/theme-air,near-midnight.dcdbf18e.css">
+<link rel="stylesheet" type="text/css" href="./_observablehq/stdlib/inputs.ea9fd553.css">
+<link rel="modulepreload" href="./_observablehq/client.f2b649b1.js">
+<link rel="modulepreload" href="./_observablehq/runtime.f168f711.js">
+<link rel="modulepreload" href="./_observablehq/stdlib.1020d4a0.js">
+<link rel="modulepreload" href="./_npm/react@19.0.0/jsx-runtime.a4fc5384.js">
+<link rel="modulepreload" href="./_observablehq/stdlib/inputs.8858dda5.js">
+<link rel="modulepreload" href="./_npm/@observablehq/plot@0.6.17/b783768b.js">
+<link rel="modulepreload" href="./_npm/react-dom@19.0.0/client.764cc9eb.js">
+<link rel="modulepreload" href="./_npm/htl@0.3.1/063eb405.js">
+<link rel="modulepreload" href="./_npm/isoformat@0.2.1/c68fbd73.js">
+<link rel="modulepreload" href="./_npm/d3@7.9.0/2325b2c8.js">
+<link rel="modulepreload" href="./_npm/interval-tree-1d@1.0.4/a62ae5ce.js">
+<link rel="modulepreload" href="./_npm/scheduler@0.25.0/489117cb.js">
+<link rel="modulepreload" href="./_npm/react@19.0.0/03d80e9e.js">
+<link rel="modulepreload" href="./_npm/react-dom@19.0.0/077fc3de.js">
+<link rel="modulepreload" href="./_npm/d3-array@3.2.4/37839b6a.js">
+<link rel="modulepreload" href="./_npm/d3-axis@3.0.0/bd0afa17.js">
+<link rel="modulepreload" href="./_npm/d3-brush@3.0.0/6ac7d65c.js">
+<link rel="modulepreload" href="./_npm/d3-chord@3.0.1/c6aedacf.js">
+<link rel="modulepreload" href="./_npm/d3-color@3.1.0/6821f0c1.js">
+<link rel="modulepreload" href="./_npm/d3-contour@4.0.2/d496a3b3.js">
+<link rel="modulepreload" href="./_npm/d3-delaunay@6.0.4/c1ddf721.js">
+<link rel="modulepreload" href="./_npm/d3-dispatch@3.0.1/b5f7cdc6.js">
+<link rel="modulepreload" href="./_npm/d3-drag@3.0.0/ef06b1ff.js">
+<link rel="modulepreload" href="./_npm/d3-dsv@3.0.1/9f467835.js">
+<link rel="modulepreload" href="./_npm/d3-ease@3.0.1/6f15f633.js">
+<link rel="modulepreload" href="./_npm/d3-fetch@3.0.1/d9a18fcf.js">
+<link rel="modulepreload" href="./_npm/d3-force@3.0.0/60bb70b3.js">
+<link rel="modulepreload" href="./_npm/d3-format@3.1.0/33fb7288.js">
+<link rel="modulepreload" href="./_npm/d3-geo@3.1.1/5e427f4b.js">
+<link rel="modulepreload" href="./_npm/d3-hierarchy@3.1.2/f1db2593.js">
+<link rel="modulepreload" href="./_npm/d3-interpolate@3.0.1/7e45aaba.js">
+<link rel="modulepreload" href="./_npm/d3-path@3.1.0/4bb53638.js">
+<link rel="modulepreload" href="./_npm/d3-polygon@3.0.1/bbafde58.js">
+<link rel="modulepreload" href="./_npm/d3-quadtree@3.0.1/aa5b35a8.js">
+<link rel="modulepreload" href="./_npm/d3-random@3.0.1/32c7fec2.js">
+<link rel="modulepreload" href="./_npm/d3-scale@4.0.2/435d3e9d.js">
+<link rel="modulepreload" href="./_npm/d3-scale-chromatic@3.1.0/6a41b56e.js">
+<link rel="modulepreload" href="./_npm/d3-selection@3.0.0/a4e530fb.js">
+<link rel="modulepreload" href="./_npm/d3-shape@3.2.0/be692bd9.js">
+<link rel="modulepreload" href="./_npm/d3-time@3.1.0/3a9ac1c1.js">
+<link rel="modulepreload" href="./_npm/d3-time-format@4.1.0/28d1ef76.js">
+<link rel="modulepreload" href="./_npm/d3-timer@3.0.1/f31b5398.js">
+<link rel="modulepreload" href="./_npm/d3-transition@3.0.1/5c345eab.js">
+<link rel="modulepreload" href="./_npm/d3-zoom@3.0.0/6bf2ba81.js">
+<link rel="modulepreload" href="./_npm/binary-search-bounds@2.0.5/1ee6c50d.js">
+<link rel="modulepreload" href="./_npm/internmap@2.0.3/5eed35fd.js">
+<link rel="modulepreload" href="./_npm/delaunator@5.0.1/e67acb27.js">
+<link rel="modulepreload" href="./_npm/robust-predicates@3.0.2/8ac9039b.js">
+<link rel="icon" href="./_file/observable.1af93621.png" type="image/png" sizes="32x32">
+<script type="module">
+
+import {define} from "./_observablehq/client.f2b649b1.js";
+import {registerFile} from "./_observablehq/stdlib.1020d4a0.js";
+
+registerFile("./data/french-loadPlays.json", {"name":"./data/french-loadPlays.json","mimeType":"application/json","path":"./_file/data/french-loadPlays.ea3d2558.json","lastModified":1742258791824,"size":98461});
+
+define({id: "89b3701b", inputs: ["FileAttachment"], outputs: ["plays"], body: (FileAttachment) => {
+const plays = FileAttachment("./data/french-loadPlays.json").json();
+return {plays};
+}});
+
+define({id: "85a7faef", inputs: ["view","Inputs","plays"], body: (view,Inputs,plays) => {
+view(Inputs.table(plays));
+}});
+
+define({id: "302a3a2d", inputs: ["Plot"], outputs: ["countByGenre","genrePlot"], body: (Plot) => {
+// genrePlot
+function countByGenre(data, cutoff = 10) {
+  const genreCounts = {};
+  data.forEach((play) => {
+    const genre = play.genre || "Unknown";
+    genreCounts[genre] = (genreCounts[genre] || 0) + 1;
+  });
+  return Object.entries(genreCounts)
+    .map(([genre, count]) => ({ genre, count }))
+    .filter((genre) => genre.count >= cutoff);
+}
+
+function genrePlot(data, cutoff = 10) {
+  return Plot.plot({
+    title: "Number of Plays by Genre",
+    width: 600,
+    height: 400,
+    x: { label: "Genre" },
+    y: { label: "Count" },
+    marks: [
+      Plot.barY(countByGenre(data, cutoff), {
+        x: "genre",
+        y: "count",
+        fill: "steelblue",
+        tip: true,
+        sort: { x: "-y" },
+      }),
+    ],
+  });
+}
+return {countByGenre,genrePlot};
+}});
+
+define({id: "a8976af8", outputs: ["cutoff"], body: () => {
+const cutoff = 3;
+return {cutoff};
+}});
+
+define({id: "9ff7ec7c", mode: "inline", inputs: ["cutoff","display"], body: async (cutoff,display) => {
+display(await(
+cutoff
+))
+}});
+
+define({id: "66116ffb", inputs: ["genrePlot","plays","cutoff"], body: (genrePlot,plays,cutoff) => {
+genrePlot(plays, cutoff);
+}});
+
+define({id: "378d6e74", mode: "jsx", outputs: ["jsx","jsxs","listData"], body: async () => {
+const {jsx, jsxs} = await import("./_npm/react@19.0.0/jsx-runtime.a4fc5384.js");
+function listData(data) {
+  return /* @__PURE__ */ jsx("ul", { children: data.map((play) => /* @__PURE__ */ jsxs("li", { children: [
+    play.title,
+    " by ",
+    play.author,
+    " (Genre: ",
+    play.genre,
+    ")"
+  ] })) });
+}
+return {jsx,jsxs,listData};
+}});
+
+define({id: "f21c4fde", mode: "jsx", inputs: ["display","listData","plays"], body: (display,listData,plays) => {
+display(listData(plays));
+}});
+
+define({id: "5ef6c8f5", inputs: ["Plot"], outputs: ["countByAuthor","authorPlot"], body: (Plot) => {
+function countByAuthor(data) {
+  const authorCounts = {};
+  data.forEach((play) => {
+    const author = play.author || "Unknown";
+    authorCounts[author] = (authorCounts[author] || 0) + 1;
+  });
+  return Object.entries(authorCounts).map(([author, count]) => ({
+    author,
+    count,
+  }));
+}
+
+function authorPlot(data) {
+  return Plot.plot({
+    title: "Number of Plays by Author",
+    width: 600,
+    height: 400,
+    x: { label: "Author" },
+    y: { label: "Count" },
+    marks: [
+      Plot.barY(countByAuthor(data), {
+        x: "author",
+        y: "count",
+        fill: "darkorange",
+        tip: true,
+        sort: { x: "-y" },
+      }),
+    ],
+  });
+}
+return {countByAuthor,authorPlot};
+}});
+
+define({id: "618bb841", inputs: ["authorPlot","plays"], body: (authorPlot,plays) => {
+authorPlot(plays);
+}});
+
+define({id: "a7f86acc", inputs: ["Plot"], outputs: ["countByPrologue","prologuePlot"], body: (Plot) => {
+function countByPrologue(data) {
+  const result = { "With Prologue": 0, "Without Prologue": 0 };
+  data.forEach((play) => {
+    if (play.prologue) result["With Prologue"]++;
+    else result["Without Prologue"]++;
+  });
+  return Object.entries(result).map(([prologue, count]) => ({
+    prologue,
+    count,
+  }));
+}
+
+function prologuePlot(data) {
+  return Plot.plot({
+    title: "Plays with/without Prologue",
+    width: 600,
+    height: 400,
+    x: { label: "Prologue" },
+    y: { label: "Count" },
+    marks: [
+      Plot.barY(countByPrologue(data), {
+        x: "prologue",
+        y: "count",
+        fill: "purple",
+        tip: true,
+      }),
+    ],
+  });
+}
+return {countByPrologue,prologuePlot};
+}});
+
+define({id: "5e198c61", inputs: ["prologuePlot","plays"], body: (prologuePlot,plays) => {
+prologuePlot(plays);
+}});
+
+define({id: "2ed61912", inputs: ["Plot"], outputs: ["countByMusique","musiquePlot"], body: (Plot) => {
+function countByMusique(data) {
+  const result = { "With Effects": 0, "Without Effects": 0 };
+  data.forEach((play) => {
+    if (play.musique_danse_machine) result["With Effects"]++;
+    else result["Without Effects"]++;
+  });
+  return Object.entries(result).map(([type, count]) => ({ type, count }));
+}
+
+function musiquePlot(data) {
+  return Plot.plot({
+    title: "Plays with Musique/Danse/Machine",
+    width: 600,
+    height: 400,
+    x: { label: "Effect Type" },
+    y: { label: "Count" },
+    marks: [
+      Plot.barY(countByMusique(data), {
+        x: "type",
+        y: "count",
+        fill: "teal",
+        tip: true,
+      }),
+    ],
+  });
+}
+return {countByMusique,musiquePlot};
+}});
+
+define({id: "1c202321", inputs: ["musiquePlot","plays"], body: (musiquePlot,plays) => {
+musiquePlot(plays);
+}});
+
+define({id: "378d6e74-1", mode: "jsx", outputs: ["jsx","jsxs","listData"], body: async () => {
+const {jsx, jsxs} = await import("./_npm/react@19.0.0/jsx-runtime.a4fc5384.js");
+function listData(data) {
+  return /* @__PURE__ */ jsx("ul", { children: data.map((play) => /* @__PURE__ */ jsxs("li", { children: [
+    play.title,
+    " by ",
+    play.author,
+    " (Genre: ",
+    play.genre,
+    ")"
+  ] })) });
+}
+return {jsx,jsxs,listData};
+}});
+
+define({id: "f21c4fde-1", mode: "jsx", inputs: ["display","listData","plays"], body: (display,listData,plays) => {
+display(listData(plays));
+}});
+
+</script>
+</head>
+<body>
+<input id="observablehq-sidebar-toggle" type="checkbox" title="Toggle sidebar">
+<label id="observablehq-sidebar-backdrop" for="observablehq-sidebar-toggle"></label>
+<nav id="observablehq-sidebar">
+  <ol>
+    <label id="observablehq-sidebar-close" for="observablehq-sidebar-toggle"></label>
+    <li class="observablehq-link"><a href="./">Danish French Theater Data</a></li>
+  </ol>
+  <section>
+    <summary>Visualizations</summary>
+    <ol>
+    <li class="observablehq-link"><a href="./combined-data">Performances</a></li>
+    <li class="observablehq-link"><a href="./combined-comedy">Comedy Performances</a></li>
+    <li class="observablehq-link"><a href="./visualizations">Further Visualizations</a></li>
+    </ol>
+  </section>
+</nav>
+<script>{const e=document.querySelector("#observablehq-sidebar"),o=document.querySelector("#observablehq-sidebar-toggle"),r=sessionStorage.getItem("observablehq-sidebar");r?o.checked=r==="true":o.indeterminate=!0;for(const t of document.querySelectorAll("#observablehq-sidebar summary")){const s=t.parentElement;switch(sessionStorage.getItem(`observablehq-sidebar:${t.textContent}`)){case"true":s.open=!0;break;case"false":s.classList.contains("observablehq-section-active")||(s.open=!1);break}}addEventListener("beforeunload",()=>sessionStorage.setItem("observablehq-sidebar-scrolly",`${e.scrollTop}`));const a=sessionStorage.getItem("observablehq-sidebar-scrolly");a!=null&&(e.style.cssText="overflow: hidden;",e.scrollTop=+a,e.style.cssText="");}</script>
+<div id="observablehq-center">
+<aside id="observablehq-toc" data-selector="h1:not(:first-of-type)[id], h2:first-child[id], :not(h1) + h2[id]">
+<nav>
+</nav>
+</aside>
+<main id="observablehq-main" class="observablehq">
+<h1 id="data-visualization" tabindex="-1"><a class="observablehq-header-anchor" href="#data-visualization">Data visualization</a></h1>
+<div class="observablehq observablehq--block"><!--:89b3701b:--></div>
+<div class="observablehq observablehq--block"><!--:85a7faef:--></div>
+<div class="observablehq observablehq--block"><!--:302a3a2d:--></div>
+<div class="observablehq observablehq--block"><!--:a8976af8:--></div>
+<p>The following graph shows the number of plays by genre for all genres that applied to at least <observablehq-loading></observablehq-loading><!--:9ff7ec7c:--> plays in the dataset.</p>
+<div class="observablehq observablehq--block"><!--:66116ffb:--></div>
+<div class="observablehq observablehq--block"><!--:378d6e74:--></div>
+<div class="observablehq observablehq--block"><!--:f21c4fde:--></div>
+<p>// 🔸 Author Plot</p>
+<div class="observablehq observablehq--block"><!--:5ef6c8f5:--></div>
+<div class="observablehq observablehq--block"><!--:618bb841:--></div>
+<hr>
+<p>// 🔸 Prologue Plot</p>
+<div class="observablehq observablehq--block"><!--:a7f86acc:--></div>
+<div class="observablehq observablehq--block"><!--:5e198c61:--></div>
+<hr>
+<p>// 🔸 Musique / Danse / Machine Plot</p>
+<div class="observablehq observablehq--block"><!--:2ed61912:--></div>
+<div class="observablehq observablehq--block"><!--:1c202321:--></div>
+<hr>
+<div class="observablehq observablehq--block"><!--:378d6e74-1:--></div>
+<div class="observablehq observablehq--block"><!--:f21c4fde-1:--></div>
+</main>
+<footer id="observablehq-footer">
+<div>Built with <a href="https://observablehq.com/" target="_blank" rel="noopener noreferrer">Observable</a> on <a title="2025-05-15T23:21:31">May 15, 2025</a>.</div>
+</footer>
+</div>
+</body>
+</html>

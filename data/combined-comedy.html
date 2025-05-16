@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="generator" content="Observable Framework v1.13.2">
+<title>Comedy Performances | Danish French Theater Data</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,200..900;1,8..60,200..900&amp;display=swap" crossorigin>
+<link rel="preload" as="style" href="./_observablehq/theme-air,near-midnight,alt,wide.db1cdf55.css">
+<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,200..900;1,8..60,200..900&amp;display=swap" crossorigin>
+<link rel="stylesheet" type="text/css" href="./_observablehq/theme-air,near-midnight,alt,wide.db1cdf55.css">
+<link rel="modulepreload" href="./_observablehq/client.f2b649b1.js">
+<link rel="modulepreload" href="./_observablehq/runtime.f168f711.js">
+<link rel="modulepreload" href="./_observablehq/stdlib.1020d4a0.js">
+<link rel="modulepreload" href="./_import/components/comedyCharts.53034d04.js">
+<link rel="modulepreload" href="./_npm/@observablehq/plot@0.6.17/b783768b.js">
+<link rel="modulepreload" href="./_npm/d3-dsv@3.0.1/9f467835.js">
+<link rel="modulepreload" href="./_npm/d3@7.9.0/2325b2c8.js">
+<link rel="modulepreload" href="./_npm/isoformat@0.2.1/c68fbd73.js">
+<link rel="modulepreload" href="./_npm/interval-tree-1d@1.0.4/a62ae5ce.js">
+<link rel="modulepreload" href="./_npm/d3-array@3.2.4/37839b6a.js">
+<link rel="modulepreload" href="./_npm/d3-axis@3.0.0/bd0afa17.js">
+<link rel="modulepreload" href="./_npm/d3-brush@3.0.0/6ac7d65c.js">
+<link rel="modulepreload" href="./_npm/d3-chord@3.0.1/c6aedacf.js">
+<link rel="modulepreload" href="./_npm/d3-color@3.1.0/6821f0c1.js">
+<link rel="modulepreload" href="./_npm/d3-contour@4.0.2/d496a3b3.js">
+<link rel="modulepreload" href="./_npm/d3-delaunay@6.0.4/c1ddf721.js">
+<link rel="modulepreload" href="./_npm/d3-dispatch@3.0.1/b5f7cdc6.js">
+<link rel="modulepreload" href="./_npm/d3-drag@3.0.0/ef06b1ff.js">
+<link rel="modulepreload" href="./_npm/d3-ease@3.0.1/6f15f633.js">
+<link rel="modulepreload" href="./_npm/d3-fetch@3.0.1/d9a18fcf.js">
+<link rel="modulepreload" href="./_npm/d3-force@3.0.0/60bb70b3.js">
+<link rel="modulepreload" href="./_npm/d3-format@3.1.0/33fb7288.js">
+<link rel="modulepreload" href="./_npm/d3-geo@3.1.1/5e427f4b.js">
+<link rel="modulepreload" href="./_npm/d3-hierarchy@3.1.2/f1db2593.js">
+<link rel="modulepreload" href="./_npm/d3-interpolate@3.0.1/7e45aaba.js">
+<link rel="modulepreload" href="./_npm/d3-path@3.1.0/4bb53638.js">
+<link rel="modulepreload" href="./_npm/d3-polygon@3.0.1/bbafde58.js">
+<link rel="modulepreload" href="./_npm/d3-quadtree@3.0.1/aa5b35a8.js">
+<link rel="modulepreload" href="./_npm/d3-random@3.0.1/32c7fec2.js">
+<link rel="modulepreload" href="./_npm/d3-scale@4.0.2/435d3e9d.js">
+<link rel="modulepreload" href="./_npm/d3-scale-chromatic@3.1.0/6a41b56e.js">
+<link rel="modulepreload" href="./_npm/d3-selection@3.0.0/a4e530fb.js">
+<link rel="modulepreload" href="./_npm/d3-shape@3.2.0/be692bd9.js">
+<link rel="modulepreload" href="./_npm/d3-time@3.1.0/3a9ac1c1.js">
+<link rel="modulepreload" href="./_npm/d3-time-format@4.1.0/28d1ef76.js">
+<link rel="modulepreload" href="./_npm/d3-timer@3.0.1/f31b5398.js">
+<link rel="modulepreload" href="./_npm/d3-transition@3.0.1/5c345eab.js">
+<link rel="modulepreload" href="./_npm/d3-zoom@3.0.0/6bf2ba81.js">
+<link rel="modulepreload" href="./_npm/binary-search-bounds@2.0.5/1ee6c50d.js">
+<link rel="modulepreload" href="./_npm/internmap@2.0.3/5eed35fd.js">
+<link rel="modulepreload" href="./_npm/delaunator@5.0.1/e67acb27.js">
+<link rel="modulepreload" href="./_npm/robust-predicates@3.0.2/8ac9039b.js">
+<link rel="icon" href="./_file/observable.1af93621.png" type="image/png" sizes="32x32">
+<script type="module">
+
+import {define} from "./_observablehq/client.f2b649b1.js";
+import {registerFile} from "./_observablehq/stdlib.1020d4a0.js";
+
+registerFile("./data/danish-performances.csv", {"name":"./data/danish-performances.csv","mimeType":"text/csv","path":"./_file/data/danish-performances.4497749d.csv","lastModified":1745953973039,"size":699625});
+registerFile("./data/french-performances.json", {"name":"./data/french-performances.json","mimeType":"application/json","path":"./_file/data/french-performances.bf109f55.json","lastModified":1742670219426,"size":1243807});
+
+define({id: "43a64807", inputs: ["FileAttachment"], outputs: ["filterComedyPerformances","danish_data","french_data"], body: async (FileAttachment) => {
+const {filterComedyPerformances} = await import("./_import/components/comedyCharts.53034d04.js");
+ // [Added]
+
+const danish_data = FileAttachment("./data/danish-performances.csv").csv({
+  typed: true,
+});
+const french_data = FileAttachment("./data/french-performances.json").json();
+return {filterComedyPerformances,danish_data,french_data};
+}});
+
+define({id: "fbb4c80e", inputs: ["Plot"], outputs: ["yearChart"], body: (Plot) => {
+// Yearly Performance Chart Function
+function yearChart(data) {
+  return Plot.plot({
+    title: "Performances by year",
+    x: { label: "Year" },
+    y: { grid: true, label: "Performances" },
+    width: 1000,
+    marks: [
+      Plot.barY(data, Plot.groupX({ y: "count" }, { x: "year" })),
+      Plot.ruleY([0]),
+    ],
+  });
+}
+return {yearChart};
+}});
+
+define({id: "cff11c66", inputs: ["danish_data","display","yearChart"], outputs: ["danish_comedy"], body: (danish_data,display,yearChart) => {
+const danish_comedy = danish_data.filter(
+  (d) =>
+    d.genre &&
+    (d.genre.toLowerCase().includes("comed") ||
+      d.genre.toLowerCase().includes("coméd"))
+);
+display(yearChart(danish_comedy));
+return {danish_comedy};
+}});
+
+define({id: "1d1209da", inputs: ["filterComedyPerformances","french_data","display","yearChart"], outputs: ["french_comedy"], body: (filterComedyPerformances,french_data,display,yearChart) => {
+const french_comedy = filterComedyPerformances(french_data);
+display(yearChart(french_comedy));
+return {french_comedy};
+}});
+
+define({id: "4781607a", inputs: ["Plot"], outputs: ["compareYearsChart"], body: (Plot) => {
+function compareYearsChart(data) {
+  return Plot.plot({
+    title: "Compare performances per year",
+    fx: { padding: 0, label: null },
+    x: { axis: null, paddingOuter: 0.2 },
+    y: { grid: true, label: "Performances" },
+    color: { legend: true },
+    width: 1000,
+    marks: [
+      Plot.barY(
+        data,
+        Plot.groupX(
+          { y2: "count" },
+          { x: "origin", fx: "year", fill: "origin" }
+        )
+      ),
+      Plot.ruleY([0]),
+    ],
+  });
+}
+return {compareYearsChart};
+}});
+
+define({id: "694516c8", inputs: ["danish_comedy","french_comedy","display","compareYearsChart"], outputs: ["combined_comedy_data"], body: (danish_comedy,french_comedy,display,compareYearsChart) => {
+const combined_comedy_data = danish_comedy
+  .map((d) => ({ ...d, origin: "danish" }))
+  .concat(french_comedy.map((d) => ({ ...d, origin: "french" })))
+  .map((d) => ({ ...d, year: String(d.year) }));
+
+display(compareYearsChart(combined_comedy_data));
+return {combined_comedy_data};
+}});
+
+</script>
+</head>
+<body>
+<input id="observablehq-sidebar-toggle" type="checkbox" title="Toggle sidebar">
+<label id="observablehq-sidebar-backdrop" for="observablehq-sidebar-toggle"></label>
+<nav id="observablehq-sidebar">
+  <ol>
+    <label id="observablehq-sidebar-close" for="observablehq-sidebar-toggle"></label>
+    <li class="observablehq-link"><a href="./">Danish French Theater Data</a></li>
+  </ol>
+  <section class="observablehq-section-active">
+    <summary>Visualizations</summary>
+    <ol>
+    <li class="observablehq-link"><a href="./combined-data">Performances</a></li>
+    <li class="observablehq-link observablehq-link-active"><a href="./combined-comedy">Comedy Performances</a></li>
+    <li class="observablehq-link"><a href="./visualizations">Further Visualizations</a></li>
+    </ol>
+  </section>
+</nav>
+<script>{const e=document.querySelector("#observablehq-sidebar"),o=document.querySelector("#observablehq-sidebar-toggle"),r=sessionStorage.getItem("observablehq-sidebar");r?o.checked=r==="true":o.indeterminate=!0;for(const t of document.querySelectorAll("#observablehq-sidebar summary")){const s=t.parentElement;switch(sessionStorage.getItem(`observablehq-sidebar:${t.textContent}`)){case"true":s.open=!0;break;case"false":s.classList.contains("observablehq-section-active")||(s.open=!1);break}}addEventListener("beforeunload",()=>sessionStorage.setItem("observablehq-sidebar-scrolly",`${e.scrollTop}`));const a=sessionStorage.getItem("observablehq-sidebar-scrolly");a!=null&&(e.style.cssText="overflow: hidden;",e.scrollTop=+a,e.style.cssText="");}</script>
+<div id="observablehq-center">
+<aside id="observablehq-toc" data-selector="h1:not(:first-of-type)[id], h2:first-child[id], :not(h1) + h2[id]">
+<nav>
+<div>Contents</div>
+<ol>
+<li class="observablehq-secondary-link"><a href="#danish-comedy-performances-1748-1778">Danish Comedy Performances, 1748-1778</a></li>
+<li class="observablehq-secondary-link"><a href="#french-comedy-performances-1748-1778">French Comedy Performances, 1748-1778</a></li>
+<li class="observablehq-secondary-link"><a href="#comparative-comedy-performances-1748-1778">Comparative Comedy Performances, 1748-1778</a></li>
+</ol>
+</nav>
+</aside>
+<main id="observablehq-main" class="observablehq">
+<h1 id="comedy-performance-dates" tabindex="-1"><a class="observablehq-header-anchor" href="#comedy-performance-dates">Comedy Performance Dates</a></h1>
+<p>The following graphs show number of comedy performances per year.</p>
+<div class="observablehq observablehq--block"><!--:43a64807:--></div>
+<div class="observablehq observablehq--block"><!--:fbb4c80e:--></div>
+<h1 id="danish-comedy-performances-1748-1778" tabindex="-1"><a class="observablehq-header-anchor" href="#danish-comedy-performances-1748-1778">Danish Comedy Performances, 1748-1778</a></h1>
+<div class="observablehq observablehq--block"><!--:cff11c66:--></div>
+<h1 id="french-comedy-performances-1748-1778" tabindex="-1"><a class="observablehq-header-anchor" href="#french-comedy-performances-1748-1778">French Comedy Performances, 1748-1778</a></h1>
+<div class="observablehq observablehq--block"><!--:1d1209da:--></div>
+<h1 id="comparative-comedy-performances-1748-1778" tabindex="-1"><a class="observablehq-header-anchor" href="#comparative-comedy-performances-1748-1778">Comparative Comedy Performances, 1748-1778</a></h1>
+<div class="observablehq observablehq--block"><!--:4781607a:--></div>
+<div class="observablehq observablehq--block"><!--:694516c8:--></div>
+</main>
+<footer id="observablehq-footer">
+<nav><a rel="prev" href="./combined-data"><span>Performances</span></a><a rel="next" href="./visualizations"><span>Further Visualizations</span></a></nav>
+<div>Built with <a href="https://observablehq.com/" target="_blank" rel="noopener noreferrer">Observable</a> on <a title="2025-05-15T23:21:31">May 15, 2025</a>.</div>
+</footer>
+</div>
+</body>
+</html>

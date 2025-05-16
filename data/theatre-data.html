@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="generator" content="Observable Framework v1.13.2">
+<title>theatre dashboard | Danish French Theater Data</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,200..900;1,8..60,200..900&amp;display=swap" crossorigin>
+<link rel="preload" as="style" href="./_observablehq/theme-air,near-midnight,alt,wide.db1cdf55.css">
+<link rel="preload" as="style" href="./_observablehq/stdlib/inputs.ea9fd553.css">
+<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,200..900;1,8..60,200..900&amp;display=swap" crossorigin>
+<link rel="stylesheet" type="text/css" href="./_observablehq/theme-air,near-midnight,alt,wide.db1cdf55.css">
+<link rel="stylesheet" type="text/css" href="./_observablehq/stdlib/inputs.ea9fd553.css">
+<link rel="modulepreload" href="./_observablehq/client.f2b649b1.js">
+<link rel="modulepreload" href="./_observablehq/runtime.f168f711.js">
+<link rel="modulepreload" href="./_observablehq/stdlib.1020d4a0.js">
+<link rel="modulepreload" href="./_observablehq/stdlib/inputs.8858dda5.js">
+<link rel="modulepreload" href="./_npm/@observablehq/plot@0.6.17/b783768b.js">
+<link rel="modulepreload" href="./_npm/d3-dsv@3.0.1/9f467835.js">
+<link rel="modulepreload" href="./_npm/htl@0.3.1/063eb405.js">
+<link rel="modulepreload" href="./_npm/isoformat@0.2.1/c68fbd73.js">
+<link rel="modulepreload" href="./_npm/d3@7.9.0/2325b2c8.js">
+<link rel="modulepreload" href="./_npm/interval-tree-1d@1.0.4/a62ae5ce.js">
+<link rel="modulepreload" href="./_npm/d3-array@3.2.4/37839b6a.js">
+<link rel="modulepreload" href="./_npm/d3-axis@3.0.0/bd0afa17.js">
+<link rel="modulepreload" href="./_npm/d3-brush@3.0.0/6ac7d65c.js">
+<link rel="modulepreload" href="./_npm/d3-chord@3.0.1/c6aedacf.js">
+<link rel="modulepreload" href="./_npm/d3-color@3.1.0/6821f0c1.js">
+<link rel="modulepreload" href="./_npm/d3-contour@4.0.2/d496a3b3.js">
+<link rel="modulepreload" href="./_npm/d3-delaunay@6.0.4/c1ddf721.js">
+<link rel="modulepreload" href="./_npm/d3-dispatch@3.0.1/b5f7cdc6.js">
+<link rel="modulepreload" href="./_npm/d3-drag@3.0.0/ef06b1ff.js">
+<link rel="modulepreload" href="./_npm/d3-ease@3.0.1/6f15f633.js">
+<link rel="modulepreload" href="./_npm/d3-fetch@3.0.1/d9a18fcf.js">
+<link rel="modulepreload" href="./_npm/d3-force@3.0.0/60bb70b3.js">
+<link rel="modulepreload" href="./_npm/d3-format@3.1.0/33fb7288.js">
+<link rel="modulepreload" href="./_npm/d3-geo@3.1.1/5e427f4b.js">
+<link rel="modulepreload" href="./_npm/d3-hierarchy@3.1.2/f1db2593.js">
+<link rel="modulepreload" href="./_npm/d3-interpolate@3.0.1/7e45aaba.js">
+<link rel="modulepreload" href="./_npm/d3-path@3.1.0/4bb53638.js">
+<link rel="modulepreload" href="./_npm/d3-polygon@3.0.1/bbafde58.js">
+<link rel="modulepreload" href="./_npm/d3-quadtree@3.0.1/aa5b35a8.js">
+<link rel="modulepreload" href="./_npm/d3-random@3.0.1/32c7fec2.js">
+<link rel="modulepreload" href="./_npm/d3-scale@4.0.2/435d3e9d.js">
+<link rel="modulepreload" href="./_npm/d3-scale-chromatic@3.1.0/6a41b56e.js">
+<link rel="modulepreload" href="./_npm/d3-selection@3.0.0/a4e530fb.js">
+<link rel="modulepreload" href="./_npm/d3-shape@3.2.0/be692bd9.js">
+<link rel="modulepreload" href="./_npm/d3-time@3.1.0/3a9ac1c1.js">
+<link rel="modulepreload" href="./_npm/d3-time-format@4.1.0/28d1ef76.js">
+<link rel="modulepreload" href="./_npm/d3-timer@3.0.1/f31b5398.js">
+<link rel="modulepreload" href="./_npm/d3-transition@3.0.1/5c345eab.js">
+<link rel="modulepreload" href="./_npm/d3-zoom@3.0.0/6bf2ba81.js">
+<link rel="modulepreload" href="./_npm/binary-search-bounds@2.0.5/1ee6c50d.js">
+<link rel="modulepreload" href="./_npm/internmap@2.0.3/5eed35fd.js">
+<link rel="modulepreload" href="./_npm/delaunator@5.0.1/e67acb27.js">
+<link rel="modulepreload" href="./_npm/robust-predicates@3.0.2/8ac9039b.js">
+<link rel="icon" href="./_file/observable.1af93621.png" type="image/png" sizes="32x32">
+<script type="module">
+
+import {define} from "./_observablehq/client.f2b649b1.js";
+import {registerFile} from "./_observablehq/stdlib.1020d4a0.js";
+
+registerFile("./data/danish-performances.csv", {"name":"./data/danish-performances.csv","mimeType":"text/csv","path":"./_file/data/danish-performances.4497749d.csv","lastModified":1745953973039,"size":699625});
+
+define({id: "f8ad3246", inputs: ["FileAttachment"], outputs: ["theatre"], body: (FileAttachment) => {
+const theatre = FileAttachment("./data/danish-performances.csv").csv({typed: true});
+return {theatre};
+}});
+
+define({id: "f302f63d", inputs: ["Inputs","theatre","display"], body: async (Inputs,theatre,display) => {
+display(await(
+Inputs.table(theatre)
+))
+}});
+
+define({id: "a7e32eb1", inputs: ["Plot","display","theatre"], outputs: ["yearChart"], body: (Plot,display,theatre) => {
+function yearChart(data) {
+  return Plot.plot({
+    title: "Performances by year",
+    x: {grid: true, label: "Year"},
+    y: {label: "Performances"},
+    width: 1000,
+    // color: {...color},
+    marks: [
+      Plot.barY(data, Plot.groupX({y: "count"}, {x: "year", fill: "year"})),
+      Plot.ruleY([0])
+    ]
+  });
+}
+
+display(yearChart(theatre))
+return {yearChart};
+}});
+
+define({id: "2de79317", inputs: ["Plot","display","theatre"], outputs: ["genreChart"], body: (Plot,display,theatre) => {
+function genreChart(data) {
+  return Plot.plot({
+    title: "Genres",
+    // width,
+    // height: 300,
+    marginTop: 0,
+    marginLeft: 100,
+    x: {grid: true, label: "Performances"},
+    y: {label: null},
+    // color: {...color},
+    marks: [
+      Plot.rectX(data, Plot.groupY({x: "count"}, {y: "genre", fill: "genre", tip: true, sort: {y: "-x"}})),
+      Plot.ruleX([0])
+    ]
+  });
+}
+
+display(genreChart(theatre))
+return {genreChart};
+}});
+
+define({id: "a17731cf", inputs: ["Plot","display","theatre"], outputs: ["titleChart"], body: (Plot,display,theatre) => {
+function titleChart(data) {
+  return Plot.plot({
+    title: "Titles by frequency",
+    // width,
+    // height: 300,
+    height: 5000,
+    marginTop: 0,
+    marginLeft: 100,
+    x: {grid: true, label: "Performances"},
+    y: {label: null},
+    // color: {...color},
+    marks: [
+      Plot.rectX(data, Plot.groupY({x: "count"}, {y: "title", fill: "title", tip: true, sort: {y: "-x"}})),
+      Plot.ruleX([0])
+    ]
+  });
+}
+
+display(titleChart(theatre))
+return {titleChart};
+}});
+
+</script>
+</head>
+<body>
+<input id="observablehq-sidebar-toggle" type="checkbox" title="Toggle sidebar">
+<label id="observablehq-sidebar-backdrop" for="observablehq-sidebar-toggle"></label>
+<nav id="observablehq-sidebar">
+  <ol>
+    <label id="observablehq-sidebar-close" for="observablehq-sidebar-toggle"></label>
+    <li class="observablehq-link"><a href="./">Danish French Theater Data</a></li>
+  </ol>
+  <section>
+    <summary>Visualizations</summary>
+    <ol>
+    <li class="observablehq-link"><a href="./combined-data">Performances</a></li>
+    <li class="observablehq-link"><a href="./combined-comedy">Comedy Performances</a></li>
+    <li class="observablehq-link"><a href="./visualizations">Further Visualizations</a></li>
+    </ol>
+  </section>
+</nav>
+<script>{const e=document.querySelector("#observablehq-sidebar"),o=document.querySelector("#observablehq-sidebar-toggle"),r=sessionStorage.getItem("observablehq-sidebar");r?o.checked=r==="true":o.indeterminate=!0;for(const t of document.querySelectorAll("#observablehq-sidebar summary")){const s=t.parentElement;switch(sessionStorage.getItem(`observablehq-sidebar:${t.textContent}`)){case"true":s.open=!0;break;case"false":s.classList.contains("observablehq-section-active")||(s.open=!1);break}}addEventListener("beforeunload",()=>sessionStorage.setItem("observablehq-sidebar-scrolly",`${e.scrollTop}`));const a=sessionStorage.getItem("observablehq-sidebar-scrolly");a!=null&&(e.style.cssText="overflow: hidden;",e.scrollTop=+a,e.style.cssText="");}</script>
+<div id="observablehq-center">
+<main id="observablehq-main" class="observablehq">
+<div class="observablehq observablehq--block"><!--:f8ad3246:--></div>
+<h1 id="danish-performances-1748-1778" tabindex="-1"><a class="observablehq-header-anchor" href="#danish-performances-1748-1778">Danish Performances, 1748-1778</a></h1>
+<div class="observablehq observablehq--block"><observablehq-loading></observablehq-loading><!--:f302f63d:--></div>
+<div class="observablehq observablehq--block"><!--:a7e32eb1:--></div>
+<div class="observablehq observablehq--block"><!--:2de79317:--></div>
+<div class="observablehq observablehq--block"><!--:a17731cf:--></div>
+</main>
+<footer id="observablehq-footer">
+<div>Built with <a href="https://observablehq.com/" target="_blank" rel="noopener noreferrer">Observable</a> on <a title="2025-05-15T23:21:31">May 15, 2025</a>.</div>
+</footer>
+</div>
+</body>
+</html>

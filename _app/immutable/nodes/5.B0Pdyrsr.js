@@ -1,0 +1,1 @@
+import{t as o,h as e,a as r}from"../chunks/BVzV4-Vc.js";import"../chunks/DB-pbytP.js";import{$ as n}from"../chunks/1Yz4qXLV.js";var i=o('<section>Check out our visualization tool <a href="/data" target="_blank">here</a>.</section>');function h(t){var a=i();e(p=>{n.title="Explore the Data"}),r(t,a)}export{h as component};
