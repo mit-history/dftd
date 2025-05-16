@@ -5,7 +5,7 @@ const config = {
   kit: {
     adapter: adapter({ fallback: "404.html", pages: "../dist" }),
     paths: {
-      base: process.argv.includes("dev") ? "" : "/dftd",
+      base: process.argv.includes("dev") ? "" : "",
     },
   },
 };
