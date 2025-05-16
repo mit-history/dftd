@@ -10,11 +10,11 @@ export default {
     {
       name: "Visualizations",
       pages: [
-        {name: "Performances", path: "/combined-data"},
-        {name: "Comedy Performances", path: "/combined-comedy"},
-        {name: "Further Visualizations", path: "/visualizations"}
-      ]
-    }
+        { name: "Performances", path: "/combined-data" },
+        { name: "Comedy Performances", path: "/combined-comedy" },
+        { name: "Further Visualizations", path: "/visualizations" },
+      ],
+    },
   ],
 
   // Content to add to the head of the page, e.g. for a favicon:
@@ -30,7 +30,7 @@ export default {
   // sidebar: true, // whether to show the sidebar
   // toc: true, // whether to show the table of contents
   // pager: true, // whether to show previous & next links in the footer
-  // output: "dist", // path to the output root for build
+  output: "dist/data", // path to the output root for build
   // search: true, // activate search
   // linkify: true, // convert URLs in Markdown to links
   // typographer: false, // smart quotes and other typographic improvements
