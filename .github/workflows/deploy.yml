@@ -27,6 +27,7 @@ jobs:
       - run: npm install
       - run: cd web
       - run: npm install
+      - run: npm install vite
       - run: cd ..
       - run: npm run build
       - uses: actions/configure-pages@v4
