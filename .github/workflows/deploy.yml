@@ -24,9 +24,9 @@ jobs:
         with:
           node-version: 22
           cache: npm
-      - run: npm ci
+      - run: npm install
       - run: cd web
-      - run: npm ci
+      - run: npm install
       - run: cd ..
       - run: npm run build
       - uses: actions/configure-pages@v4
