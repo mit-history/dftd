@@ -126,7 +126,7 @@ const performanceDays = viz.includes("Days with Performances");
 
 <div class="card" style="position:sticky;top:5px;">
 
-<details>
+<details open>
 
 <summary>Filters</summary>
 
