@@ -11,8 +11,8 @@
       label: "Project Co-Directors",
       members: [
         { name: "Professor Ulla Kallenbach", link: "https://www4.uib.no/en/find-employees/Ulla.Kallenbach" },
-        { name: "Professor Anne McCants", link: "https://history.mit.edu/people/anne-e-c-mccants/" },
-        { name: "Professor Jeffrey Ravel", link: "https://history.mit.edu/people/jeffrey-s-ravel/" }
+        { name: "Professor Anne McCants", link: "https://history.mit.edu/people/anne-e-c-mccants/", image: base + "/images/Anne-McCants-photo.jpg" },
+        { name: "Professor Jeffrey Ravel", link: "https://history.mit.edu/people/jeffrey-s-ravel/", image: base + "/images/Jeff_photo.png"}
       ]
     },
     {
@@ -96,7 +96,7 @@
             <div class="member-grid">
               {#each group.members as member}
                 <div class="member-card">
-                  <img src={base + "/images/blank_prof.jpeg"} alt="Profile image" />
+                  <img src={member.image ?? base + "/images/blank_prof.jpeg"} alt="Profile image" />
                   <div class="name">
                     {#if member.link}
                       <a href={member.link} target="_blank">{member.name}</a>
@@ -113,7 +113,7 @@
         <div class="member-grid">
           {#each section.members as member}
             <div class="member-card">
-              <img src={base + "/images/blank_prof.jpeg"} alt="Profile image" />
+              <img src={member.image ?? base + "/images/blank_prof.jpeg"} alt="Profile image" />
               <div class="name">
                 {#if member.link}
                   <a href={member.link} target="_blank">{member.name}</a>
@@ -173,12 +173,12 @@
   }
 
   .member-card img {
-    width: 100px;
-    height: 100px;
-    object-fit: cover;
-    border-radius: 50%;
-    margin-bottom: 0.5rem;
-  }
+      width: 100px;
+      height: 120px;
+      object-fit: cover;
+      border-radius: 12px; 
+      margin-bottom: 0.5rem;
+      }
 
   .name {
     font-size: 1rem;

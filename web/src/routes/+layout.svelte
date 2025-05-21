@@ -8,12 +8,13 @@
     import { base } from '$app/paths';
 </script>
 
+
 <svelte:head>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet" />
 </svelte:head>
 
 
-
+<div class="layout-wrapper">
 <header class="top-bar">
   <div class="top-bar-container">
     <!-- <button class="hamburger" on:click={toggleMenu} aria-label="Toggle navigation">
@@ -39,10 +40,44 @@
 </header>
 
 
+<main class="page-content">
 <slot />
+</main>
+
 <Footer />
 
+</div>
+
 <style>
+
+  :global(footer) {
+    margin-top: auto;
+}
+
+:global(html, body) {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+
+  .page-content {
+    flex-grow: 1;
+}
+
+  .layout-wrapper {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+
+  :global(body) {
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+}
+
   .top-bar {
     background-color: rgb(51, 168, 98);
     padding: 0.75rem 1.5rem;
@@ -54,42 +89,14 @@
   }
 
   .top-bar-container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    max-width: 1200px;
-    margin: 0 auto;
-    width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 100%;
   }
 
-  /* .hamburger {
-    font-size: 2rem;
-    background: none;
-    border: none;
-    color: black;
-    cursor: pointer;
-    padding: 0.5rem;
-  } */
-
-  .search-icon {
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 0.5rem;
-    display: flex;
-    align-items: center;
-  }
-
-  .search-icon .icon {
-    stroke: black;
-    width: 1.5rem;
-    height: 1.5rem;
-    transition: stroke 0.2s ease;
-  }
-
-  .search-icon:hover .icon {
-    stroke: #555;
-  }
 
   ul {
         transition: max-height 0.3s ease;
@@ -118,11 +125,6 @@
         color: rgb(255, 254, 254);
         transition: stroke 0.2s ease
     }
-
-    .active a {
-        background-color: rgba(255, 255, 255, 0.25);
-        font-weight: 600;
-      }
 
 
   </style>

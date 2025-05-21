@@ -70,7 +70,7 @@
     </div>
 
     <div class="project-card">
-      <img src={base + '/images/comed_fran.jpg'} alt="Comédie-Française">
+      <img src={base + '/images/2560px-Couronnement_de_Voltaire.jpg'} alt="Comédie-Française">
       <hr />
       <a href="https://www.cfregisters.org/#!/" target="_blank" class="project-title">Comédie-Française (Paris)</a>
       <p class="project-description">
