@@ -111,10 +111,194 @@ function mapPlot(data) {
 }
 ```
 
+```js
+function processPerformanceGenres(fullData, comedyData, dramaData, tragedyData, balletData, origin) {
+  const allYears = d3.rollup(fullData, v => v.length, d => d.year);
+  const comedyYears = d3.rollup(comedyData, v => v.length, d => d.year);
+  const dramaYears = d3.rollup(dramaData.concat(tragedyData), v => v.length, d => d.year);
+  const balletYears = d3.rollup(balletData, v => v.length, d => d.year);
+
+  return Array.from(allYears, ([year, total]) => {
+    const comedy = comedyYears.get(year) || 0;
+    const drama = dramaYears.get(year) || 0;
+    const ballet = balletYears.get(year) || 0;
+    const other = total - comedy - drama - ballet;
+    return {
+      year: +year,
+      origin,
+      comedy,
+      drama,
+      ballet,
+      other,
+      percent: {
+        comedy: comedy / total,
+        drama: drama / total,
+        ballet: ballet / total,
+        other: other / total
+      }
+    };
+  });
+}
+```
+
+```js
+function genreLegend() {
+  return Plot.legend({
+    color: {
+      domain: [
+        "danish-comedy", "danish-drama", "danish-ballet", "danish-other",
+        "french-comedy", "french-drama", "french-ballet", "french-other"
+      ],
+      range: ["#fca5a5", "#fb7185", "#ef4444", "#a3a3a3", "#93c5fd", "#60a5fa", "#3b82f6", "#6b7280"]
+    },
+    title: "Legend",
+    columns: 2
+  })
+}
+```
+
+```js
+function divergentPlot() {
+  return Plot.plot({
+    title: `Diverging Genre Performance Chart (${start_date.getFullYear()} - ${end_date.getFullYear()})`,
+    width: 1000,
+    height: 800,
+    x: {
+      label: "Number of Performances",
+      tickFormat: Math.abs
+    },
+    y: {
+      label: "Year",
+      reverse: true
+    },
+    color: {
+      domain: [
+        "danish-comedy", "danish-drama", "danish-ballet", "danish-other",
+        "french-comedy", "french-drama", "french-ballet", "french-other"
+      ],
+      range: ["#fca5a5", "#fb7185", "#ef4444", "#a3a3a3", "#93c5fd", "#60a5fa", "#3b82f6", "#6b7280"]
+    },
+  
+    marks: [
+      // 左侧（丹麦）：堆叠柱状图（负数）
+      Plot.barX(
+        danish_summary.flatMap(d => {
+          const parts = [];
+          let x = 0;
+          for (const type of ["comedy", "drama", "ballet", "other"]) {
+            const value = d[type];
+            parts.push({
+              year: d.year,
+              x1: -x,
+              x2: -(x + value),
+              type,
+              origin: "danish",
+              percent: `${Math.round(d.percent[type] * 100)}%`
+            });
+            x += value;
+          }
+          return parts;
+        }),
+        {
+          x1: "x1",
+          x2: "x2",
+          y: "year",
+          fill: d => `${d.origin}-${d.type}`
+        }
+      ),
+
+      // 右侧（法国）：堆叠柱状图（正数）
+      Plot.barX(
+        french_summary.flatMap(d => {
+          const parts = [];
+          let x = 0;
+          for (const type of ["comedy", "drama", "ballet", "other"]) {
+            const value = d[type];
+            parts.push({
+              year: d.year,
+              x1: x,
+              x2: x + value,
+              type,
+              origin: "french",
+              percent: `${Math.round(d.percent[type] * 100)}%`
+            });
+            x += value;
+          }
+          return parts;
+        }),
+        {
+          x1: "x1",
+          x2: "x2",
+          y: "year",
+          fill: d => `${d.origin}-${d.type}`
+        }
+      ),
+
+      // 中心线
+      Plot.ruleX([0]),
+
+      // 百分比文字标签（丹麦）
+      Plot.text(
+        danish_summary.flatMap(d => {
+          const labels = [];
+          let x = 0;
+          for (const type of ["comedy", "drama", "ballet", "other"]) {
+            const value = d[type];
+            if (value > 0) {
+              labels.push({
+                year: d.year,
+                x: -(x + value / 2),
+                text: `${Math.round(d.percent[type] * 100)}%`
+              });
+            }
+            x += value;
+          }
+          return labels;
+        }),
+        {
+          x: "x",
+          y: "year",
+          text: "text",
+          fill: "black",
+          textAnchor: "middle"
+        }
+      ),
+
+      // 百分比文字标签（法国）
+      Plot.text(
+        french_summary.flatMap(d => {
+          const labels = [];
+          let x = 0;
+          for (const type of ["comedy", "drama", "ballet", "other"]) {
+            const value = d[type];
+            if (value > 0) {
+              labels.push({
+                year: d.year,
+                x: x + value / 2,
+                text: `${Math.round(d.percent[type] * 100)}%`
+              });
+            }
+            x += value;
+          }
+          return labels;
+        }),
+        {
+          x: "x",
+          y: "year",
+          text: "text",
+          fill: "black",
+          textAnchor: "middle"
+        }
+      )
+    ]
+  })
+}
+```
+
 <div>
 
 ```js
-const opt = ["Over Time", "By Author", "Days with Performances"];
+const opt = ["Over Time", "Diverging Genres", "By Author", "Days with Performances"];
 const vizOpt = Inputs.checkbox(opt, {label: "Visualization", value: ["Over Time"]});
 const viz = view(vizOpt);
 ```
@@ -123,6 +307,7 @@ const viz = view(vizOpt);
 
 ```js
 const overTime = viz.includes("Over Time");
+const divergingGenres = viz.includes("Diverging Genres");
 const byAuthor = viz.includes("By Author");
 const performanceDays = viz.includes("Days with Performances");
 ```
@@ -204,6 +389,77 @@ display(overTime ? html `<h2>Comparative Performances Over Time</h2>` : html`<di
 
 ```js
 display(overTime ? (formatted_data.length > 0 ? compareYearsChart(formatted_data) : html`<i>No data.</i>`) : html`<div></div>`)
+```
+
+```js
+display(divergingGenres ? html `<h2>Comparative Performance Genres Over Time</h2>` : html`<div></div>`)
+```
+
+```js
+const danish_comedy = danish.filter( (d) =>
+  d.genre && (d.genre.toLowerCase().includes("comed") || d.genre.toLowerCase().includes("coméd"))
+).filter(d => (new Date(d.date) > start_date) && (new Date(d.date)));
+
+const french_comedy = french.filter(d => d.genre === "comédie").filter(d => (new Date(d.date) > start_date) && (new Date(d.date)));
+
+// filter out french tragedy, ballet and drama genres
+const french_tragedy = french.filter(
+  (d) => d.genre && (d.genre.toLowerCase().includes("tragédie"))
+).filter(d => (new Date(d.date) > start_date) && (new Date(d.date)));
+
+const french_ballet = french.filter(
+  (d) =>
+    d.genre &&
+    (d.genre.toLowerCase().includes("ballet"))
+).filter(d => (new Date(d.date) > start_date) && (new Date(d.date)));
+
+const french_drama = french.filter(
+  (d) =>
+    d.genre &&
+    (d.genre.toLowerCase().includes("drame"))).filter(d => (new Date(d.date) > start_date) && (new Date(d.date)));
+
+// filter out danish tragedy, ballet and drama genres
+const danish_tragedy = danish.filter(
+  (d) =>
+    d.genre &&
+    (d.genre.toLowerCase().includes("tragedia per musica") ||
+      d.genre.toLowerCase().includes("tragedy"))
+).filter(d => (new Date(d.date) > start_date) && (new Date(d.date)));
+
+const danish_ballet = danish.filter(
+  (d) =>
+    d.genre &&
+    (d.genre.toLowerCase().includes("ballet") ||
+      d.genre.toLowerCase().includes("ballet,ballet")||
+      d.genre.toLowerCase().includes("ballet,ballet,ballet"))
+).filter(d => (new Date(d.date) > start_date) && (new Date(d.date)));
+
+const danish_drama = danish.filter(
+  (d) =>
+    d.genre &&
+    (d.genre.toLowerCase().includes("drama") ||
+      d.genre.toLowerCase().includes("dramma giocoso per musica") ||
+      d.genre.toLowerCase().includes("dramma pastorale")||
+      d.genre.toLowerCase().includes("dramma per musica"))
+).filter(d => (new Date(d.date) > start_date) && (new Date(d.date)));
+```
+
+```js
+const danish_filtered_data = danish.filter(d => (new Date(d.date) > start_date) && (new Date(d.date)));
+const french_filtered_data = french.filter(d => (new Date(d.date) > start_date) && (new Date(d.date)));
+const danish_summary = processPerformanceGenres(danish_filtered_data, danish_comedy, danish_drama, danish_tragedy, danish_ballet, "danish");
+const french_summary = processPerformanceGenres(french_filtered_data, french_comedy, french_drama, french_tragedy, french_ballet, "french");
+```
+
+```js
+display(divergingGenres ? genreLegend() : html`<div></div>`);
+```
+
+```js
+display(divergingGenres ? 
+  ((danish_filtered_data.length > 0  && french_filtered_data.length > 0) ? divergentPlot() : html`<i>No data.</i>`) : 
+  html`<div></div>`
+)
 ```
 
 ```js
