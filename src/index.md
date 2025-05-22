@@ -115,8 +115,11 @@ function mapPlot(data) {
 
 ```js
 const opt = ["Over Time", "By Author", "Days with Performances"];
-const viz = view(Inputs.checkbox(opt, {label: "Visualization", value: opt.filter(o => Math.round(Math.random()))}));
+const vizOpt = Inputs.checkbox(opt, {label: "Visualization", value: ["Over Time"]});
+const viz = view(vizOpt);
 ```
+
+<p> Note: random genre options are selected by default. </p>
 
 ```js
 const overTime = viz.includes("Over Time");
@@ -136,21 +139,27 @@ const end_date = view(Inputs.date({label: "End", value: "1778-12-31"}));
 ```
 
 ```js
-const origins = view(Inputs.checkbox(["danish", "dutch", "french"], {label: "Origin", value: ["danish", "dutch", "french"].filter(i => Math.round(Math.random()))}));
+const originOptions = ["danish", "dutch", "french"];
+const originsInput = Inputs.checkbox(originOptions, {label: "Origin", value: originOptions});
+const origins = view(originsInput);
+const randomOrigins = () => {
+  originsInput.value = originOptions.filter(i => Math.round(Math.random()));
+  originsInput.dispatchEvent(new Event("input"));
+}
 ```
 
 ```js
 const genreOptions = Array.from(new Set(combined_data.filter(d => origins.includes(d.origin)).map((d) => d.genre).filter(Boolean))).sort();
 
-const genres = view(
-  Inputs.checkbox(
-    genreOptions,
-    {
-      label: "Select genre(s)",
-      value: genreOptions.filter(i => Math.round(Math.random())), // default: all
-    }
-  )
+const genreInput = Inputs.checkbox(
+  genreOptions,
+  {
+    label: "Select genre(s)",
+    value: genreOptions.filter(i => Math.round(Math.random()))
+  }
 );
+
+const genres = view(genreInput);
 ```
 
 ```js
@@ -165,9 +174,20 @@ const authorOptions = [
     ).sort()
 ]
 
-const author = view(
-  Inputs.select( authorOptions, { label: "Filter by author", value: authorOptions[Math.floor(Math.random() * authorOptions.length)] })
-);
+const authorInput = Inputs.select( authorOptions, { label: "Filter by author", value: "No author" })
+const author = view(authorInput);
+
+const randomAuthor = () => {
+  authorInput.value = authorOptions[Math.floor(Math.random() * authorOptions.length)];
+  authorInput.dispatchEvent(new Event("input"));
+}
+```
+
+```js
+view(Inputs.button("Randomize", {value: null, reduce: () => { 
+  randomOrigins(); 
+  randomAuthor();
+}}));
 ```
 
 </details>
