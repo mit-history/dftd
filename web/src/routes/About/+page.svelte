@@ -16,7 +16,7 @@
     <div class="about-text">
 
       <p>
-        <strong>Transnational Stages</strong> is a digital humanities project is a digital humanities project that builds on the foundation of several extant theater history projects. Our aim is to create a way for theater historians, performance studies scholars, and others interested in theater in the Atlantic world between 1700 and 1850 to compare performance practices in different theatrical venues, and to trace the mobility of performers and repertory across national boundaries.
+        <strong>Transnational Stages</strong> is a digital humanities project that builds on the foundation of several extant theater history projects. Our aim is to create a way for theater historians, performance studies scholars, and others interested in theater in the Atlantic world between 1700 and 1850 to compare performance practices in different theatrical venues, and to trace the mobility of performers and repertory across national boundaries.
       </p>
 
       <p>
@@ -59,10 +59,11 @@
 
 
   h1 {
-    font-family: 'Playfair Display', serif;
+    font-family: 'Inter', sans-serif;
     font-size: 3rem;
     font-weight: 700;
     margin-bottom: 0.5rem;
+    margin-top: 4rem;
     text-align: center;
   }
 

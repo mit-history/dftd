@@ -10,7 +10,7 @@
     {
       label: "Project Co-Directors",
       members: [
-        { name: "Professor Ulla Kallenbach", link: "https://www4.uib.no/en/find-employees/Ulla.Kallenbach" },
+        { name: "Professor Ulla Kallenbach", link: "https://www4.uib.no/en/find-employees/Ulla.Kallenbach", image: base + "/images/ulla_photo.jpg"  },
         { name: "Professor Anne McCants", link: "https://history.mit.edu/people/anne-e-c-mccants/", image: base + "/images/Anne-McCants-photo.jpg" },
         { name: "Professor Jeffrey Ravel", link: "https://history.mit.edu/people/jeffrey-s-ravel/", image: base + "/images/Jeff_photo.png"}
       ]
@@ -46,8 +46,8 @@
           name: "Theatronomics",
           link: "https://www.theatronomics.com/",
           members: [
-            { name: "Professor David O'Shaugnessy, University of Galway", link: "https://research.universityofgalway.ie/en/persons/david-oshaughnessy" },
-            { name: "David Kelley, University of Galway", link: "https://www.theatronomics.com/team/david-kelly-digital-humanities-developer/" }
+            { name: "Professor David O'Shaughnessy, University of Galway", link: "https://research.universityofgalway.ie/en/persons/david-oshaughnessy", image: base + "/images/David_OShaughnessy_photo.jpeg"},
+            { name: "David Kelly, University of Galway", link: "https://www.theatronomics.com/team/david-kelly-digital-humanities-developer/" }
           ]
         },
         {
@@ -130,17 +130,22 @@
 </section>
 
 <style>
+
+  :global(body) {
+    font-family: 'Inter', sans-serif;
+  }
   .team-page {
     padding: 2rem;
     max-width: 1000px;
     margin: 0 auto;
-    font-family: Georgia, serif;
+    font-family: 'Inter', sans-serif;
   }
 
   h1 {
     font-size: 2.5rem;
     margin-bottom: 2rem;
     text-align: center;
+    margin-top: 4rem;
   }
 
   .section {
@@ -173,10 +178,10 @@
   }
 
   .member-card img {
-      width: 100px;
-      height: 120px;
+      width: 10rem;
+      height: 10.8rem;
       object-fit: cover;
-      border-radius: 12px; 
+      border-radius: 12px;
       margin-bottom: 0.5rem;
       }
 
@@ -185,12 +190,13 @@
   }
 
   a {
-    color: #0055a5;
+    color: black;
     text-decoration: none;
   }
 
   a:hover {
-    text-decoration: underline;
+    text-decoration: none;
+    color: rgb(200, 76, 171);
   }
 
   @media (max-width: 600px) {

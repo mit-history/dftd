@@ -51,50 +51,54 @@
   <hr />
 
   <div class="projects-grid">
+
     <div class="project-card">
+      <a href="https://artex.au.dk/" target="_blank" class="project-title">
+      <img src={base + '/images/copen_theat.jpg'} alt="Copenhagen Theater">
+      Artistic Exchanges (Copenhagen)</a>
+      <p class="project-description">
+        Artistic Exchanges explores the transnational currents of Danish theatre. Follow the routes of travelling artists on the interactive mobility map, discover artists and their works, and delve into the repertoire of the Danish stage.
+      </p>
+    </div>
+
+    <div class="project-card">
+      <a href="https://www.vondel.humanities.uva.nl/onstage/" target="_blank" class="project-title">
       <img src={base + '/images/amsterdam_theater.jpeg'} alt="Amsterdam Theater">
-      <hr />
-      <a href="https://www.vondel.humanities.uva.nl/onstage/" target="_blank" class="project-title">Onstage (Amsterdam)</a>
+      Onstage (Amsterdam)</a>
       <p class="project-description">
         This is your address for questions about the repertoire, performances, popularity and revenues of the cultural program in Amsterdam’s public theatre during the period 1637 - 1772.
       </p>
     </div>
 
     <div class="project-card">
-      <img src={base + '/images/lond_theat.jpg'} alt="London Theater">
-      <hr />
-      <a href="https://www.theatronomics.com/" target="_blank" class="project-title">Theatronomics (London)</a>
+      <a href="https://www.cfregisters.org/#!/" target="_blank" class="project-title">
+        <img src={base + '/images/2560px-Couronnement_de_Voltaire.jpg'} alt="Comédie-Française">
+        Comédie-Française (Paris)</a>
+      <p class="project-description">
+        Since its establishment in 1680, the Comédie-Française has produced and preserved daily registers documenting the company’s income and expenses, as well as the plays performed and their casting.
+      </p>
+    </div>
+    
+    <div class="project-card">
+      <a href="https://www.theatronomics.com/" target="_blank" class="project-title">
+      <img src={base + '/images/Theatronomics Map 2[21].jpg.jpeg'} alt="London Theater">
+      Theatronomics (London)</a>
       <p class="project-description">
         Theatronomics offers an account of the eighteenth-century London stage. We tell the story of the commercial side of the entertainment industry to understand why some people made it…. and others did not.
       </p>
     </div>
 
-    <div class="project-card">
-      <img src={base + '/images/2560px-Couronnement_de_Voltaire.jpg'} alt="Comédie-Française">
-      <hr />
-      <a href="https://www.cfregisters.org/#!/" target="_blank" class="project-title">Comédie-Française (Paris)</a>
-      <p class="project-description">
-        Since its establishment in 1680, the Comédie-Française has produced and preserved daily registers documenting the company’s income and expenses, as well as the plays performed and their casting.
-      </p>
-    </div>
 
     <div class="project-card">
+      <a href="https://www.theatreinsaintdomingue.org/" target="_blank" class="project-title">
       <img src={base + '/images/perf_hait.jpg'} alt="Saint Domingue Theater">
-      <hr />
-      <a href="https://www.theatreinsaintdomingue.org/" target="_blank" class="project-title">Theatre in St Domingue</a>
+        Theatre in St Domingue</a>
       <p class="project-description">
         This website and database seek to make known the rich and varied culture of public theatre as documented in the local newspapers between 1764 and 1791.
       </p>
     </div>
 
-    <div class="project-card">
-      <img src={base + '/images/copen_theat.jpg'} alt="Copenhagen Theater">
-      <hr />
-      <a href="https://artex.au.dk/" target="_blank" class="project-title">Artistic Exchanges (Copenhagen)</a>
-      <p class="project-description">
-        Artistic Exchanges explores the transnational currents of Danish theatre. Follow the routes of travelling artists on the interactive mobility map, discover artists and their works, and delve into the repertoire of the Danish stage.
-      </p>
-    </div>
+
   </div>
 </section>
 
