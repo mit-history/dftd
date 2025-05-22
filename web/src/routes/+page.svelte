@@ -28,9 +28,10 @@
   </div>
 </section>
 
+<p class="caption">Image from the web site <a href="https://artex.au.dk/">Artistic Exchanges</a></p>
 
 <section class="content-wrapper">
-  <p class="caption">Image from the web site <a href="https://artex.au.dk/">Artistic Exchanges</a></p>
+
   <p class="intro">
       Theatre history from the seventeenth to the twentieth centuries is often studied in isolated national
       contexts. But performers, texts, and plays often crossed land boundaries and oceans in the period,
@@ -111,8 +112,17 @@
   .caption {
     font-size: 0.9rem;
     color: #555;
-    margin-bottom: 1.5rem;
-    margin-top: 0;
+    margin: 1.5rem;
+
+  }
+
+  .caption a {
+    text-decoration: none;
+    color: rgb(3, 29, 160);
+  }
+
+  .caption a:hover {
+    color: rgb(159, 17, 17);
   }
 
   .intro {
