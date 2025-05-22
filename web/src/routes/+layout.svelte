@@ -35,11 +35,11 @@
 <style>
 
   :global(html, body) {
-  margin: 0;
-  padding: 0;
-  overflow-x: hidden;
-  font-family: 'Inter', sans-serif;
-  box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    font-family: 'Inter', sans-serif;
+    box-sizing: border-box;
 }
 
 *, *::before, *::after {
@@ -77,6 +77,10 @@
 
   .top-bar.transparent-nav li a {
     color: white;
+  }
+
+  .top-bar.transparent-nav li a:hover {
+    color: black;
   }
 
 
