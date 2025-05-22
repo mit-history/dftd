@@ -319,8 +319,20 @@ const performanceDays = viz.includes("Days with Performances");
 <summary>Filters</summary>
 
 ```js
-const start_date = view(Inputs.date({label: "Start", value: "1748-01-01"}));
-const end_date = view(Inputs.date({label: "End", value: "1778-12-31"}));
+const start_date_input = Inputs.date({label: "Start", value: "1748-01-01"})
+const start_date =  view(start_date_input);
+const end_date_input = Inputs.date({label: "End", value: "1778-12-31"})
+const end_date =  view(end_date_input);
+const randomDates = () =>  {
+  const start = new Date("1748-01-01");
+  const end = new Date("1778-12-31");
+  const new_start = new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
+  const new_end = new Date(new_start.getTime() + Math.random() * (end.getTime() - new_start.getTime()));
+  start_date_input.value = new_start;
+  end_date_input.value = new_end;
+  start_date_input.dispatchEvent(new Event("input"));
+  end_date_input.dispatchEvent(new Event("input"));
+}
 ```
 
 ```js
@@ -370,6 +382,7 @@ const randomAuthor = () => {
 
 ```js
 view(Inputs.button("Randomize", {value: null, reduce: () => { 
+  randomDates();
   randomOrigins(); 
   randomAuthor();
 }}));
