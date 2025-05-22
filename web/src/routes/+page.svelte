@@ -32,11 +32,11 @@
 <section class="content-wrapper">
   <p class="caption">Image from the web site <a href="https://artex.au.dk/">Artistic Exchanges</a></p>
   <p class="intro">
-    Theatre history from the seventeenth to the twentieth centuries is often studied in isolated national
-    contexts. But performers, texts, and plays often crossed land boundaries and oceans in the period,
-    creating new meanings and audience expectations as they did so. <strong>Transnational Stages</strong>
-    offers users the opportunity to study national datasets via comparative visualization tools, thereby
-    creating new insights into international theatrical trends in the Early Modern and Modern periods.
+      Theatre history from the seventeenth to the twentieth centuries is often studied in isolated national
+      contexts. But performers, texts, and plays often crossed land boundaries and oceans in the period,
+      creating new meanings and audience expectations as they did so. <strong>Transnational Stages</strong>
+      offers users the opportunity to study national datasets via comparative visualization tools, thereby
+      creating new insights into international theatrical trends in the Early Modern and Modern periods.
   </p>
 </section>
 
