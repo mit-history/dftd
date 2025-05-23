@@ -303,8 +303,6 @@ const vizOpt = Inputs.checkbox(opt, {label: "Visualization", value: ["Over Time"
 const viz = view(vizOpt);
 ```
 
-<p> Note: random genre options are selected by default. </p>
-
 ```js
 const overTime = viz.includes("Over Time");
 const divergingGenres = viz.includes("Diverging Genres");
@@ -338,10 +336,37 @@ const randomDates = () =>  {
 ```js
 const originOptions = ["danish", "dutch", "french"];
 const originsInput = Inputs.checkbox(originOptions, {label: "Origin", value: originOptions});
+const originsSelect = Inputs.toggle({label: "Select All", value: true})
 const origins = view(originsInput);
-const randomOrigins = () => {
-  originsInput.value = originOptions.filter(i => Math.round(Math.random()));
+view(originsSelect);
+
+originsSelect.oninput = (event) => {
+  if (!event.bubbles) return;
+  if(originsSelect.value) {
+    originsInput.value = originOptions;
+  }
+  else {
+    originsInput.value = [];
+  }
+
   originsInput.dispatchEvent(new Event("input"));
+}
+
+originsInput.oninput = (event) => {
+  if(originsInput.value.length !== originOptions.length)  {
+    originsSelect.value = false;
+  } else {
+    originsSelect.value = true;
+  }
+}
+
+const randomOrigins = () => {
+  const newValue = originOptions.filter(i => Math.round(Math.random()));
+  originsInput.value = newValue;
+  originsInput.dispatchEvent(new Event("input"));
+  
+  if(newValue.length === 3) originsSelect.value = true;
+  else originsSelect.value = false;
 }
 ```
 
@@ -352,11 +377,33 @@ const genreInput = Inputs.checkbox(
   genreOptions,
   {
     label: "Select genre(s)",
-    value: genreOptions.filter(i => Math.round(Math.random()))
+    value: genreOptions // default: all
   }
 );
 
+const genreSelect = Inputs.toggle({label: "Select All", value: true})
+
+genreSelect.oninput = (event) => {
+  if(genreSelect.value) {
+    genreInput.value = genreOptions;
+  }
+  else {
+    genreInput.value = [];
+  }
+
+  genreInput.dispatchEvent(new Event("input"));
+}
+
+genreInput.oninput = (event) => {
+  if(genreInput.value.length !== genreOptions.length)  {
+    genreSelect.value = false;
+  } else {
+    genreSelect.value = true;
+  }
+}
+
 const genres = view(genreInput);
+if(genreOptions.length > 0) view(genreSelect);
 ```
 
 ```js
@@ -527,7 +574,7 @@ display(byAuthor ? author_counts ? mapPlot(author_counts) : html`<i>No data.</i>
 
 ```js
 display(performanceDays ? html `<h2>Animated Line Chart and Heatmap of Days with Performances</h2>` : html`<div></div>`)
-display(performanceDays ? html `<p> Selected genres: ${genres.length === 0 ? "None" : genres.join(", ")} </p>` : html`<div></div>`)
+display(performanceDays ? html `<p> Selected genres: ${genres.length === 0 ? "None" : genres.length === genreOptions.length ? "All" : genres.join(", ")} </p>` : html`<div></div>`)
 ```
 
 ```js
