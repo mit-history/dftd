@@ -12,16 +12,17 @@
 
 
   <footer class="footer">
-    <div class="page-wrapper">
+    <!-- <div class="page-wrapper"> -->
       <div class="nav-container">
 
         <div class="logos">
           <img src="{base}/images/mit_lockup_std-three-line_rgb_silver-gray.png" alt="MIT logo" width="190" />
           <img src="{base}/images/UiB_NegativEmblem.png" alt="University of Bergen logo" width="120" />
+          <img src="{base}/images/04-standard-monochrome-all-white.jpg" alt="University of St Andrews logo" width="190" />
         </div>
 
       </div>
-  </div>
+  <!-- </div> -->
 </footer>
 
   <style>
@@ -37,18 +38,18 @@
 
     .nav-container {
       display: flex;
-      justify-content: space-between;
+      justify-content: center;
       align-items: center;
       padding: 0;
       margin: 0;
     }
 
-    .page-wrapper {
+    /* .page-wrapper {
       max-width: 1200px;
       margin: 0 auto;
       padding: 0 1rem;
       width: 100%;
-}
+} */
 
     .logos {
       display: flex;

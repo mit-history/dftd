@@ -16,7 +16,7 @@
     <div class="about-text">
 
       <p>
-        <strong>Transnational Stages</strong> is a digital humanities project that builds on the foundation of several extant theater history projects. Our aim is to create a way for theater historians, performance studies scholars, and others interested in theater in the Atlantic world between 1700 and 1850 to compare performance practices in different theatrical venues, and to trace the mobility of performers and repertory across national boundaries.
+        <strong>Transnational Stages</strong> is a digital humanities project that builds on the foundation of several extant theater history projects. Our aim is to create a way for theater historians, performance studies scholars, and others interested in theater in the Atlantic world between 1680 and 1850 to compare performance practices in different theatrical venues, and to trace the mobility of performers and repertory across national boundaries.
       </p>
 
       <p>
@@ -24,7 +24,7 @@
       </p>
 
       <p>
-        Based on this prototype, we intend to expand the chronological range to 1700–1850, and add data from London and St. Domingue. Later, we'll include other theatrical venues from Europe and the Atlantic world and refine our search and visualization tools.
+        Based on this prototype, we intend to expand the chronological range to 1680–1850, and add data from London and St. Domingue. Later, we'll include other theatrical venues from Europe and the Atlantic world and refine our search and visualization tools.
       </p>
 
       <p class="contact">
@@ -33,16 +33,34 @@
       </p>
     </div>
 
-    <!-- Right: Image -->
-    <div class="about-image">
+   <!-- Right: Image with caption -->
+  <div class="about-image">
+    <div class="image-wrapper">
       <img src="{base}/images/random_french_theater.jpg" alt="random French Theatre Illustration" />
+      <p class="caption">
+        P. A. Wille, Interior of the Hôtel de Bourgogne Playhouse in Paris, 1767. Courtesy of Wikimedia Commons.
+      </p>
     </div>
-
   </div>
+
 </section>
 
 
   <style>
+.image-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.caption {
+  font-size: 0.9rem;
+  color: #555;
+  margin-top: 0.5rem;
+  max-width: 500px;
+}
+
 
   :global(body) {
     font-family: 'Inter', sans-serif;

@@ -54,8 +54,8 @@
           name: "Theatre in Saint Domingue",
           link: "https://www.theatreinsaintdomingue.org/",
           members: [
-            { name: "Professor Julia Prest, University of St. Andrews", link: "https://www.st-andrews.ac.uk/modern-languages/people/french/jtp22/" },
-            { name: "Swithun Crowe, University of St. Andrews", link: "https://researchcomputing.wp.st-andrews.ac.uk/team/" },
+            { name: "Professor Julia Prest, University of St. Andrews", link: "https://www.st-andrews.ac.uk/modern-languages/people/french/jtp22/", image: base + "/images/thumbnail_image001.jpg" },
+            { name: "Swithun Crowe, University of St. Andrews", link: "https://researchcomputing.wp.st-andrews.ac.uk/team/", image: base + "/images/Swithun Crowe.jpg"},
             { name: "Mary Woodcock Kroble, University of St. Andrews", link: "https://researchcomputing.wp.st-andrews.ac.uk/team/" }
           ]
         }

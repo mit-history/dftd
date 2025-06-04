@@ -7,16 +7,13 @@
 </script>
 
 <div class="explore-container">
-  <h1>Explore the Data</h1>
+  <h1><a href="/data" target="_blank">Explore the Data</a></h1>
 
-  <section class="link">
-    To view interactive versions of these visualizations, click <a href="/data" target="_blank">here.</a>.
-  </section>
 
   <p class="desc">
     Our ultimate goal is to allow users to explore multiple datasets simultaneously across the 1680-1750 period.
     The search and visualization tools we provide at this time allow access to data from playhouses in Amsterdam,
-    Copenhagen, and Paris from 1748 to 1778. We plan to expand the both the chronological and geographical scope of
+    Copenhagen, and Paris from 1748 to 1778. We plan to expand both the chronological and geographical scope of
     our data as we move forward.
     As an example, at present you can compare the number of annual performances in each of these three venues from 1748 to
     1778 in a bar graph:
@@ -37,7 +34,7 @@
   </div>
 
   <section class="link">
-    To view interactive versions of these visualizations, click <a href="/data" target="_blank">here.</a>.
+    To view interactive versions of these visualizations, click <a href="/data" target="_blank">here.</a>
   </section>
 </div>
 
@@ -57,6 +54,17 @@
   h1 {
     font-size: 2.5rem;
     margin-bottom: 1rem;
+  }
+
+  h1 a {
+  color: inherit;
+  text-decoration: none;
+  font-weight: inherit;
+}
+
+  h1 a:hover {
+    color: rgb(120, 0, 0);
+    text-decoration: underline;
   }
 
   .link {
