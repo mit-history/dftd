@@ -38,7 +38,7 @@
           name: "Onstage",
           link: "https://www.vondel.humanities.uva.nl/onstage/",
           members: [
-            { name: "Professor Frans Blom, University of Amsterdam", link: "https://www.uva.nl/en/profile/b/l/f.r.e.blom/f.r.e.blom.html#Research" },
+            { name: "Professor Frans Blom, University of Amsterdam", link: "https://www.uva.nl/en/profile/b/l/f.r.e.blom/f.r.e.blom.html#Research", image: base + "/images/frans.blom.jpg" },
             { name: "Harm Nijboer" }
           ]
         },
@@ -68,8 +68,8 @@
           name: "Performant Software Solutions",
           link: "https://www.performantsoftware.com/",
           members: [
-            { name: "Jamie Folsom, Partner", link: "https://www.performantsoftware.com/about/" },
-            { name: "Rebecca Black, Software Developer", link: "https://www.performantsoftware.com/about/" }
+            { name: "Jamie Folsom, Partner", link: "https://www.performantsoftware.com/about/", image: base + "/images/Jamie.webp" },
+            { name: "Rebecca Black, Software Developer", link: "https://www.performantsoftware.com/about/", image: base + "/images/Rebecca.png" }
           ]
         }
       ]
