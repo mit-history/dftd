@@ -24,7 +24,7 @@
       </p>
 
       <p>
-        Based on this prototype, we intend to expand the chronological range to 1680–1850, and add data from London and St. Domingue. Later, we'll include other theatrical venues from Europe and the Atlantic world and refine our search and visualization tools.
+        Based on this prototype, we intend to expand the chronological range to 1680–1850, and add data from London and Saint-Domingue.. Later, we'll include other theatrical venues from Europe and the Atlantic world and refine our search and visualization tools.
       </p>
 
       <p class="contact">

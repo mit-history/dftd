@@ -34,7 +34,7 @@
       color: '#8c3f5d'
     },
     {
-      name: 'Theatre in St Domingue',
+      name: 'Theatre in Saint-Domingue',
       link: 'https://www.theatreinsaintdomingue.org/',
       ranges: [{ start: 1764, end: 1791 }],
       color: '#b07d62'
@@ -78,7 +78,7 @@
         Since its establishment in 1680, the Comédie-Française has produced and preserved daily registers documenting the company’s income and expenses, as well as the plays performed and their casting.
       </p>
     </div>
-    
+
     <div class="project-card">
       <a href="https://www.theatronomics.com/" target="_blank" class="project-title">
       <img src={base + '/images/Theatronomics Map 2[21].jpg.jpeg'} alt="London Theater">
@@ -91,8 +91,8 @@
 
     <div class="project-card">
       <a href="https://www.theatreinsaintdomingue.org/" target="_blank" class="project-title">
-      <img src={base + '/images/perf_hait.jpg'} alt="Saint Domingue Theater">
-        Theatre in St Domingue</a>
+      <img src={base + '/images/pic for website.jpeg'} alt="Theatre in Saint-Domingue">
+        Theatre in Saint-Domingue</a>
       <p class="project-description">
         This website and database seek to make known the rich and varied culture of public theatre as documented in the local newspapers between 1764 and 1791.
       </p>
