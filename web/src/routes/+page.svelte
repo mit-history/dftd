@@ -16,7 +16,7 @@
     loop
     playsinline
   >
-    <source src={base + '/images/artex_journeys_animated.mov'} type="video/mp4" />
+    <source src={base + '/images/looped_journeys.mov'} type="video/mp4" />
     Your browser does not support the video tag.
   </video>
 
