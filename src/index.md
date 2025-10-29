@@ -5,9 +5,72 @@ toc: false
 # Visualizations of Play Data
 
 ```js
-const danish = FileAttachment("data/danish-performances.csv").csv({typed: true});
-const french = FileAttachment("data/french-performances.json").json();
-const dutch = FileAttachment("data/dutch-performances.csv").csv({typed: true});
+// const danish = FileAttachment("data/danish-performances.csv").csv({typed: true});
+const french = await FileAttachment("data/french-performances.json").json();
+const dutch = await FileAttachment("data/dutch-performances.csv").csv({typed: true});
+```
+
+```js
+// Load & normalize the Danish performances directly from the raw JSON
+const danish_raw = await FileAttachment("data/danish-performances.json").json();
+
+// Helper: Strapi is giving "date" as a big negative number (ms since 1970).
+// Example: -6813244828000. We convert that to a real JS Date.
+function parsePerformanceDate(rawDate) {
+  // rawDate can be a number like -6813244828000
+  // If it's already a number, Date(rawDate) works.
+  // If it's a string, Number(...) will also work.
+  const d = new Date(Number(rawDate));
+  return {
+    dateObj: d,
+    year: d.getUTCFullYear() // use UTC so 1759 doesn't become 1758 due to timezone
+  };
+}
+
+const danish = danish_raw.map(perf => {
+  const { dateObj, year } = parsePerformanceDate(perf.date);
+
+  // get all works in this production
+  const works = perf.production?.works ?? [];
+
+  // collect titles like "Attendez-moi sous l'Orme"
+  const title = works.map(w => w.title).join("; ");
+
+  // collect first genre name from each work, if any
+  // (Your CSV builder in danish-performances.csv.js did something similar.) :contentReference[oaicite:2]{index=2}
+  const genre = works
+    .map(w => {
+      // in the CSV script you looked up work objects in a workMap to get genres,
+      // but here we may not have that map yet.
+      // we’ll just leave genre null for now if it's not present in perf itself.
+      return null;
+    })
+    .join("; ");
+
+  // where was it staged
+  const place = perf.place?.name ?? null;
+
+  // author names:
+  // In your script you walked through each work, then each contributor.person.name. :contentReference[oaicite:3]{index=3}
+  const author = works
+    .map(w => {
+      // we DO have danish-works.json if you want full contributor info later,
+      // but for now we’ll just fall back to unknown.
+      return null;
+    })
+    .join("; ");
+
+  return {
+    id: perf.id,
+    date: dateObj,     // actual JS Date object
+    year,              // integer like 1759
+    title,
+    genre,
+    place,
+    author,
+    origin: "danish",  // so it still plays nicely with combined_data/origins filtering
+  };
+});
 ```
 
 ```js
@@ -18,12 +81,12 @@ data_origin.set("dutch", dutch);
 ```
 
 ```js
-const combined_data = danish
-    .map(d => ({...d, origin: "danish"}))
-    .concat(french.map(d => ({...d, origin: "french"})))
-    .map(d => ({...d, year: String(d.year)}))
-    .concat(dutch.map(d => ({...d, origin: "dutch"})))
-    .map(d => ({...d, year: String(d.year)}));
+const combined_data = [
+  ...danish,
+  ...french.map(d => ({ ...d, origin: "french" })),
+  ...dutch.map(d => ({ ...d, origin: "dutch" }))
+];
+
 ```
 
 ```js
@@ -89,12 +152,12 @@ function mapPlot(data) {
       Plot.graticule(),
       Plot.geo(land, {fill: "currentColor", fillOpacity: 0.3}),
       Plot.dot(data, {
-        x: "longitude", 
-        y: "latitude", 
-        r: "count", 
-        stroke: "red", 
-        fill: "red", 
-        fillOpacity: 0.2, 
+        x: "longitude",
+        y: "latitude",
+        r: "count",
+        stroke: "red",
+        fill: "red",
+        fillOpacity: 0.2,
         channels: {origin: "origin"},
         tip: {
           format: {
@@ -178,7 +241,7 @@ function divergentPlot() {
       ],
       range: ["#fca5a5", "#fb7185", "#ef4444", "#a3a3a3", "#93c5fd", "#60a5fa", "#3b82f6", "#6b7280"]
     },
-  
+
     marks: [
       // 左侧（丹麦）：堆叠柱状图（负数）
       Plot.barX(
@@ -318,12 +381,13 @@ const performanceDays = viz.includes("Days with Performances");
 
 ```js
 const start_date_input = Inputs.date({label: "Start", value: "1748-01-01"})
-const start_date =  view(start_date_input);
-const end_date_input = Inputs.date({label: "End", value: "1778-12-31"})
-const end_date =  view(end_date_input);
+const end_date_input = Inputs.date({label: "End", value: "1798-12-31"})
+const start_date = view(start_date_input);
+const end_date = view(end_date_input);
+
 const randomDates = () =>  {
   const start = new Date("1748-01-01");
-  const end = new Date("1778-12-31");
+  const end = new Date("1798-12-31"); // was 1778-12-31 before
   const new_start = new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
   const new_end = new Date(new_start.getTime() + Math.random() * (end.getTime() - new_start.getTime()));
   start_date_input.value = new_start;
@@ -331,6 +395,7 @@ const randomDates = () =>  {
   start_date_input.dispatchEvent(new Event("input"));
   end_date_input.dispatchEvent(new Event("input"));
 }
+
 ```
 
 ```js
@@ -364,7 +429,7 @@ const randomOrigins = () => {
   const newValue = originOptions.filter(i => Math.round(Math.random()));
   originsInput.value = newValue;
   originsInput.dispatchEvent(new Event("input"));
-  
+
   if(newValue.length === 3) originsSelect.value = true;
   else originsSelect.value = false;
 }
@@ -428,9 +493,9 @@ const randomAuthor = () => {
 ```
 
 ```js
-view(Inputs.button("Randomize", {value: null, reduce: () => { 
+view(Inputs.button("Randomize", {value: null, reduce: () => {
   randomDates();
-  randomOrigins(); 
+  randomOrigins();
   randomAuthor();
 }}));
 ```
@@ -441,6 +506,19 @@ view(Inputs.button("Randomize", {value: null, reduce: () => {
 
 ```js
 const formatted_data = combined_data.filter(d => (new Date(d.date) > start_date) && (new Date(d.date) <= end_date) && origins.includes(d.origin));
+
+const yearsInView = Array.from(new Set(formatted_data.map(d => +d.year))).sort((a,b) => a-b);
+console.log("Earliest year in filtered data:", yearsInView[0]);
+console.log("Latest year in filtered data:", yearsInView[yearsInView.length - 1]);
+yearsInView.slice(0,10).concat("...").concat(yearsInView.slice(-10))
+
+```
+
+<!-- TEMPORARY DEBUGGING FOR YEAR RANGE -->
+```js
+const allDanishYears = Array.from(new Set(danish.map(d => d.year))).sort((a,b)=>a-b);
+console.log("ALL DANISH YEARS:", allDanishYears[0], "→", allDanishYears[allDanishYears.length - 1]);
+allDanishYears.slice(-30);
 ```
 
 ```js
@@ -516,8 +594,8 @@ display(divergingGenres ? genreLegend() : html`<div></div>`);
 ```
 
 ```js
-display(divergingGenres ? 
-  ((danish_filtered_data.length > 0  && french_filtered_data.length > 0) ? divergentPlot() : html`<i>No data.</i>`) : 
+display(divergingGenres ?
+  ((danish_filtered_data.length > 0  && french_filtered_data.length > 0) ? divergentPlot() : html`<i>No data.</i>`) :
   html`<div></div>`
 )
 ```
@@ -543,7 +621,7 @@ const author_counts = author_filtered_data ? Object.entries(author_filtered_data
   acc[d.origin] = (acc[d.origin] || 0) + 1;
   return acc;
 }, {})).map(([origin, count]) => {
-  const coordinates = { 
+  const coordinates = {
     danish: copenhagen,
     dutch: amsterdam,
     french: paris
