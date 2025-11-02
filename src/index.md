@@ -5,9 +5,48 @@ toc: false
 # Visualizations of Play Data
 
 ```js
-const danish = FileAttachment("data/danish-performances.csv").csv({typed: true});
-const french = FileAttachment("data/french-performances.json").json();
-const dutch = FileAttachment("data/dutch-performances.csv").csv({typed: true});
+const french = await FileAttachment("data/french-performances.json").json();
+const dutch = await FileAttachment("data/dutch-performances.csv").csv({typed: true});
+
+// Load & normalize the Danish performances directly from the raw JSON
+const danish_raw = await FileAttachment("data/danish-performances.json").json();
+
+// helper: make any Strapi date format a usable (number OR "1748-12-16 AD")
+function toDate(value) {
+  if (value instanceof Date) return value;
+  if (typeof value === "number") return new Date(value);
+  if (typeof value === "string") {
+    // strip trailing " AD" if present
+    const clean = value.replace(" AD", "");
+    return new Date(clean);
+  }
+  return null;
+}
+
+const danish = danish_raw.map((perf) => {
+  const d = toDate(perf.date);
+  const year = d ? d.getUTCFullYear() : null;
+
+  // try to get a title, fall back to Strapi's formatted_title
+  const works = perf.production?.works ?? [];
+  const titleFromWorks = works.map((w) => w.title).filter(Boolean).join("; ");
+
+  return {
+    id: typeof perf.id === "string" ? perf.id : String(perf.id),
+    date: d,                     // <-- real Date object
+    year,                        // <-- number, e.g. 1748
+    title:
+      titleFromWorks ||
+      perf.formatted_title ||
+      perf.production?.formatted_title ||
+      null,
+    genre: null,                 //  current JSON doesn't carry genres here
+    place: perf.place?.name ?? null,
+    author: null,
+    origin: "danish",
+  };
+});
+
 ```
 
 ```js
@@ -15,38 +54,20 @@ const data_origin = new Map();
 data_origin.set("french", french);
 data_origin.set("danish", danish);
 data_origin.set("dutch", dutch);
+
+const combined_data = [
+  ...danish,
+  ...french.map(d => ({ ...d, origin: "french" })),
+  ...dutch.map(d => ({ ...d, origin: "dutch" }))
+];
+
 ```
 
-```js
-const combined_data = danish
-    .map(d => ({...d, origin: "danish"}))
-    .concat(french.map(d => ({...d, origin: "french"})))
-    .map(d => ({...d, year: String(d.year)}))
-    .concat(dutch.map(d => ({...d, origin: "dutch"})))
-    .map(d => ({...d, year: String(d.year)}));
-```
-
-```js
-function compareYearsChart(data) {
-  return Plot.plot({
-    title: `Compare performances per year, ${start_date.getFullYear()}-${end_date.getFullYear()}`,
-    fx: { padding: 0, label: null },
-    x: { axis: null, paddingOuter: 0.2 },
-    y: { grid: true, label: "Performances", domain: [0, 366] },
-    color: { legend: true },
-    width: 1000,
-    marks: [
-      Plot.barY(data, Plot.groupX({y2: "count"}, {x: "origin", fx: "year", fill: "origin", tip: true})),
-      Plot.ruleY([0])
-    ]
-  });
-}
-```
 
 ```js
 function percentageYearsChart(data) {
   return Plot.plot({
-    title: `Percentage of performances per year of works by ${author}, ${start_date.getFullYear()} - ${end_date.getFullYear()}`,
+    title: `Percentage of performances per year of works by ${author},${start_date.getUTCFullYear()} - ${end_date.getFullYear()}`,
     fx: { padding: 0, label: null },
     x: { axis: null, paddingOuter: 0.2 },
     y: { grid: true, label: "Percentage" },
@@ -77,7 +98,7 @@ const land = topojson.feature(world, world.objects.land)
 ```js
 function mapPlot(data) {
   return Plot.plot({
-    title: `Total number of performances of works by ${author}, ${start_date.getFullYear()} - ${end_date.getFullYear()}`,
+    title: `Total number of performances of works by ${author},${start_date.getUTCFullYear()} - ${end_date.getFullYear()}`,
     width: 400,
     projection: {
       type: "azimuthal-equidistant",
@@ -89,12 +110,12 @@ function mapPlot(data) {
       Plot.graticule(),
       Plot.geo(land, {fill: "currentColor", fillOpacity: 0.3}),
       Plot.dot(data, {
-        x: "longitude", 
-        y: "latitude", 
-        r: "count", 
-        stroke: "red", 
-        fill: "red", 
-        fillOpacity: 0.2, 
+        x: "longitude",
+        y: "latitude",
+        r: "count",
+        stroke: "red",
+        fill: "red",
+        fillOpacity: 0.2,
         channels: {origin: "origin"},
         tip: {
           format: {
@@ -160,7 +181,7 @@ function genreLegend() {
 ```js
 function divergentPlot() {
   return Plot.plot({
-    title: `Diverging Genre Performance Chart (${start_date.getFullYear()} - ${end_date.getFullYear()})`,
+    title: `Diverging Genre Performance Chart (${start_date.getUTCFullYear()} - ${end_date.getFullYear()})`,
     width: 1000,
     height: 800,
     x: {
@@ -178,7 +199,7 @@ function divergentPlot() {
       ],
       range: ["#fca5a5", "#fb7185", "#ef4444", "#a3a3a3", "#93c5fd", "#60a5fa", "#3b82f6", "#6b7280"]
     },
-  
+
     marks: [
       // 左侧（丹麦）：堆叠柱状图（负数）
       Plot.barX(
@@ -318,12 +339,13 @@ const performanceDays = viz.includes("Days with Performances");
 
 ```js
 const start_date_input = Inputs.date({label: "Start", value: "1748-01-01"})
-const start_date =  view(start_date_input);
-const end_date_input = Inputs.date({label: "End", value: "1778-12-31"})
-const end_date =  view(end_date_input);
+const end_date_input = Inputs.date({label: "End", value: "1798-12-31"})
+const start_date = view(start_date_input);
+const end_date = view(end_date_input);
+
 const randomDates = () =>  {
   const start = new Date("1748-01-01");
-  const end = new Date("1778-12-31");
+  const end = new Date("1798-12-31"); // was 1778-12-31 before
   const new_start = new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
   const new_end = new Date(new_start.getTime() + Math.random() * (end.getTime() - new_start.getTime()));
   start_date_input.value = new_start;
@@ -331,6 +353,7 @@ const randomDates = () =>  {
   start_date_input.dispatchEvent(new Event("input"));
   end_date_input.dispatchEvent(new Event("input"));
 }
+
 ```
 
 ```js
@@ -364,14 +387,20 @@ const randomOrigins = () => {
   const newValue = originOptions.filter(i => Math.round(Math.random()));
   originsInput.value = newValue;
   originsInput.dispatchEvent(new Event("input"));
-  
+
   if(newValue.length === 3) originsSelect.value = true;
   else originsSelect.value = false;
 }
 ```
 
 ```js
-const genreOptions = Array.from(new Set(combined_data.filter(d => origins.includes(d.origin)).map((d) => d.genre).filter(Boolean))).sort();
+const genreOptions = Array.from(new Set(
+  formatted_data
+    .filter(d => origins.includes(d.origin))
+    .map((d) => d.genre)
+    .filter(Boolean)
+)).sort();
+
 
 const genreInput = Inputs.checkbox(
   genreOptions,
@@ -428,9 +457,9 @@ const randomAuthor = () => {
 ```
 
 ```js
-view(Inputs.button("Randomize", {value: null, reduce: () => { 
+view(Inputs.button("Randomize", {value: null, reduce: () => {
   randomDates();
-  randomOrigins(); 
+  randomOrigins();
   randomAuthor();
 }}));
 ```
@@ -440,7 +469,60 @@ view(Inputs.button("Randomize", {value: null, reduce: () => {
 </div>
 
 ```js
-const formatted_data = combined_data.filter(d => (new Date(d.date) > start_date) && (new Date(d.date) <= end_date) && origins.includes(d.origin));
+const formatted_data = combined_data.filter(d => {
+  const dt = asDate(d.date);
+  return dt && dt > start_date && dt <= end_date && origins.includes(d.origin);
+});
+
+
+const yearsInView = Array.from(
+  new Set(formatted_data.map(d => +d.year).filter(Boolean))
+).sort((a, b) => a - b);
+
+
+yearsInView.slice(0,10).concat("...").concat(yearsInView.slice(-10))
+
+function asDate(x) {
+  if (x instanceof Date) return x;
+  if (typeof x === "number") return new Date(x);
+  if (typeof x === "string") return new Date(x.replace(" AD", ""));
+  return null;
+}
+```
+
+```js
+function compareYearsChart(data) {
+  const years = Array.from(new Set(data.map(d => d.year).filter(Boolean))).sort((a, b) => a - b);
+  const n = years.length;
+  const step =
+    n > 60 ? 10 :
+    n > 40 ? 5 :
+    n > 25 ? 2 : 1;
+  const yearTicks = years.filter((_, i) => i % step === 0);
+
+  return Plot.plot({
+    title: `Compare performances per year, ${start_date.getFullYear()}–${end_date.getFullYear()}`,
+    fx: { label: null, padding: 0.1 },
+    x: { axis: null, paddingOuter: 0.2 },
+    y: { grid: true, label: "Performances", domain: [0, 366] },
+    color: { legend: true },
+    width: 1000,
+    marginBottom: 60,
+    marks: [
+      Plot.barY(data, Plot.groupX({y2: "count"}, {x: "origin", fx: "year", fill: "origin", tip: true})),
+      Plot.ruleY([0]),
+      // 👇 labels below instead of above
+      Plot.axisFx({
+        ticks: yearTicks,
+        tickFormat: d => d,
+        anchor: "bottom"
+      })
+    ]
+  });
+}
+
+
+
 ```
 
 ```js
@@ -505,8 +587,15 @@ const danish_drama = danish.filter(
 ```
 
 ```js
-const danish_filtered_data = danish.filter(d => (new Date(d.date) > start_date) && (new Date(d.date)));
-const french_filtered_data = french.filter(d => (new Date(d.date) > start_date) && (new Date(d.date)));
+const danish_filtered_data = danish.filter(d => {
+  const dt = asDate(d.date);
+  return dt && dt > start_date && dt <= end_date;
+});
+const french_filtered_data = french.filter(d => {
+  const dt = asDate(d.date);
+  return dt && dt > start_date && dt <= end_date;
+});
+
 const danish_summary = processPerformanceGenres(danish_filtered_data, danish_comedy, danish_drama, danish_tragedy, danish_ballet, "danish");
 const french_summary = processPerformanceGenres(french_filtered_data, french_comedy, french_drama, french_tragedy, french_ballet, "french");
 ```
@@ -516,8 +605,8 @@ display(divergingGenres ? genreLegend() : html`<div></div>`);
 ```
 
 ```js
-display(divergingGenres ? 
-  ((danish_filtered_data.length > 0  && french_filtered_data.length > 0) ? divergentPlot() : html`<i>No data.</i>`) : 
+display(divergingGenres ?
+  ((danish_filtered_data.length > 0  && french_filtered_data.length > 0) ? divergentPlot() : html`<i>No data.</i>`) :
   html`<div></div>`
 )
 ```
@@ -543,7 +632,7 @@ const author_counts = author_filtered_data ? Object.entries(author_filtered_data
   acc[d.origin] = (acc[d.origin] || 0) + 1;
   return acc;
 }, {})).map(([origin, count]) => {
-  const coordinates = { 
+  const coordinates = {
     danish: copenhagen,
     dutch: amsterdam,
     french: paris
@@ -610,13 +699,16 @@ import {
 genre_data.sort((a, b) => a.year - b.year);
 
 // When dataset === "All", group each dataset into performance counts by year
+// summarize only what’s in the current date window
 function summarize(dataset, label) {
   const map = new Map();
   dataset.forEach(d => {
-    const year = d.year;
-    const date = d.performance_date || d.date;
+    const dt = asDate(d.date);
+    if (!dt) return;
+    if (dt < start_date || dt > end_date) return; // 👈 clamp to filter
+    const year = d.year ?? dt.getUTCFullYear();
     if (!map.has(year)) map.set(year, new Set());
-    map.get(year).add(date);
+    map.get(year).add(dt.toISOString().slice(0, 10)); // day-level uniqueness
   });
   const summary = Array.from(map, ([year, dates]) => ({
     year,
@@ -625,11 +717,24 @@ function summarize(dataset, label) {
   return { label, data: summary };
 }
 
-const french_data = summarize(french, "French");
-const danish_data = summarize(danish, "Danish");
-const dutch_data = summarize(dutch, "Dutch");
+// use the already-filtered datasets
+const originToData = {
+  danish: danish_filtered_data,
+  french: french_filtered_data,
+  // if you ever add dutch_filtered_data, put it here too
+  dutch: combined_data
+    .filter(d => d.origin === "dutch")
+    .filter(d => {
+      const dt = asDate(d.date);
+      return dt && dt >= start_date && dt <= end_date;
+    })
+};
 
-const summarized_data = origins.map(origin => summarize(data_origin.get(origin), origin));
+// build the list in the order the user selected
+const summarized_data = origins.map(origin =>
+  summarize(originToData[origin] ?? [], origin)
+);
+
 
 // clear old charts
 document.getElementById("line-chart-container").innerHTML = "";
