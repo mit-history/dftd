@@ -63,22 +63,6 @@ const combined_data = [
 
 ```
 
-```js
-function compareYearsChart(data) {
-  return Plot.plot({
-    title: `Compare performances per year,${start_date.getUTCFullYear()}-${end_date.getUTCFullYear()}`,
-    fx: { padding: 0, label: null },
-    x: { axis: null, paddingOuter: 0.2 },
-    y: { grid: true, label: "Performances", domain: [0, 366] },
-    color: { legend: true },
-    width: 1000,
-    marks: [
-      Plot.barY(data, Plot.groupX({y2: "count"}, {x: "origin", fx: "year", fill: "origin", tip: true})),
-      Plot.ruleY([0])
-    ]
-  });
-}
-```
 
 ```js
 function percentageYearsChart(data) {
@@ -491,9 +475,11 @@ const formatted_data = combined_data.filter(d => {
 });
 
 
-const yearsInView = Array.from(new Set(formatted_data.map(d => +d.year))).sort((a,b) => a-b);
-console.log("Earliest year in filtered data:", yearsInView[0]);
-console.log("Latest year in filtered data:", yearsInView[yearsInView.length - 1]);
+const yearsInView = Array.from(
+  new Set(formatted_data.map(d => +d.year).filter(Boolean))
+).sort((a, b) => a - b);
+
+
 yearsInView.slice(0,10).concat("...").concat(yearsInView.slice(-10))
 
 function asDate(x) {
@@ -502,15 +488,54 @@ function asDate(x) {
   if (typeof x === "string") return new Date(x.replace(" AD", ""));
   return null;
 }
-
-
 ```
 
-<!-- TEMPORARY DEBUGGING FOR YEAR RANGE -->
 ```js
-const allDanishYears = Array.from(new Set(danish.map(d => d.year))).sort((a,b)=>a-b);
-console.log("ALL DANISH YEARS:", allDanishYears[0], "→", allDanishYears[allDanishYears.length - 1]);
-allDanishYears.slice(-30);
+function compareYearsChart(data) {
+  // aggregate to ONE number per year (after the origin + date filters)
+  const byYear = d3.rollups(
+    data.filter(d => d.year != null),
+    v => v.length,
+    d => d.year
+  )
+  .map(([year, count]) => ({ year: +year, count }))
+  .sort((a, b) => a.year - b.year);
+
+  // build the x domain
+  const yearsInView = byYear.map(d => d.year);
+
+  // keep the labels from crashing into each other
+  const n = yearsInView.length;
+  const step =
+    n > 40 ? 5 :
+    n > 25 ? 2 : 1;
+  const xTicks = yearsInView.filter((_, i) => i % step === 0);
+
+  return Plot.plot({
+    title: `Compare performances per year, ${start_date.getUTCFullYear()}–${end_date.getUTCFullYear()}`,
+    width: 950,
+    x: {
+      label: "Year",
+      domain: yearsInView,
+      ticks: xTicks
+    },
+    y: {
+      label: "Performances",
+      grid: true
+    },
+    marks: [
+      Plot.ruleY([0]),
+      Plot.barY(byYear, {
+        x: "year",
+        y: "count",
+        // fill: "steelblue",
+        tip: true,
+        title: d => `${d.year}: ${d.count} performances`
+      })
+    ]
+  });
+}
+
 ```
 
 ```js
