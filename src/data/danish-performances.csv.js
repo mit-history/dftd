@@ -49,3 +49,61 @@ readFile("src/data/danish-works.json", "utf8", (err, worksRaw) => {
     process.stdout.write(csvFormat(features));
   });
 });
+
+
+
+/*
+📜 RECORDS NOTE: How danish-performances.json was generated with up-to-date information
+Data exported on November 2, 2025 via the Strapi admin console.
+
+Steps:
+ Open Strapi dashboard → Performances collection
+ Open browser DevTools → Console
+ Paste the export script (see below)
+ File downloaded as 'performances-from-admin.json'
+
+Script used:
+
+  (async () => {
+    const raw = localStorage.getItem('jwtToken');
+    const TOKEN = raw ? JSON.parse(raw) : null;
+    if (!TOKEN) return console.error('no token');
+
+    const baseUrl = 'https://artex.au.dk/strapi';
+    const uid = 'api::performance.performance';
+    const pageSize = 100;
+    let page = 1;
+    let pageCount = 1;
+    const all = [];
+
+    while (page <= pageCount) {
+      const url =
+        `${baseUrl}/content-manager/collection-types/${encodeURIComponent(uid)}` +
+        `?page=${page}` +
+        `&pageSize=${pageSize}` +
+        `&sort=date:ASC` +
+        `&populate=*`;              // 👈 THIS is the key part
+
+      const res = await fetch(url, {
+        headers: {
+          Authorization: `Bearer ${TOKEN}`,
+          Accept: 'application/json'
+        }
+      });
+
+      const json = await res.json();
+      const items = json.results || json.data || [];
+      const pagination = json.pagination || (json.meta && json.meta.pagination) || {};
+      all.push(...items);
+      pageCount = pagination.pageCount || pageCount;
+      page++;
+    }
+
+    const blob = new Blob([JSON.stringify(all, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'performances-populated.json';
+    a.click();
+  })();
+
+  */
