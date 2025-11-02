@@ -492,49 +492,36 @@ function asDate(x) {
 
 ```js
 function compareYearsChart(data) {
-  // aggregate to ONE number per year (after the origin + date filters)
-  const byYear = d3.rollups(
-    data.filter(d => d.year != null),
-    v => v.length,
-    d => d.year
-  )
-  .map(([year, count]) => ({ year: +year, count }))
-  .sort((a, b) => a.year - b.year);
-
-  // build the x domain
-  const yearsInView = byYear.map(d => d.year);
-
-  // keep the labels from crashing into each other
-  const n = yearsInView.length;
+  const years = Array.from(new Set(data.map(d => d.year).filter(Boolean))).sort((a, b) => a - b);
+  const n = years.length;
   const step =
+    n > 60 ? 10 :
     n > 40 ? 5 :
     n > 25 ? 2 : 1;
-  const xTicks = yearsInView.filter((_, i) => i % step === 0);
+  const yearTicks = years.filter((_, i) => i % step === 0);
 
   return Plot.plot({
-    title: `Compare performances per year, ${start_date.getUTCFullYear()}–${end_date.getUTCFullYear()}`,
-    width: 950,
-    x: {
-      label: "Year",
-      domain: yearsInView,
-      ticks: xTicks
-    },
-    y: {
-      label: "Performances",
-      grid: true
-    },
+    title: `Compare performances per year, ${start_date.getFullYear()}–${end_date.getFullYear()}`,
+    fx: { label: null, padding: 0.1 },
+    x: { axis: null, paddingOuter: 0.2 },
+    y: { grid: true, label: "Performances", domain: [0, 366] },
+    color: { legend: true },
+    width: 1000,
+    marginBottom: 60,
     marks: [
+      Plot.barY(data, Plot.groupX({y2: "count"}, {x: "origin", fx: "year", fill: "origin", tip: true})),
       Plot.ruleY([0]),
-      Plot.barY(byYear, {
-        x: "year",
-        y: "count",
-        // fill: "steelblue",
-        tip: true,
-        title: d => `${d.year}: ${d.count} performances`
+      // 👇 labels below instead of above
+      Plot.axisFx({
+        ticks: yearTicks,
+        tickFormat: d => d,
+        anchor: "bottom"
       })
     ]
   });
 }
+
+
 
 ```
 
