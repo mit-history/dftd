@@ -15,7 +15,7 @@ readFile("src/data/dutch_data_1748_1798.csv", "utf8", (err, data) => {
     process.stdout.write(csvFormat(transformed));
 });
 
-`Query used to get this data:
+`Query made to https://lod.uba.uva.nl/CREATE/ONSTAGE/sparql to get this data:
 
 PREFIX schema: <https://schema.org/>
 PREFIX owl: <http://www.w3.org/2002/07/owl#>
@@ -24,20 +24,12 @@ PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 SELECT
   ?date
   ?playTitle
-  # ?firstAuthorName
   (SAMPLE(?firstAuthorName) AS ?authorName)
   ?originalTitle
-  # ?firstOriginalAuthorName
   (SAMPLE(?firstOriginalAuthorName) AS ?originalAuthorName)
 WHERE {
   VALUES (?theaterEvent) { (schema:TheatreEvent) (schema:TheaterEvent) }
 
-  OPTIONAL {
-    ?work schema:isBasedOn ?original .
-    ?original schema:creator ?originalAuthor .
-    ?originalAuthor schema:name ?firstOriginalAuthorName .
-    ?original schema:headline ?originalTitle .
-  }
 
   ?work schema:headline ?playTitle ;
         schema:creator ?author .
@@ -47,6 +39,12 @@ WHERE {
   ?show a ?theaterEvent ;
         schema:subEvent ?performance ;
         schema:startDate ?date .
+  OPTIONAL {
+    ?work schema:isBasedOn ?original .
+    ?original schema:creator ?originalAuthor .
+    ?originalAuthor schema:name ?firstOriginalAuthorName .
+    ?original schema:headline ?originalTitle .
+  }
 
   FILTER (
     ?date >= "1748-01-01"^^xsd:date &&
