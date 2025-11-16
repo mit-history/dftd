@@ -9,7 +9,7 @@ export async function load() {
 
     // Fetch data
     const response = await fetch(
-      "https://api.cfregisters.org/performances?date=gt.%221748-01-01%22&date=lt.%221779-01-01%22"
+      "https://api.cfregisters.org/performances?date=gt.%221748-01-01%22&date=lt.%221794-01-01%22"
     );
     if (!response.ok) throw new Error(`fetch failed: ${response.status}`);
     const performances = await response.json();
