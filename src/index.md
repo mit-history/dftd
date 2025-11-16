@@ -319,7 +319,7 @@ function divergentPlot() {
 <div>
 
 ```js
-const opt = ["Over Time", "Diverging Genres", "By Author", "Days with Performances"];
+const opt = ["Over Time", "Diverging Genres", "By Author", "Days with Performances", "Author Share"];
 const vizOpt = Inputs.checkbox(opt, {label: "Visualization", value: ["Over Time"]});
 const viz = view(vizOpt);
 ```
@@ -329,6 +329,7 @@ const overTime = viz.includes("Over Time");
 const divergingGenres = viz.includes("Diverging Genres");
 const byAuthor = viz.includes("By Author");
 const performanceDays = viz.includes("Days with Performances");
+const authorShare = viz.includes("Author Share");
 ```
 
 <div class="card" style="position:sticky;top:5px;">
@@ -535,6 +536,54 @@ display(overTime ? (formatted_data.length > 0 ? compareYearsChart(formatted_data
 
 ```js
 display(divergingGenres ? html `<h2>Comparative Performance Genres Over Time</h2>` : html`<div></div>`)
+```
+
+```js
+import {
+  authorShareChart,
+  emitAuthorsToCompare,
+  addAuthorToCompare,
+  clearAuthorsToCompare,
+} from "./components/author-share.js";
+
+if (authorShare) {
+  display(html`<h2>Author Performance Contribution Percentage</h2>`);
+  if (author === "No author") {
+    display(html`<i>Select an author to see their share per year.</i>`);
+  } else {
+    display(authorShareChart(author, formatted_data));
+  }
+} else
+  display(html`<div></div>`)
+```
+
+```js
+let authorsToCompare = [];
+
+if (authorShare) {
+  view(
+    Inputs.button("Add author", {
+      value: null,
+      reduce: () => {
+        addAuthorToCompare(author);
+        return null;
+      }
+    })
+  );
+
+  view(
+    Inputs.button("Clear authors", {
+      value: null,
+      reduce: () => {
+        clearAuthorsToCompare();
+        console.log("Author bucket cleared");
+        return null;
+      }
+    })
+  );
+} else {
+  display(html`<div></div>`)
+}
 ```
 
 ```js
