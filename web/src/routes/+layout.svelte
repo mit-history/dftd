@@ -9,17 +9,21 @@
     isOpen = !isOpen;
   }
 
-  const isHome = derived(page, $page => $page.url.pathname === base + '/');
+  // trying to make explore the data nav transparent like home page, come back later
+  const transparentNav = derived(page, ($page) => {
+    const path = $page.url.pathname;
+    return path === base + '/' || path === base + '/Data';
+  });
 </script>
 
 <div class="layout-wrapper">
-  <header class="top-bar" class:transparent-nav={$isHome}>
+  <header class="top-bar" class:transparent-nav={$transparentNav}>
     <div class="top-bar-container">
       <ul class:open={isOpen}>
         <li><a href={base + '/'}>Home</a></li>
         <li><a href={base + '/About'}>About</a></li>
         <li><a href={base + '/Affiliates'}>Affiliates</a></li>
-        <li><a href={base + '/Explore%20the%20Data'}>Explore the Data</a></li>
+        <li><a href={base + '/data'}>Explore the Data</a></li>
         <li><a href={base + '/Team'}>Team</a></li>
       </ul>
     </div>

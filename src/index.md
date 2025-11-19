@@ -2,7 +2,7 @@
 toc: false
 ---
 
-# Visualizations of Play Data
+# Explore the Data
 
 ```js
 const french = await FileAttachment("data/french-performances.json").json();
@@ -318,17 +318,24 @@ function divergentPlot() {
 
 <div>
 
+<!-- toggle to go to visualizations -->
 ```js
-const opt = ["Over Time", "Diverging Genres", "By Author", "Days with Performances"];
-const vizOpt = Inputs.checkbox(opt, {label: "Visualization", value: ["Over Time"]});
-const viz = view(vizOpt);
+const vizOptions = ["Over Time", "Diverging Genres", "By Author", "Days with Performances"];
+
+const vizInput = Inputs.select(vizOptions, {
+  label: "Choose a visualization",
+  value: "Over Time" // default
+});
+
+const viz = view(vizInput);
+
 ```
 
 ```js
-const overTime = viz.includes("Over Time");
-const divergingGenres = viz.includes("Diverging Genres");
-const byAuthor = viz.includes("By Author");
-const performanceDays = viz.includes("Days with Performances");
+const overTime = viz === "Over Time";
+const divergingGenres = viz === "Diverging Genres";
+const byAuthor = viz === "By Author";
+const performanceDays = viz === "Days with Performances";
 ```
 
 <div class="card" style="position:sticky;top:5px;">
