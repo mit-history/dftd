@@ -548,12 +548,8 @@ import {
 
 if (authorShare) {
   display(html`<h2>Author Performance Contribution Percentage</h2>`);
-  if (author === "No author") {
-    display(html`<i>Select an author to see their share per year.</i>`);
-  } else {
-    display(authorShareChart(author, formatted_data));
-  }
-} else
+  display(authorShareChart(author, formatted_data));
+  } else
   display(html`<div></div>`)
 ```
 
@@ -576,7 +572,6 @@ if (authorShare) {
       value: null,
       reduce: () => {
         clearAuthorsToCompare();
-        console.log("Author bucket cleared");
         return null;
       }
     })
