@@ -16,15 +16,19 @@
     <div class="about-text">
 
       <p>
-        <strong>Transnational Stages</strong> is a digital humanities project that builds on the foundation of several extant theater history projects. Our aim is to create a way for theater historians, performance studies scholars, and others interested in theater in the Atlantic world between 1680 and 1850 to compare performance practices in different theatrical venues, and to trace the mobility of performers and repertory across national boundaries.
+        December 2025
       </p>
 
       <p>
-        In the 2024-2025 academic year, funded by MIT and the University of Bergen, we compared the datasets created by these different national projects and assembled the current website. Its main feature is a tool that allows one to compare the frequency of performance and the types of genres found in the repertory of theaters in Amsterdam, Copenhagen, and Paris from 1748–1778.
+        <strong>Transnational Stages</strong> is a digital humanities project that builds on the foundation of several extant theater history projects. Our aim is to create a way for theater historians, performance studies scholars, and others interested in theater in the Atlantic world between 1680 and 1850 to compare performance practices in different theatrical venues, and to trace the mobility of authors, performers, and repertory across national boundaries.
       </p>
 
       <p>
-        Based on this prototype, we intend to expand the chronological range to 1680–1850, and add data from London and Saint-Domingue.. Later, we'll include other theatrical venues from Europe and the Atlantic world and refine our search and visualization tools.
+        In the 2024-2025 academic year, funded by MIT and the University of Bergen, we compared the datasets created by these different national projects and assembled the current website. Its main feature is a set of visualizations that allows one to compare the frequency of performance and the types of genres found in the repertory of theaters in Amsterdam, Copenhagen, and Paris from 1748–1798.
+      </p>
+
+      <p>
+        In the 2025-2026 academic year, we have already added to these visualizations and modified our web site design. By the end of the year, we hope to add data to our visualizations from theaters in London, Paris, Saint-Domingue (later Haiti), and New Orleans.
       </p>
 
       <p class="contact">
