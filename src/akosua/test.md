@@ -5,9 +5,48 @@ toc: false
 # Visualizations of Play Data
 
 ```js
-const danish = FileAttachment("data/danish-performances.csv").csv({typed: true});
-const french = FileAttachment("data/french-performances.json").json();
-const dutch = FileAttachment("data/dutch-performances.csv").csv({typed: true});
+const french = await FileAttachment("data/french-performances.json").json();
+const dutch = await FileAttachment("data/dutch-performances.csv").csv({typed: true});
+
+// Load & normalize the Danish performances directly from the raw JSON
+const danish_raw = await FileAttachment("data/danish-performances.json").json();
+
+// helper: make any Strapi date format a usable (number OR "1748-12-16 AD")
+function toDate(value) {
+  if (value instanceof Date) return value;
+  if (typeof value === "number") return new Date(value);
+  if (typeof value === "string") {
+    // strip trailing " AD" if present
+    const clean = value.replace(" AD", "");
+    return new Date(clean);
+  }
+  return null;
+}
+
+const danish = danish_raw.map((perf) => {
+  const d = toDate(perf.date);
+  const year = d ? d.getUTCFullYear() : null;
+
+  // try to get a title, fall back to Strapi's formatted_title
+  const works = perf.production?.works ?? [];
+  const titleFromWorks = works.map((w) => w.title).filter(Boolean).join("; ");
+
+  return {
+    id: typeof perf.id === "string" ? perf.id : String(perf.id),
+    date: d,                     // <-- real Date object
+    year,                        // <-- number, e.g. 1748
+    title:
+      titleFromWorks ||
+      perf.formatted_title ||
+      perf.production?.formatted_title ||
+      null,
+    genre: null,                 //  current JSON doesn't carry genres here
+    place: perf.place?.name ?? null,
+    author: null,
+    origin: "danish",
+  };
+});
+
 ```
 
 ```js
@@ -15,27 +54,283 @@ const data_origin = new Map();
 data_origin.set("french", french);
 data_origin.set("danish", danish);
 data_origin.set("dutch", dutch);
+
+const combined_data = [
+  ...danish,
+  ...french.map(d => ({ ...d, origin: "french" })),
+  ...dutch.map(d => ({ ...d, origin: "dutch" }))
+];
+
+```
+
+
+```js
+function percentageYearsChart(data) {
+  return Plot.plot({
+    title: `Percentage of performances per year of works by ${author},${start_date.getUTCFullYear()} - ${end_date.getFullYear()}`,
+    fx: { padding: 0, label: null },
+    x: { axis: null, paddingOuter: 0.2 },
+    y: { grid: true, label: "Percentage" },
+    color: { legend: true },
+    marks: [
+      Plot.barY(data, {x: "origin", y: "percentage", fx: "year", fill: "origin", tip: true}),
+      Plot.ruleY([0])
+    ]
+  });
+}
 ```
 
 ```js
-const combined_data = danish
-    .map(d => ({...d, origin: "danish"}))
-    .concat(french.map(d => ({...d, origin: "french"})))
-    .map(d => ({...d, year: String(d.year)}))
-    .concat(dutch.map(d => ({...d, origin: "dutch"})))
-    .map(d => ({...d, year: String(d.year)}));
+const paris = {latitude: 48.856667, longitude: 2.352222}
+const copenhagen = {latitude: 55.676111, longitude: 12.568333}
+const amsterdam = {latitude: 52.372778, longitude: 4.893611}
 ```
+
+```js
+const world = FileAttachment("data/countries-110m.json").json()
+```
+
+```js
+const circle = d3.geoCircle().center([7, 50]).radius(10).precision(2)()
+const land = topojson.feature(world, world.objects.land)
+```
+
+```js
+function mapPlot(data) {
+  return Plot.plot({
+    title: `Total number of performances of works by ${author},${start_date.getUTCFullYear()} - ${end_date.getFullYear()}`,
+    width: 400,
+    projection: {
+      type: "azimuthal-equidistant",
+      rotate: [-7, -50],
+      domain: circle,
+      inset: 10
+    },
+    marks: [
+      Plot.graticule(),
+      Plot.geo(land, {fill: "currentColor", fillOpacity: 0.3}),
+      Plot.dot(data, {
+        x: "longitude",
+        y: "latitude",
+        r: "count",
+        stroke: "red",
+        fill: "red",
+        fillOpacity: 0.2,
+        channels: {origin: "origin"},
+        tip: {
+          format: {
+            x: false,
+            y: false,
+            origin: true,
+            count: true,
+          }
+        }
+      }),
+      Plot.frame()
+    ]
+  })
+}
+```
+
+```js
+function processPerformanceGenres(fullData, comedyData, dramaData, tragedyData, balletData, origin) {
+  const allYears = d3.rollup(fullData, v => v.length, d => d.year);
+  const comedyYears = d3.rollup(comedyData, v => v.length, d => d.year);
+  const dramaYears = d3.rollup(dramaData.concat(tragedyData), v => v.length, d => d.year);
+  const balletYears = d3.rollup(balletData, v => v.length, d => d.year);
+
+  return Array.from(allYears, ([year, total]) => {
+    const comedy = comedyYears.get(year) || 0;
+    const drama = dramaYears.get(year) || 0;
+    const ballet = balletYears.get(year) || 0;
+    const other = total - comedy - drama - ballet;
+    return {
+      year: +year,
+      origin,
+      comedy,
+      drama,
+      ballet,
+      other,
+      percent: {
+        comedy: comedy / total,
+        drama: drama / total,
+        ballet: ballet / total,
+        other: other / total
+      }
+    };
+  });
+}
+```
+
+```js
+function genreLegend() {
+  return Plot.legend({
+    color: {
+      domain: [
+        "danish-comedy", "danish-drama", "danish-ballet", "danish-other",
+        "french-comedy", "french-drama", "french-ballet", "french-other"
+      ],
+      range: ["#fca5a5", "#fb7185", "#ef4444", "#a3a3a3", "#93c5fd", "#60a5fa", "#3b82f6", "#6b7280"]
+    },
+    title: "Legend",
+    columns: 2
+  })
+}
+```
+
+```js
+function divergentPlot() {
+  return Plot.plot({
+    title: `Diverging Genre Performance Chart (${start_date.getUTCFullYear()} - ${end_date.getFullYear()})`,
+    width: 1000,
+    height: 800,
+    x: {
+      label: "Number of Performances",
+      tickFormat: Math.abs
+    },
+    y: {
+      label: "Year",
+      reverse: true
+    },
+    color: {
+      domain: [
+        "danish-comedy", "danish-drama", "danish-ballet", "danish-other",
+        "french-comedy", "french-drama", "french-ballet", "french-other"
+      ],
+      range: ["#fca5a5", "#fb7185", "#ef4444", "#a3a3a3", "#93c5fd", "#60a5fa", "#3b82f6", "#6b7280"]
+    },
+
+    marks: [
+      // 左侧（丹麦）：堆叠柱状图（负数）
+      Plot.barX(
+        danish_summary.flatMap(d => {
+          const parts = [];
+          let x = 0;
+          for (const type of ["comedy", "drama", "ballet", "other"]) {
+            const value = d[type];
+            parts.push({
+              year: d.year,
+              x1: -x,
+              x2: -(x + value),
+              type,
+              origin: "danish",
+              percent: `${Math.round(d.percent[type] * 100)}%`
+            });
+            x += value;
+          }
+          return parts;
+        }),
+        {
+          x1: "x1",
+          x2: "x2",
+          y: "year",
+          fill: d => `${d.origin}-${d.type}`
+        }
+      ),
+
+      // 右侧（法国）：堆叠柱状图（正数）
+      Plot.barX(
+        french_summary.flatMap(d => {
+          const parts = [];
+          let x = 0;
+          for (const type of ["comedy", "drama", "ballet", "other"]) {
+            const value = d[type];
+            parts.push({
+              year: d.year,
+              x1: x,
+              x2: x + value,
+              type,
+              origin: "french",
+              percent: `${Math.round(d.percent[type] * 100)}%`
+            });
+            x += value;
+          }
+          return parts;
+        }),
+        {
+          x1: "x1",
+          x2: "x2",
+          y: "year",
+          fill: d => `${d.origin}-${d.type}`
+        }
+      ),
+
+      // 中心线
+      Plot.ruleX([0]),
+
+      // 百分比文字标签（丹麦）
+      Plot.text(
+        danish_summary.flatMap(d => {
+          const labels = [];
+          let x = 0;
+          for (const type of ["comedy", "drama", "ballet", "other"]) {
+            const value = d[type];
+            if (value > 0) {
+              labels.push({
+                year: d.year,
+                x: -(x + value / 2),
+                text: `${Math.round(d.percent[type] * 100)}%`
+              });
+            }
+            x += value;
+          }
+          return labels;
+        }),
+        {
+          x: "x",
+          y: "year",
+          text: "text",
+          fill: "black",
+          textAnchor: "middle"
+        }
+      ),
+
+      // 百分比文字标签（法国）
+      Plot.text(
+        french_summary.flatMap(d => {
+          const labels = [];
+          let x = 0;
+          for (const type of ["comedy", "drama", "ballet", "other"]) {
+            const value = d[type];
+            if (value > 0) {
+              labels.push({
+                year: d.year,
+                x: x + value / 2,
+                text: `${Math.round(d.percent[type] * 100)}%`
+              });
+            }
+            x += value;
+          }
+          return labels;
+        }),
+        {
+          x: "x",
+          y: "year",
+          text: "text",
+          fill: "black",
+          textAnchor: "middle"
+        }
+      )
+    ]
+  })
+}
+```
+
 <div>
 
 ```js
-const opt = ["Author Genre Bubble", "Location Author Bubble"];
-const vizOpt = Inputs.checkbox(opt, {label: "Visualization", value: ["Author Genre Bubble"]});
+const opt = ["Over Time", "Diverging Genres", "By Author", "Days with Performances", "Author Share", "Author Bubble"];
+const vizOpt = Inputs.checkbox(opt, {label: "Visualization", value: ["Over Time"]});
 const viz = view(vizOpt);
 ```
 
 ```js
-const bubble = viz.includes("Author Genre Bubble");
-const location = viz.includes("Location Author Bubble");
+const overTime = viz.includes("Over Time");
+const divergingGenres = viz.includes("Diverging Genres");
+const byAuthor = viz.includes("By Author");
+const performanceDays = viz.includes("Days with Performances");
+const authorShare = viz.includes("Author Share");
+const location = viz.includes("Author Bubble");
 ```
 
 <div class="card" style="position:sticky;top:5px;">
@@ -46,12 +341,13 @@ const location = viz.includes("Location Author Bubble");
 
 ```js
 const start_date_input = Inputs.date({label: "Start", value: "1748-01-01"})
-const start_date =  view(start_date_input);
-const end_date_input = Inputs.date({label: "End", value: "1778-12-31"})
-const end_date =  view(end_date_input);
+const end_date_input = Inputs.date({label: "End", value: "1798-12-31"})
+const start_date = view(start_date_input);
+const end_date = view(end_date_input);
+
 const randomDates = () =>  {
   const start = new Date("1748-01-01");
-  const end = new Date("1778-12-31");
+  const end = new Date("1798-12-31"); // was 1778-12-31 before
   const new_start = new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
   const new_end = new Date(new_start.getTime() + Math.random() * (end.getTime() - new_start.getTime()));
   start_date_input.value = new_start;
@@ -59,7 +355,6 @@ const randomDates = () =>  {
   start_date_input.dispatchEvent(new Event("input"));
   end_date_input.dispatchEvent(new Event("input"));
 }
-console.log(`start_date is ${start_date}`)
 
 ```
 
@@ -101,7 +396,13 @@ const randomOrigins = () => {
 ```
 
 ```js
-const genreOptions = Array.from(new Set(combined_data.filter(d => origins.includes(d.origin)).map((d) => d.genre).filter(Boolean))).sort();
+const genreOptions = Array.from(new Set(
+  formatted_data
+    .filter(d => origins.includes(d.origin))
+    .map((d) => d.genre)
+    .filter(Boolean)
+)).sort();
+
 
 const genreInput = Inputs.checkbox(
   genreOptions,
@@ -169,358 +470,150 @@ view(Inputs.button("Randomize", {value: null, reduce: () => {
 
 </div>
 
+```js
+const formatted_data = combined_data.filter(d => {
+  const dt = asDate(d.date);
+  return dt && dt > start_date && dt <= end_date && origins.includes(d.origin);
+});
+
+
+const yearsInView = Array.from(
+  new Set(formatted_data.map(d => +d.year).filter(Boolean))
+).sort((a, b) => a - b);
+
+
+yearsInView.slice(0,10).concat("...").concat(yearsInView.slice(-10))
+
+function asDate(x) {
+  if (x instanceof Date) return x;
+  if (typeof x === "number") return new Date(x);
+  if (typeof x === "string") return new Date(x.replace(" AD", ""));
+  return null;
+}
+```
 
 ```js
-const formatted_data = combined_data.filter(d => (new Date(d.date) > start_date) && (new Date(d.date) <= end_date) && origins.includes(d.origin) && genres.includes(d.genre));
+function compareYearsChart(data) {
+  const years = Array.from(new Set(data.map(d => d.year).filter(Boolean))).sort((a, b) => a - b);
+  const n = years.length;
+  const step =
+    n > 60 ? 10 :
+    n > 40 ? 5 :
+    n > 25 ? 2 : 1;
+  const yearTicks = years.filter((_, i) => i % step === 0);
+
+  return Plot.plot({
+    title: `Compare performances per year, ${start_date.getFullYear()}–${end_date.getFullYear()}`,
+    fx: { label: null, padding: 0.1 },
+    x: { axis: null, paddingOuter: 0.2 },
+    y: { grid: true, label: "Performances", domain: [0, 366] },
+    color: { legend: true },
+    width: 1000,
+    marginBottom: 60,
+    marks: [
+      Plot.barY(data, Plot.groupX({y2: "count"}, {x: "origin", fx: "year", fill: "origin", tip: true})),
+      Plot.ruleY([0]),
+      // 👇 labels below instead of above
+      Plot.axisFx({
+        ticks: yearTicks,
+        tickFormat: d => d,
+        anchor: "bottom"
+      })
+    ]
+  });
+}
+
+
+
+```
+
+```js
+display(overTime ? html `<h2>Comparative Performances Over Time</h2>` : html`<div></div>`)
+```
+
+```js
+display(overTime ? (formatted_data.length > 0 ? compareYearsChart(formatted_data) : html`<i>No data.</i>`) : html`<div></div>`)
+```
+
+```js
+display(divergingGenres ? html `<h2>Comparative Performance Genres Over Time</h2>` : html`<div></div>`)
+```
+
+```js
+import {
+  authorShareChart,
+  emitAuthorsToCompare,
+  addAuthorToCompare,
+  clearAuthorsToCompare,
+} from "./components/author-share.js";
+
+if (authorShare) {
+  display(html`<h2>Author Performance Contribution Percentage</h2>`);
+  if (author === "No author") {
+    display(html`<i>Select an author to see their share per year.</i>`);
+  } else {
+    display(authorShareChart(author, formatted_data));
+  }
+} else
+  display(html`<div></div>`)
+```
+
+```js
+let authorsToCompare = [];
+
+if (authorShare) {
+  view(
+    Inputs.button("Add author", {
+      value: null,
+      reduce: () => {
+        addAuthorToCompare(author);
+        return null;
+      }
+    })
+  );
+
+  view(
+    Inputs.button("Clear authors", {
+      value: null,
+      reduce: () => {
+        clearAuthorsToCompare();
+        console.log("Author bucket cleared");
+        return null;
+      }
+    })
+  );
+} else {
+  display(html`<div></div>`)
+}
 ```
 
 ```js
 import { BubbleChart, authorBubble } from "./akosua/bubble_chart.js";
-// import { rangeInput } from "./akosua/range_input.js";
+import { rangeInput } from "./akosua/range_input.js";
 ```
-
-```js
-// import { htl } from "npm:@observablehq/htl";
-
-const theme_Flat = `
-/* Options */
-:scope {
-  color: #3b99fc;
-  width: 240px;
-}
-
-:scope {
-  position: relative;
-  display: inline-block;
-  --thumb-size: 15px;
-  --thumb-radius: calc(var(--thumb-size) / 2);
-  padding: var(--thumb-radius) 0;
-  margin: 2px;
-  vertical-align: middle;
-}
-:scope .range-track {
-  box-sizing: border-box;
-  position: relative;
-  height: 7px;
-  background-color: hsl(0, 0%, 80%);
-  overflow: visible;
-  border-radius: 4px;
-  padding: 0 var(--thumb-radius);
-}
-:scope .range-track-zone {
-  box-sizing: border-box;
-  position: relative;
-}
-:scope .range-select {
-  box-sizing: border-box;
-  position: relative;
-  left: var(--range-min);
-  width: calc(var(--range-max) - var(--range-min));
-  cursor: ew-resize;
-  background: currentColor;
-  height: 7px;
-  border: inherit;
-}
-/* Expands the hotspot area. */
-:scope .range-select:before {
-  content: "";
-  position: absolute;
-  width: 100%;
-  height: var(--thumb-size);
-  left: 0;
-  top: calc(2px - var(--thumb-radius));
-}
-:scope .range-select:focus,
-:scope .thumb:focus {
-  outline: none;
-}
-:scope .thumb {
-  box-sizing: border-box;
-  position: absolute;
-  width: var(--thumb-size);
-  height: var(--thumb-size);
-
-  background: #fcfcfc;
-  top: -4px;
-  border-radius: 100%;
-  border: 1px solid hsl(0,0%,55%);
-  cursor: default;
-  margin: 0;
-}
-:scope .thumb:active {
-  box-shadow: inset 0 var(--thumb-size) #0002;
-}
-:scope .thumb-min {
-  left: calc(-1px - var(--thumb-radius));
-}
-:scope .thumb-max {
-  right: calc(-1px - var(--thumb-radius));
-}
-`
-function randomScope(prefix = 'scope-') {
-  return prefix + (performance.now() + Math.random()).toString(32).replace('.', '-');
-}
-
-const cssLength = v => v == null ? null : typeof v === 'number' ? `${v}px` : `${v}`
-
-function rangeInput(options = {}) {
-  const {
-    min = 0,
-    max = 100,
-    step = "any",
-    value: defaultValue = [min, max],
-    color,
-    width,
-    theme = theme_Flat,
-    enableTextInput = false
-  } = options;
-
-  const controls = {};
-  const scope = randomScope();
-  const clamp = (a, b, v) => (v < a ? a : v > b ? b : v);
-  // const html = htl.html;
-
-  const inputMin = html`<input type="number" id="min-input"  min=${min} max=${defaultValue[1]} step=${step} value=${defaultValue[0]} />`;
-  inputMin.style = "width:5em";
-  const inputMax = html`<input type="number" id="max-input"  min=${defaultValue[0]} max=${max} step=${step} value=${defaultValue[1]} />`;
-  inputMax.style = "width:5em";
-
-  // Will be used to sanitize values while avoiding floating point issues.
-  const input = html`<input type=range ${{ min, max, step }}>`;
-
-  const dom = html`${
-    enableTextInput ? inputMin : ""
-  }<div class=${`${scope} range-slider`} style=${{
-    color,
-    width: cssLength(width)
-  }}>
-  ${(controls.track = html`<div class="range-track">
-    ${(controls.zone = html`<div class="range-track-zone">
-      ${(controls.range = html`<div class="range-select" tabindex=0>
-        ${(controls.min = html`<div class="thumb thumb-min" tabindex=0>`)}
-        ${(controls.max = html`<div class="thumb thumb-max" tabindex=0>`)}
-      `)}
-    `)}
-  `)}
-  ${html`<style>${theme.replace(/:scope\b/g, "." + scope)}`}
-</div>${enableTextInput ? inputMax : ""}`;
-
-  let value = [],
-    changed = false;
-  Object.defineProperty(dom, "value", {
-    get: () => [...value],
-    set: ([a, b]) => {
-      value = sanitize(a, b);
-      updateRange();
-    }
-  });
-
-  const sanitize = (a, b) => {
-    a = isNaN(a) ? min : ((input.value = a), input.valueAsNumber);
-    b = isNaN(b) ? max : ((input.value = b), input.valueAsNumber);
-    return [Math.min(a, b), Math.max(a, b)];
-  };
-
-  const updateRange = () => {
-    const ratio = (v) => (v - min) / (max - min);
-    dom.style.setProperty("--range-min", `${ratio(value[0]) * 100}%`);
-    dom.style.setProperty("--range-max", `${ratio(value[1]) * 100}%`);
-  };
-
-  const dispatch = (name) => {
-    dom.dispatchEvent(new Event(name, { bubbles: true }));
-  };
-  const setValue = (vmin, vmax) => {
-    const [pmin, pmax] = value;
-    value = sanitize(vmin, vmax);
-    updateRange();
-    // Only dispatch if values have changed.
-    if (pmin === value[0] && pmax === value[1]) return;
-    inputMin.value = value[0];
-    inputMax.value = value[1];
-    dispatch("input");
-    changed = true;
-  };
-
-  inputMin.addEventListener("input", () => {
-    if (+inputMin.value > +inputMax.value || +inputMin.value < min) {
-      dom.appendChild(html`<please enter less>`);
-      return;
-    }
-    inputMax.min = inputMin.value;
-    setValue(inputMin.value, dom.value[1]);
-  });
-
-  inputMax.addEventListener("input", () => {
-    if (+inputMax.value < +inputMin.value || +inputMax.value > max) {
-      dom.appendChild(html`<please enter above>`);
-      return;
-    }
-
-    inputMin.max = inputMax.value;
-    setValue(dom.value[0], inputMax.value);
-  });
-
-  setValue(...defaultValue);
-
-  // Mousemove handlers.
-  const handlers = new Map([
-    [
-      controls.min,
-      (dt, ov) => {
-        const v = clamp(min, ov[1], ov[0] + dt * (max - min));
-        setValue(v, ov[1]);
-      }
-    ],
-    [
-      controls.max,
-      (dt, ov) => {
-        const v = clamp(ov[0], max, ov[1] + dt * (max - min));
-        setValue(ov[0], v);
-      }
-    ],
-    [
-      controls.range,
-      (dt, ov) => {
-        const d = ov[1] - ov[0];
-        const v = clamp(min, max - d, ov[0] + dt * (max - min));
-        setValue(v, v + d);
-      }
-    ]
-  ]);
-
-  // Returns client offset object.
-  const pointer = (e) => (e.touches ? e.touches[0] : e);
-  // Note: Chrome defaults "passive" for touch events to true.
-  const on = (e, fn) =>
-    e
-      .split(" ")
-      .map((e) => document.addEventListener(e, fn, { passive: false }));
-  const off = (e, fn) =>
-    e
-      .split(" ")
-      .map((e) => document.removeEventListener(e, fn, { passive: false }));
-
-  let initialX,
-    initialV,
-    target,
-    dragging = false;
-  function handleDrag(e) {
-    // Gracefully handle exit and reentry of the viewport.
-    if (!e.buttons && !e.touches) {
-      handleDragStop();
-      return;
-    }
-    dragging = true;
-    const w = controls.zone.getBoundingClientRect().width;
-    e.preventDefault();
-    handlers.get(target)((pointer(e).clientX - initialX) / w, initialV);
-  }
-
-  function handleDragStop(e) {
-    off("mousemove touchmove", handleDrag);
-    off("mouseup touchend", handleDragStop);
-    if (changed) dispatch("change");
-  }
-
-  invalidation.then(handleDragStop);
-
-  dom.ontouchstart = dom.onmousedown = (e) => {
-    dragging = false;
-    changed = false;
-    if (!handlers.has(e.target)) return;
-    on("mousemove touchmove", handleDrag);
-    on("mouseup touchend", handleDragStop);
-    e.preventDefault();
-    e.stopPropagation();
-
-    target = e.target;
-    initialX = pointer(e).clientX;
-    initialV = value.slice();
-  };
-
-  controls.track.onclick = (e) => {
-    if (dragging) return;
-    changed = false;
-    const r = controls.zone.getBoundingClientRect();
-    const t = clamp(0, 1, (pointer(e).clientX - r.left) / r.width);
-    const v = min + t * (max - min);
-    const [vmin, vmax] = value,
-      d = vmax - vmin;
-    if (v < vmin) setValue(v, v + d);
-    else if (v > vmax) setValue(v - d, v);
-    if (changed) dispatch("change");
-  };
-
-  return dom;
-}
-
-```
-
-
-```js
-// filter data to only include selected author
-const author_formatted_data = (author != "No author")? formatted_data.filter(d => d.author == author) : formatted_data;
-
-// count number of performances by genre
-const count_by_genre = Object.entries(author_formatted_data.reduce((acc, d) => {
-  acc[d.genre] = (acc[d.genre] || 0) + 1;
-  return acc;
-}, {})).map(c => ({genre: c[0], count: c[1]}));
-
-```
-
-```js
-display(bubble ? html `<h2>Bubble Author Genre</h2>` : html`<div></div>`);
-display(bubble ? html `<h2>${author}</h2>` : html`<div></div>`)
-
-display(bubble ? BubbleChart(count_by_genre, {
-    label: d => `${d.genre}-${d.count}`,
-    value: d => d.count,
-    title: d => d.genre,
-    group: d => d.genre[0],
-    width: 700,
-    fontSize: 20
-}): html`<div></div>`);
-```
-
-```js
-const locs = {}
-
-const french_authors = Object.entries(formatted_data.filter(d => d.origin == 'french').reduce((acc, d) => {
-    acc[d.author] = (acc[d.author] || 0) + 1;
-    return acc;
-  }, {})).map(c => {return {author: c[0], count: c[1]}});
-
-const danish_authors = Object.entries(formatted_data.filter(d => d.origin == 'danish').reduce((acc, d) => {
-    acc[d.author] = (acc[d.author] || 0) + 1;
-    return acc;
-  }, {})).map(c => {return {author: c[0], count: c[1]}});
-
-const dutch_authors = Object.entries(formatted_data.filter(d => d.origin == 'dutch').reduce((acc, d) => {
-    acc[d.author] = (acc[d.author] || 0) + 1;
-    return acc;
-  }, {})).map(c => {return {author: c[0], count: c[1]}});
-
-
-
-```
-
 
 ```js
 display(location ? html `<h2>Bubble Location Authors</h2>` : html`<div></div>`);
 ```
 
+```js
+display(location? html `<div></h2>` : html`<div></div>`);
+const percent_absolute = Inputs.radio(["percentage", "absolute"], {label: "Mode", value: "percentage"});
+const percent_absolute_val = location?view(percent_absolute):0;
+```
 
 ```js
+display(location? html `<div></h2>` : html`<div></div>`);
 const do_overall_threshold = Inputs.toggle({label: "Overall Threshold", value: true});
 const do_overall_threshold_val = location?view(do_overall_threshold):false;
 
 ```
 ```js
+display(location? html `<div></h2>` : html`<div></div>`);
 const overall_threshold = Inputs.number({value:1, label: 'Enter Threshold'});
 const overall_threshold_val = do_overall_threshold_val?view(overall_threshold):0;
 ```
+
 
 ```js
 display(location? html `<h2>French</h2>` : html`<div></div>`);
@@ -535,12 +628,10 @@ const f = rangeInput({
 });
 const f_val = location?view(f):[0,0];
 
-// const french_year_opt = Inputs.range([1748, 1778], {label: "Year", step: 1, placeholder: "1748–1778"});
-// const french_year = location? view(french_year_opt): 0;
 ```
 
 ```js
-display(location? authorBubble(combined_data, 'french', 0, french_threshold_val, f_val[0], f_val[1]): html`<div></div>`);
+display(location? authorBubble(combined_data, 'french', 0, french_threshold_val, f_val[0], f_val[1], percent_absolute_val): html`<div></div>`);
 ```
 
 ```js
@@ -557,12 +648,10 @@ const du = rangeInput({
 });
 const du_val = location?view(du):[0,0];
 
-// const dutch_year_opt = Inputs.range([1748, 1778], {label: "Year", step: 1, placeholder: "1748–1778"});
-// const dutch_year = location? view(dutch_year_opt):0;
 ```
 
 ```js
-display(location? authorBubble(combined_data, 'dutch', 0, dutch_threshold_val, du_val[0], du_val[1]): html`<div></div>`);
+display(location? authorBubble(combined_data, 'dutch', 0, dutch_threshold_val, du_val[0], du_val[1], percent_absolute_val): html`<div></div>`);
 ```
 
 ```js
@@ -578,14 +667,229 @@ const da = rangeInput({
 });
 const da_val = location?view(da):[0,0];
 
-// const danish_year_opt = Inputs.range([1748, 1778], {label: "Year", step: 1, placeholder: "1748–1778"});
-// const danish_year = location?view(danish_year_opt):0;
+
 ```
 
 ```js
-display(location? authorBubble(combined_data, 'danish', 0, danish_threshold_val, da_val[0], da_val[1]): html`<div></div>`);
+display(location? authorBubble(combined_data, 'danish', 0, danish_threshold_val, da_val[0], da_val[1], percent_absolute_val): html`<div></div>`);
 ```
 
 
+
+</div>
+
+
+```js
+const danish_comedy = danish.filter( (d) =>
+  d.genre && (d.genre.toLowerCase().includes("comed") || d.genre.toLowerCase().includes("coméd"))
+).filter(d => (new Date(d.date) > start_date) && (new Date(d.date)));
+
+const french_comedy = french.filter(d => d.genre === "comédie").filter(d => (new Date(d.date) > start_date) && (new Date(d.date)));
+
+// filter out french tragedy, ballet and drama genres
+const french_tragedy = french.filter(
+  (d) => d.genre && (d.genre.toLowerCase().includes("tragédie"))
+).filter(d => (new Date(d.date) > start_date) && (new Date(d.date)));
+
+const french_ballet = french.filter(
+  (d) =>
+    d.genre &&
+    (d.genre.toLowerCase().includes("ballet"))
+).filter(d => (new Date(d.date) > start_date) && (new Date(d.date)));
+
+const french_drama = french.filter(
+  (d) =>
+    d.genre &&
+    (d.genre.toLowerCase().includes("drame"))).filter(d => (new Date(d.date) > start_date) && (new Date(d.date)));
+
+// filter out danish tragedy, ballet and drama genres
+const danish_tragedy = danish.filter(
+  (d) =>
+    d.genre &&
+    (d.genre.toLowerCase().includes("tragedia per musica") ||
+      d.genre.toLowerCase().includes("tragedy"))
+).filter(d => (new Date(d.date) > start_date) && (new Date(d.date)));
+
+const danish_ballet = danish.filter(
+  (d) =>
+    d.genre &&
+    (d.genre.toLowerCase().includes("ballet") ||
+      d.genre.toLowerCase().includes("ballet,ballet")||
+      d.genre.toLowerCase().includes("ballet,ballet,ballet"))
+).filter(d => (new Date(d.date) > start_date) && (new Date(d.date)));
+
+const danish_drama = danish.filter(
+  (d) =>
+    d.genre &&
+    (d.genre.toLowerCase().includes("drama") ||
+      d.genre.toLowerCase().includes("dramma giocoso per musica") ||
+      d.genre.toLowerCase().includes("dramma pastorale")||
+      d.genre.toLowerCase().includes("dramma per musica"))
+).filter(d => (new Date(d.date) > start_date) && (new Date(d.date)));
+```
+
+```js
+const danish_filtered_data = danish.filter(d => {
+  const dt = asDate(d.date);
+  return dt && dt > start_date && dt <= end_date;
+});
+const french_filtered_data = french.filter(d => {
+  const dt = asDate(d.date);
+  return dt && dt > start_date && dt <= end_date;
+});
+
+const danish_summary = processPerformanceGenres(danish_filtered_data, danish_comedy, danish_drama, danish_tragedy, danish_ballet, "danish");
+const french_summary = processPerformanceGenres(french_filtered_data, french_comedy, french_drama, french_tragedy, french_ballet, "french");
+```
+
+```js
+display(divergingGenres ? genreLegend() : html`<div></div>`);
+```
+
+```js
+display(divergingGenres ?
+  ((danish_filtered_data.length > 0  && french_filtered_data.length > 0) ? divergentPlot() : html`<i>No data.</i>`) :
+  html`<div></div>`
+)
+```
+
+```js
+// Apply filter
+const author_filtered_data =
+  author === "No author selected" ? undefined : formatted_data.filter((d) => d.author === author || d.author?.includes(author));
+```
+
+```js
+const author_data_combined = author_filtered_data ? author_filtered_data .map((d, i, arr) => {
+    const total = combined_data.filter(f => f.year === d.year && f.origin === d.origin).reduce((a, b) => a + 1, 0);
+    const author = arr.filter(f => f.year === d.year && f.origin === d.origin).reduce((a, b) => a + 1, 0);
+    return {year: d.year, origin: d.origin, percentage: (author / total) };
+  }) : undefined;
+
+const author_data = Array.from(new Set(author_data_combined?.map(JSON.stringify))).map(JSON.parse);
+```
+
+```js
+const author_counts = author_filtered_data ? Object.entries(author_filtered_data.reduce((acc, d) => {
+  acc[d.origin] = (acc[d.origin] || 0) + 1;
+  return acc;
+}, {})).map(([origin, count]) => {
+  const coordinates = {
+    danish: copenhagen,
+    dutch: amsterdam,
+    french: paris
+  }[origin];
+  return { origin, count, ...coordinates };
+}) : undefined;
+```
+
+```js
+display(byAuthor ? html `<h2>Performances by Author</h2>` : html`<div></div>`)
+```
+
+```js
+display(byAuthor ? html `<h3>Percentage by Author</h3>` : html`<div></div>`)
+```
+
+```js
+display(byAuthor ? author_data.length > 0 ? percentageYearsChart(author_data) : html`<i>No data.</i>` : html`<div></div>`)
+```
+
+```js
+display(byAuthor ? html `<h3>Percentage by Location</h3>` : html`<div></div>`)
+```
+
+```js
+display(byAuthor ? author_counts ? mapPlot(author_counts) : html`<i>No data.</i>` : html`<div></div>`)
+```
+
+```js
+display(performanceDays ? html `<h2>Animated Line Chart and Heatmap of Days with Performances</h2>` : html`<div></div>`)
+display(performanceDays ? html `<p> Selected genres: ${genres.length === 0 ? "None" : genres.length === genreOptions.length ? "All" : genres.join(", ")} </p>` : html`<div></div>`)
+```
+
+```js
+const genre_data =
+  genres.length === 0
+    ? formatted_data
+    : formatted_data.filter((d) => genres.includes(d.genre));
+```
+
+<div style="
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2rem;
+  max-width: 1500px;
+  margin: auto;
+">
+  <div id="line-chart-container" style="flex: 1 1 500px; min-width: 450px;"></div>
+  <div id="heatmap-container" style="flex: 1 1 500px; min-width: 450px;"></div>
+</div>
+
+```js
+import {
+  createAnimatedLineChart,
+  createMultipleAnimatedLines,
+  createHeatmap,
+  createGenreProportionChart,
+  createGenreStackedBar,
+  createGenreStackedBarVertical,
+} from "./components/barchart.js";
+
+// sort by year first for ltr visualization
+genre_data.sort((a, b) => a.year - b.year);
+
+// When dataset === "All", group each dataset into performance counts by year
+// summarize only what’s in the current date window
+function summarize(dataset, label) {
+  const map = new Map();
+  dataset.forEach(d => {
+    const dt = asDate(d.date);
+    if (!dt) return;
+    if (dt < start_date || dt > end_date) return; // 👈 clamp to filter
+    const year = d.year ?? dt.getUTCFullYear();
+    if (!map.has(year)) map.set(year, new Set());
+    map.get(year).add(dt.toISOString().slice(0, 10)); // day-level uniqueness
+  });
+  const summary = Array.from(map, ([year, dates]) => ({
+    year,
+    count: dates.size,
+  })).sort((a, b) => a.year - b.year);
+  return { label, data: summary };
+}
+
+// use the already-filtered datasets
+const originToData = {
+  danish: danish_filtered_data,
+  french: french_filtered_data,
+  // if you ever add dutch_filtered_data, put it here too
+  dutch: combined_data
+    .filter(d => d.origin === "dutch")
+    .filter(d => {
+      const dt = asDate(d.date);
+      return dt && dt >= start_date && dt <= end_date;
+    })
+};
+
+// build the list in the order the user selected
+const summarized_data = origins.map(origin =>
+  summarize(originToData[origin] ?? [], origin)
+);
+
+
+// clear old charts
+document.getElementById("line-chart-container").innerHTML = "";
+document.getElementById("heatmap-container").innerHTML = "";
+
+origins.length > 0 && performanceDays ? document.getElementById("line-chart-container").append(
+    createMultipleAnimatedLines(summarized_data, { width: 700, height: 600 })
+) : html`<i>No data.</i>`
+
+origins.length > 0 && performanceDays ? document.getElementById("heatmap-container").append(
+  createHeatmap(genre_data, { width: 700, height: 600 })
+) : html`<i>No data.</i>`
+
+```
 
 </div>

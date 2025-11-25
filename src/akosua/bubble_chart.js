@@ -111,25 +111,20 @@ export function genreBubble(formatted_data, author){
   }, {})).map(c => ({genre: c[0], count: c[1]}));
 }
 
-export function authorBubble(data, origin, season = 0, threshold = 0, season_start, season_end){
+export function authorBubble(data, origin, season = 0, threshold = 0, season_start, season_end, mode){
 
-
-  //filter by season; need to double check start date and end date of season
-  // const season_start_date = new Date(season_start.toString() + "-01-01");
-  // const season_end_date = new Date((season_end + 1).toString() + "-12-31");
-
-  // console.log(`${origin} before filtering`)
+  const percent = mode == "percentage";
   // console.log(data)
-  // console.log(data[19694].year)
-  // console.log(data[10000].year)
-  const authors = Object.entries(data.filter(d => (d.origin == origin) && (Number(d.year) <= season_end) && (Number(d.year) >= season_start)).reduce((acc, d) => {
+  let authors = Object.entries(data.filter(d => (d.origin == origin) && (Number(d.year) <= season_end) && (Number(d.year) >= season_start)).reduce((acc, d) => {
       acc[d.author] = (acc[d.author] || 0) + 1;
       return acc;
-  }, {})).filter(c => (c[1] >= threshold)).map(c => {return {author: c[0], count: c[1]}});
+  }, {})).map(c => {return {author: c[0], count: c[1]}});
+  const performance_count = percent?authors.reduce((count, author) => {return count + author.count}, 0):1;
+  authors = percent?authors.filter(c => (100*c.count/performance_count >= threshold)):authors.filter(c => c.count >= threshold);
 
-  // console.log(origin)
-  // console.log(authors)
 
+  const percentage_sign = percent?"%":"";
+  const percentage_multiplier = percent?100:1;
   //make actual chart
   return BubbleChart(authors, {
     //attempt to filter out first names for readability
@@ -143,8 +138,8 @@ export function authorBubble(data, origin, season = 0, threshold = 0, season_sta
         return author.substring(0, author.indexOf(','));
       return author.substring(author.lastIndexOf(' ')+1);
     },
-    value: d => d.count,
-    title: d => `${d.author||'unknown'} - ${d.count}`,
+    value: d => (d.count/performance_count)*percentage_multiplier,
+    title: d => `${d.author||'unknown'} - ${parseFloat(((d.count/performance_count)*percentage_multiplier).toPrecision(3))}${percentage_sign}`,
     group: d => d.author[0],
     width: 700,
     fontSize: 10

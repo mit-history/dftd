@@ -1,4 +1,12 @@
-// import { htl } from "npm:@observablehq/htl";
+//adapted from https://observablehq.com/@mootari/range-slider
+
+function createEl(tag, { styles, props, html } = {}) {
+  const node = document.createElement(tag);
+  if (styles) Object.assign(node.style, styles);
+  if (props) Object.assign(node, props);
+  if (html != null) node.innerHTML = html;
+  return node;
+}
 
 const theme_Flat = `
 /* Options */
@@ -96,32 +104,35 @@ export function rangeInput(options = {}) {
   const controls = {};
   const scope = randomScope();
   const clamp = (a, b, v) => (v < a ? a : v > b ? b : v);
-  // const html = htl.html;
 
-  const inputMin = html`<input type="number" id="min-input"  min=${min} max=${defaultValue[1]} step=${step} value=${defaultValue[0]} />`;
+  const inputMin = createEl('input', { props: { type: "number", id: "min-input",  min, max: defaultValue[1], step, value: defaultValue[0] } })
   inputMin.style = "width:5em";
-  const inputMax = html`<input type="number" id="max-input"  min=${defaultValue[0]} max=${max} step=${step} value=${defaultValue[1]} />`;
+  const inputMax = createEl('input', {props: { type: "number", id: "max-input", min: defaultValue[0], max, step, value: defaultValue[1]}})
   inputMax.style = "width:5em";
 
   // Will be used to sanitize values while avoiding floating point issues.
-  const input = html`<input type=range ${{ min, max, step }}>`;
+  const input = createEl('input', {props: {type: "range", min, max, step}});
 
-  const dom = html`${
-    enableTextInput ? inputMin : ""
-  }<div class=${`${scope} range-slider`} style=${{
-    color,
-    width: cssLength(width)
-  }}>
-  ${(controls.track = html`<div class="range-track">
-    ${(controls.zone = html`<div class="range-track-zone">
-      ${(controls.range = html`<div class="range-select" tabindex=0>
-        ${(controls.min = html`<div class="thumb thumb-min" tabindex=0>`)}
-        ${(controls.max = html`<div class="thumb thumb-max" tabindex=0>`)}
-      `)}
-    `)}
-  `)}
-  ${html`<style>${theme.replace(/:scope\b/g, "." + scope)}`}
-</div>${enableTextInput ? inputMax : ""}`;
+const dom = createEl('span', {})
+
+const rangeSlider = createEl('div', {props: {className: `${scope} range-slider`}, style: {color, width: cssLength(width)}});
+const rangeTrack = (controls.track = createEl('div', {props: {className: "range-track"}}));
+
+const rangeTrackZone = (controls.zone = createEl('div', {props: {className: "range-track-zone"}}));
+const rangeSelect = (controls.range = createEl('div', {props: {className: "range-select", tabindex: 0}}));
+const thumbMin = (controls.min = createEl('div', {props: {className: "thumb thumb-min", tabindex: 0}}));
+const thumbMax = (controls.max = createEl('div', {props: {className: "thumb thumb-max", tabindex: 0}}));
+const style = createEl('style', {props: {innerHTML: theme.replace(/:scope\b/g, "." + scope)}});
+
+
+
+rangeSelect.append(thumbMin, thumbMax);
+rangeTrackZone.append(rangeSelect);
+rangeTrack.append(rangeTrackZone);
+rangeSlider.append(rangeTrack, style);
+dom.append(enableTextInput?inputMin:"", rangeSlider, enableTextInput?inputMax:"");
+
+
 
   let value = [],
     changed = false;
@@ -132,6 +143,7 @@ export function rangeInput(options = {}) {
       updateRange();
     }
   });
+
 
   const sanitize = (a, b) => {
     a = isNaN(a) ? min : ((input.value = a), input.valueAsNumber);
@@ -162,7 +174,7 @@ export function rangeInput(options = {}) {
 
   inputMin.addEventListener("input", () => {
     if (+inputMin.value > +inputMax.value || +inputMin.value < min) {
-      dom.appendChild(html`<please enter less>`);
+      dom.appendChild(createEl('p', {}));
       return;
     }
     inputMax.min = inputMin.value;
@@ -171,7 +183,7 @@ export function rangeInput(options = {}) {
 
   inputMax.addEventListener("input", () => {
     if (+inputMax.value < +inputMin.value || +inputMax.value > max) {
-      dom.appendChild(html`<please enter above>`);
+      dom.appendChild(createEl('p', {}));
       return;
     }
 
@@ -241,7 +253,7 @@ export function rangeInput(options = {}) {
     if (changed) dispatch("change");
   }
 
-  invalidation.then(handleDragStop);
+  // invalidation.then(handleDragStop);
 
   dom.ontouchstart = dom.onmousedown = (e) => {
     dragging = false;
