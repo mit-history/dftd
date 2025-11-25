@@ -319,7 +319,7 @@ function divergentPlot() {
 <div>
 
 ```js
-const opt = ["Over Time", "Diverging Genres", "By Author", "Days with Performances", "Author Share"];
+const opt = ["Over Time", "Diverging Genres", "By Author", "Days with Performances", "Author Share", "Author Bubble"];
 const vizOpt = Inputs.checkbox(opt, {label: "Visualization", value: ["Over Time"]});
 const viz = view(vizOpt);
 ```
@@ -330,6 +330,7 @@ const divergingGenres = viz.includes("Diverging Genres");
 const byAuthor = viz.includes("By Author");
 const performanceDays = viz.includes("Days with Performances");
 const authorShare = viz.includes("Author Share");
+const bubble = viz.includes("Author Bubble");
 ```
 
 <div class="card" style="position:sticky;top:5px;">
@@ -580,6 +581,97 @@ if (authorShare) {
   display(html`<div></div>`)
 }
 ```
+
+```js
+import { BubbleChart, authorBubble } from "./components/bubble_chart.js";
+import { rangeInput } from "./components/range_input.js";
+```
+
+```js
+display(bubble ? html `<h2>Authors Performed By Location</h2>` : html`<div></div>`);
+```
+
+```js
+display(bubble? html `<div></h2>` : html`<div></div>`);
+const percent_absolute = Inputs.radio(["percentage", "absolute"], {label: "Mode", value: "percentage"});
+const percent_absolute_val = bubble?view(percent_absolute):0;
+```
+
+```js
+display(bubble? html `<div></h2>` : html`<div></div>`);
+const do_overall_threshold = Inputs.toggle({label: "Overall Threshold", value: true});
+const do_overall_threshold_val = bubble?view(do_overall_threshold):false;
+
+```
+```js
+display(bubble? html `<div></h2>` : html`<div></div>`);
+const overall_threshold = Inputs.number({value:1, label: 'Enter Threshold'});
+const overall_threshold_val = do_overall_threshold_val?view(overall_threshold):0;
+```
+
+
+```js
+display(bubble? html `<h2>French</h2>` : html`<div></div>`);
+const french_threshold = Inputs.number({value:1, label: 'Enter Threshold'});
+const french_threshold_val = bubble? (do_overall_threshold_val?overall_threshold_val:view(french_threshold)):0;
+const f = rangeInput({
+  min: 1748,
+  max: 1798,
+  step: 1,
+  value: [1748, 1778],
+  enableTextInput: true
+});
+const f_val = bubble?view(f):[0,0];
+
+```
+
+```js
+display(bubble? authorBubble(combined_data, 'french', 0, french_threshold_val, f_val[0], f_val[1], percent_absolute_val): html`<div></div>`);
+```
+
+```js
+
+display(bubble? html `<h2>Dutch</h2>` : html`<div></div>`);
+const dutch_threshold = Inputs.number({value:1, label: 'Enter Threshold'});
+const dutch_threshold_val = bubble? (do_overall_threshold_val?overall_threshold_val:view(dutch_threshold)):0;
+const du = rangeInput({
+  min: 1748,
+  max: 1798,
+  step: 1,
+  value: [1748, 1778],
+  enableTextInput: true
+});
+const du_val = bubble?view(du):[0,0];
+
+```
+
+```js
+display(bubble? authorBubble(combined_data, 'dutch', 0, dutch_threshold_val, du_val[0], du_val[1], percent_absolute_val): html`<div></div>`);
+```
+
+```js
+display(bubble? html `<h2>Danish</h2>` : html`<div></div>`)
+const danish_threshold = Inputs.number({value:1, label: 'Enter Threshold'});
+const danish_threshold_val = bubble? (do_overall_threshold_val?overall_threshold_val:view(danish_threshold)):0;
+const da = rangeInput({
+  min: 1748,
+  max: 1798,
+  step: 1,
+  value: [1748, 1778],
+  enableTextInput: true
+});
+const da_val = bubble?view(da):[0,0];
+
+
+```
+
+```js
+display(bubble? authorBubble(combined_data, 'danish', 0, danish_threshold_val, da_val[0], da_val[1], percent_absolute_val): html`<div></div>`);
+```
+
+
+
+</div>
 
 ```js
 const danish_comedy = danish.filter( (d) =>
