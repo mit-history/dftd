@@ -142,6 +142,12 @@ function riseBars(plot, { duration = 800, stagger = 5 } = {}) {
 export const authorsCompareBus = new EventTarget();
 export let latestAuthorsToCompare = [];
 
+const initialAuthors = [
+  "Florent Carton dit Dancourt",
+  "Voltaire",
+  "La Font (Joseph de)"
+];
+
 export function emitAuthorsToCompare(authors) {
   const list = [...new Set(authors)].filter(Boolean);
   authorsCompareBus.dispatchEvent(
@@ -151,6 +157,8 @@ export function emitAuthorsToCompare(authors) {
 authorsCompareBus.addEventListener("authors:update", (e) => {
   latestAuthorsToCompare = e.detail.authors ?? [];
 });
+
+emitAuthorsToCompare(initialAuthors);
 
 export const addAuthorToCompare = (name) =>
   name && name !== "No author" && emitAuthorsToCompare([...latestAuthorsToCompare, name]);
