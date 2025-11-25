@@ -52,6 +52,7 @@
     overflow-x: hidden;
     font-family: 'Inter', sans-serif;
     box-sizing: border-box;
+    background-color: rgb(246, 243, 222);
 }
 
 *, *::before, *::after {
@@ -66,7 +67,7 @@
   width: 100%;
   z-index: 1000;
   padding: 0.75rem 1.5rem;
-  background-color: rgb(51, 168, 98);
+  background-color: rgb(95, 115, 89);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
   transition: background-color 0.3s ease, box-shadow 0.3s ease;
   overflow-x: visible;
@@ -181,7 +182,7 @@
       left: -1.5rem;
       right: -1.5rem;
       flex-direction: column;
-      background-color: rgb(51, 168, 98);
+      background-color: rgb(95, 115, 89);;
       width: calc(100% + 3rem);
       margin: 0;
       padding: 0;
