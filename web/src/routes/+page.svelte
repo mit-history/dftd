@@ -24,13 +24,24 @@
 
   <div class="hero-text">
     <h1>Transnational Stages</h1>
-    <p class="subtitle">Theatrical Circulation and Exchange in the Atlantic World, 1680–1850</p>
+    <!-- <p class="subtitle">Theatrical Circulation and Exchange in the Atlantic World, 1680–1850</p> -->
+    <p class="intro">
+      Theatre history from the seventeenth to the twentieth centuries is often studied in isolated national
+      contexts. But performers, texts, and plays often crossed land boundaries and oceans in the period,
+      creating new meanings and audience expectations as they did so. <strong>Transnational Stages</strong>
+      offers users the opportunity to study national datasets via comparative visualization tools, thereby
+      creating new insights into international theatrical trends in the Early Modern and Modern periods.
+  </p>
   </div>
+
 </section>
+<div class="explore">
+  <a href={base + '/Explore%20the%20Data'}><img src={base + '/images/Screenshot 3.png'} alt="London Theater"></a>
+</div>
 
 <p class="caption">Image from the web site <a href="https://artex.au.dk/">Artistic Exchanges</a></p>
 
-<section class="content-wrapper">
+<!-- <section class="content-wrapper">
 
   <p class="intro">
       Theatre history from the seventeenth to the twentieth centuries is often studied in isolated national
@@ -39,7 +50,7 @@
       offers users the opportunity to study national datasets via comparative visualization tools, thereby
       creating new insights into international theatrical trends in the Early Modern and Modern periods.
   </p>
-</section>
+</section> -->
 
 <style>
   :global(body) {
@@ -54,17 +65,27 @@
     height: 100vh;
     width: 100%;
     overflow: hidden;
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    padding: 2rem;
   }
 
   .intro-video {
+    /* width: 100%;
+    height: 100%; */
+    flex: 1;
+    max-width: 50%;
+    aspect-ratio: 1/1;
     width: 100%;
-    height: 100%;
+    object-position: right center;
+    height: auto;
     object-fit: cover;
     display: block;
     box-shadow: 0px 40px 60px -20px rgba(0, 0, 0, 0.4);
   }
 
-  .overlay {
+  /* .overlay {
     position: absolute;
     top: 0;
     left: 0;
@@ -73,17 +94,18 @@
     background: linear-gradient(to bottom, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6));
     pointer-events: none;
     z-index: 1;
-  }
+  } */
 
   .hero-text {
-    position: absolute;
-    top: 34%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    color: rgb(233, 233, 233);
-    text-align: center;
+    /* position: absolute; */
+    flex: 1;
+    /* top: 34%;
+    left: 50%; */
+    /* transform: translate(-50%, -50%);
+    color: rgb(233, 233, 233); */
+    text-align: left;
     z-index: 2;
-    max-width: 90%;
+    max-width: 40%;
     padding: 0 1rem;
   }
 
@@ -137,5 +159,47 @@
 
   a:hover {
     text-decoration: underline;
+  }
+
+  .explore{
+    display: flex;
+    justify-content: center;
+    max-width: 80%;
+    object-fit: cover;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+  }
+
+  .explore img{
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  @media (max-width: 786px){
+    .intro-hero{
+      flex-direction: column;
+      height: auto;
+      min-height: 100vh;
+      /* padding: 1rem; */
+      padding: 7rem 0rem;
+    }
+
+    .intro-video{
+      max-width: 80%;
+      width: 100%;
+    }
+
+    .hero-text{
+      max-width: 80%;
+      text-align: center;
+      padding: 1rem 0;
+    }
+
+    .explore{
+      max-width: 95%;
+      padding: 1.5rem 1rem;
+    }
   }
 </style>
