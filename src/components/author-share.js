@@ -609,6 +609,7 @@ export function authorShareChart(author, formatted_data) {
               Performances: (d) => d.totalDays,
             },
             format: {
+              Year: (v) => `${v}`,
               x: false,
               y: false,
             },
