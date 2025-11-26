@@ -33,7 +33,7 @@
 
       <p class="contact">
         If you have questions about this work, or would like to join or contribute, please contact Jeff Ravel
-        <a href="https://outlook.office.com/mail/id/AAQkAGVjMTk5MTI0LWY4YTItNGIzOC04YjRiLTljMDc2YzQ3OTE0ZgAQANI9JbENZDxCl9ykRXnagnY%3D?actSwt=true#:~:text=you!%C2%A0%20Please%20contact-,Jeff%20Ravel,-." class="link">here</a>.
+        <a href="mailto:ravel@mit.edu" class="link">here</a>.
       </p>
     </div>
 
