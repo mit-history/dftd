@@ -1,5 +1,5 @@
 <svelte:head>
-  <title>Affiliates</title>
+  <title>Affiliated Projects</title>
 </svelte:head>
 
 <script>

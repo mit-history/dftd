@@ -1,5 +1,5 @@
 <svelte:head>
-  <title>Team</title>
+  <title>People</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet" />
 </svelte:head>
 
