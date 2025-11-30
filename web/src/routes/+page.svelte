@@ -15,12 +15,13 @@
 
   <div class="hero-text">
     <h1>Transnational Stages</h1>
+    <h3 class="subtitle">Theatrical Circulation and Exchange in the Atlantic World, 1680–1850</h3>
     <p class="intro">
-      Theatre history from the seventeenth to the twentieth centuries is often studied in isolated national
-      contexts. But performers, texts, and plays often crossed land boundaries and oceans in the period,
-      creating new meanings and audience expectations as they did so. <strong>Transnational Stages</strong>
-      offers users the opportunity to study national datasets via comparative visualization tools, thereby
-      creating new insights into international theatrical trends in the Early Modern and Modern periods.
+      From the seventeenth to the twentieth centuries in the Atlantic World plays and performers often crossed
+      land boundaries and oceans, creating new meanings and audience expectations as they did so.
+      <strong>Transnational Stages</strong> offers users the opportunity to study national datasets via
+      comparative visualization tools, thereby creating new insights into international theatrical trends
+      in the Early Modern and Modern periods.
   </p>
   </div>
 
@@ -35,6 +36,10 @@
     padding: 0;
     font-family: 'Inter', sans-serif;
     color: #000;
+  }
+
+  .subtitle {
+    font-style: italic;
   }
 
   .intro-hero {
