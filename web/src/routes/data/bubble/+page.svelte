@@ -3,19 +3,20 @@
 </svelte:head>
 
 <script>
-  const notebookUrl = "http://localhost:3000/"; // TODO: update when deployed
+  const notebookUrl = "http://localhost:3000/?viz=bubble";
 </script>
+
 
 <main class="viz-page">
   <h1 class="title">Authors by Location</h1>
 
-  <section class="timeline">
+  <!-- <section class="timeline">
     <div class="timeline-bar">
       <span class="timeline-label">
         Bubble visualization showing where authors appear across cities and time.
       </span>
     </div>
-  </section>
+  </section> -->
 
   <section class="viz-frame">
     <iframe
@@ -36,10 +37,12 @@
 </main>
 
 <style>
-  :global(body) { background: #f5f5f4; }
+  :global(body) {
+    background: #f5f5f4; /* warm light gray */
+    margin: 0;
+  }
 
   .viz-page {
-    max-width: 1100px;
     margin: 0 auto;
     padding: 4rem 1.5rem 4rem;
   }
@@ -50,34 +53,21 @@
     text-align: center;
   }
 
-  .timeline { margin-bottom: 2rem; }
-
-  .timeline-bar {
-    height: 36px;
-    border-radius: 999px;
-    background: linear-gradient(to right, #e0f2fe, #ddd6fe);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #1f2933;
-  }
-
-  .timeline-label {
-    font-size: 0.95rem;
-    font-weight: 600;
-  }
-
   .viz-frame {
+    width: min(1100px, 94vw);      /* almost full-width */
+    margin: 3rem auto;             /* center + vertical spacing */
     border-radius: 14px;
-    border: 1px solid #ddd;
+    border: 1px solid #e5e7eb;     /* unobtrusive border */
+    background: #ffffff;
+    box-shadow: 0 16px 35px rgba(15, 23, 42, 0.08);
     overflow: hidden;
-    margin-bottom: 2rem;
   }
 
   .viz-frame iframe {
     width: 100%;
-    height: 75vh;
+    height: 85vh;
     border: none;
+    display: block;
   }
 
   .below-text p {
@@ -90,8 +80,21 @@
   }
 
   @media (max-width: 600px) {
-    .viz-page { padding-top: 3rem; }
-    .title { font-size: 1.9rem; }
-    .viz-frame iframe { height: 65vh; }
+    .viz-page {
+      padding-top: 3rem;
+    }
+
+    .title {
+      font-size: 1.9rem;
+    }
+
+    .viz-frame {
+      margin: 2rem auto;
+      border-radius: 10px;
+    }
+
+    .viz-frame iframe {
+      height: 100vh;
+    }
   }
 </style>

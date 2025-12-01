@@ -3,20 +3,20 @@
 </svelte:head>
 
 <script>
-  // TODO: replace with deployed Observable URL when ready
-  const notebookUrl = "http://localhost:3000/";
+  const notebookUrl = "http://localhost:3000/?viz=over-time";
 </script>
+
 
 <main class="viz-page">
   <!-- Title -->
   <h1 class="title">Performances Over Time</h1>
 
   <!-- Dummy timeline -->
-  <section class="timeline">
+  <!-- <section class="timeline">
     <div class="timeline-bar">
       <span class="timeline-label">Timeline (placeholder – 1748 → 1798)</span>
     </div>
-  </section>
+  </section> -->
 
   <!-- Text below visualization -->
   <section class="below-text">
@@ -41,31 +41,12 @@
 </main>
 
 <style>
-
   :global(body) {
-  background: #f5f5f4; /* warm light gray (Stone-100 from Tailwind palette) */
-}
-
-  .viz-frame {
-  width: 100vw;
-  margin-left: calc(50% - 50vw); /* full-width trick */
-  margin-top: 3rem;
-  margin-bottom: 3rem;
-
-  border-radius: 0; /* optional, can set to 12px if you want rounded corners */
-  border: none;
-}
-
-.viz-frame iframe {
-  width: 100%;
-  height: 85vh; /* taller */
-  border: none;
-}
-
-
+    background: #f5f5f4; /* warm light gray */
+    margin: 0;
+  }
 
   .viz-page {
-
     margin: 0 auto;
     padding: 4rem 1.5rem 4rem;
   }
@@ -76,26 +57,22 @@
     text-align: center;
   }
 
-  .timeline {
-    margin-bottom: 2rem;
+  .viz-frame {
+    width: min(1100px, 94vw);      /* almost full-width */
+    margin: 3rem auto;             /* center + vertical spacing */
+    border-radius: 14px;
+    border: 1px solid #e5e7eb;     /* unobtrusive border */
+    background: #ffffff;
+    box-shadow: 0 16px 35px rgba(15, 23, 42, 0.08);
+    overflow: hidden;
   }
 
-  .timeline-bar {
-    position: relative;
-    height: 36px;
-    border-radius: 999px;
-    background: linear-gradient(to right, #cbd5e1, #64748b);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #1f2933;
+  .viz-frame iframe {
+    width: 100%;
+    height: 85vh;
+    border: none;
+    display: block;
   }
-
-  .timeline-label {
-    font-size: 0.95rem;
-    font-weight: 600;
-  }
-
 
   .below-text p {
     max-width: 850px;
@@ -115,8 +92,13 @@
       font-size: 1.9rem;
     }
 
+    .viz-frame {
+      margin: 2rem auto;
+      border-radius: 10px;
+    }
+
     .viz-frame iframe {
-      height: 65vh;
+      height: 100vh;
     }
   }
 </style>

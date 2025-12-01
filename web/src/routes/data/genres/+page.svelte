@@ -3,18 +3,19 @@
 </svelte:head>
 
 <script>
-  const notebookUrl = "http://localhost:3000/"; // TODO: update when deployed
+  const notebookUrl = "http://localhost:3000/?viz=genres";
 </script>
+
 
 <main class="viz-page">
   <h1 class="title">Genres Across Cities</h1>
 
   <!-- Dummy timeline -->
-  <section class="timeline">
+  <!-- <section class="timeline">
     <div class="timeline-bar">
       <span class="timeline-label">Timeline (placeholder – genre trends over time)</span>
     </div>
-  </section>
+  </section> -->
 
   <!-- Interactive visualization -->
   <section class="viz-frame">
@@ -36,13 +37,12 @@
 </main>
 
 <style>
-  
   :global(body) {
-  background: #f5f5f4; /* warm light gray (Stone-100 from Tailwind palette) */
-}
+    background: #f5f5f4; /* warm light gray */
+    margin: 0;
+  }
 
   .viz-page {
-    max-width: 1100px;
     margin: 0 auto;
     padding: 4rem 1.5rem 4rem;
   }
@@ -53,37 +53,21 @@
     text-align: center;
   }
 
-  .timeline {
-    margin-bottom: 2rem;
-  }
-
-  .timeline-bar {
-    position: relative;
-    height: 36px;
-    border-radius: 999px;
-    background: linear-gradient(to right, #fee2e2, #bfdbfe);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #1f2933;
-  }
-
-  .timeline-label {
-    font-size: 0.95rem;
-    font-weight: 600;
-  }
-
   .viz-frame {
+    width: min(1100px, 94vw);      /* almost full-width */
+    margin: 3rem auto;             /* center + vertical spacing */
     border-radius: 14px;
-    border: 1px solid #ddd;
+    border: 1px solid #e5e7eb;     /* unobtrusive border */
+    background: #ffffff;
+    box-shadow: 0 16px 35px rgba(15, 23, 42, 0.08);
     overflow: hidden;
-    margin-bottom: 2rem;
   }
 
   .viz-frame iframe {
     width: 100%;
-    height: 75vh;
+    height: 85vh;
     border: none;
+    display: block;
   }
 
   .below-text p {
@@ -104,8 +88,13 @@
       font-size: 1.9rem;
     }
 
+    .viz-frame {
+      margin: 2rem auto;
+      border-radius: 10px;
+    }
+
     .viz-frame iframe {
-      height: 65vh;
+      height: 100vh;
     }
   }
 </style>
