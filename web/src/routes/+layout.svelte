@@ -11,7 +11,7 @@
 
   function handleClickOutside(event) {
     isOpen = false;
-	}
+
 
   function clickOutside(node) {
 

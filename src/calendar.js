@@ -1,7 +1,7 @@
-
+// =============================================
 //  Calendar.js — Month/Week/Day visualization
 //  Global Theatre Calendar (Danish, French, Dutch, NOLA)
-
+// =============================================
 
 // Color map injected from index.md
 export const ORIGIN_COLOR = new Map();
