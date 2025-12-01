@@ -48,6 +48,17 @@ const danish = danish_raw.map((perf) => {
 
 ```
 
+<!-- handles date formatting -->
+```js
+function asDate(x) {
+  if (x instanceof Date) return x;
+  if (typeof x === "number") return new Date(x);
+  if (typeof x === "string") return new Date(x.replace(" AD", ""));
+  return null;
+}
+```
+
+
 <!-- styling of notebook -->
 ```js
 html`<style>
@@ -605,12 +616,6 @@ const yearsInView = Array.from(
 
 yearsInView.slice(0,10).concat("...").concat(yearsInView.slice(-10))
 
-function asDate(x) {
-  if (x instanceof Date) return x;
-  if (typeof x === "number") return new Date(x);
-  if (typeof x === "string") return new Date(x.replace(" AD", ""));
-  return null;
-}
 ```
 
 ```js

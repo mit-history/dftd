@@ -3,9 +3,16 @@
 </svelte:head>
 
 <script>
-  const baseNotebookUrl = "https://dftd.observablehq.cloud/dftd";
-const notebookUrl = `${baseNotebookUrl}?viz=authors#select-country-and-time-period`;
+  import { page } from "$app/stores";
 
+  // Base URL of your notebook deployment
+  const baseNotebookUrl = "https://dftd.observablehq.cloud/dftd";
+
+  // reactive: whenever the route changes, this updates
+  $: vizId = $page.params.viz;
+
+  // full notebook embed URL
+  $: notebookUrl = `${baseNotebookUrl}?viz=${vizId}`;
 </script>
 
 

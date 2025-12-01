@@ -3,12 +3,18 @@
 </svelte:head>
 
 <script>
+  import { page } from "$app/stores";
+
+  // Base URL of your notebook deployment
   const baseNotebookUrl = "https://dftd.observablehq.cloud/dftd";
 
-  // We still use the ?viz=... query param so the notebook knows which viz to show,
-  // and keep the #select-country-and-time-period anchor at the end.
-  const notebookUrl = `${baseNotebookUrl}?viz=days#select-country-and-time-period`;
+  // reactive: whenever the route changes, this updates
+  $: vizId = $page.params.viz;
+
+  // full notebook embed URL
+  $: notebookUrl = `${baseNotebookUrl}?viz=${vizId}`;
 </script>
+
 
 
 
