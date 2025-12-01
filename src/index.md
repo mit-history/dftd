@@ -380,6 +380,8 @@ const byAuthor = viz.includes("By Author");
 const performanceDays = viz.includes("Days with Performances");
 const authorShare = viz.includes("Author Share");
 const bubble = viz.includes("Author Bubble");
+const calendar = viz.includes("Calendar");
+
 ```
 
 <div class="card" style="margin-bottom: 1rem;">

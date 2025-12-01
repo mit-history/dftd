@@ -25,6 +25,24 @@
       title: "Days with Performances",
       description:
         "View daily patterns of performances, highlighting seasonality and repertoire activity across the year."
+    },
+    {
+      id: "calendar",
+      title: "Global Theatre Calendar",
+      description:
+        "Browse a calendrical view of performances across Amsterdam, Copenhagen, Paris, and New Orleans, with filters for date range, venue, and historical overlays."
+    },
+    {
+      id: "authorShare",
+      title: "Author Share",
+      description:
+        "Compare how much of each city’s repertoire is accounted for by a chosen author, using percentage-based stacked bar charts over time."
+    },
+    {
+      id: "bubble",
+      title: "Author Bubble",
+      description:
+        "Explore where authors are performed with bubble visualizations by city, time window, and frequency thresholds."
     }
   ];
 </script>
@@ -78,7 +96,7 @@
 
 <style>
 
-  
+
 
   :global(body) {
   background: #f5f5f4; /* warm light gray (Stone-100 from Tailwind palette) */
