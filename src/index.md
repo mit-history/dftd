@@ -2,7 +2,6 @@
 toc: false
 ---
 
-<!-- # Explore the Data -->
 
 ```js
 const french = await FileAttachment("data/french-performances.json").json();
@@ -49,8 +48,23 @@ const danish = danish_raw.map((perf) => {
 
 ```
 
-
+<!-- handles date formatting -->
 ```js
+function asDate(x) {
+  if (x instanceof Date) return x;
+  if (typeof x === "number") return new Date(x);
+  if (typeof x === "string") return new Date(x.replace(" AD", ""));
+  return null;
+}
+```
+
+
+<!-- styling of notebook -->
+```js
+html`<style>
+  body * { outline: 1px solid red !important; }
+</style>`
+
 html`<style>
 /* Remove Observable default centered column & padding */
 body,
@@ -59,6 +73,22 @@ body,
   padding: 0 !important;
   max-width: none !important;
   width: 100% !important;
+}
+
+/* Kill any extra top margin on the very first element */
+.observablehq > *:first-child {
+  margin-top: 0 !important;
+}
+
+/* Make sure the first card (Filters) starts flush at the top */
+.observablehq .card:first-of-type {
+  margin-top: 0 !important;
+}
+
+/* Override any default card margins globally */
+.card {
+  margin: 0 0 1rem 0 !important;   /* no top margin, small bottom gap */
+  padding-top: 0.75rem !important;
 }
 
 /* Allow wide sections with side margins */
@@ -91,6 +121,7 @@ body {
   min-width: 450px;
 }
 </style>`
+
 ```
 
 ```js
@@ -238,7 +269,8 @@ function divergentPlot() {
     },
     y: {
       label: "Year",
-      reverse: true
+      reverse: true,
+      tickFormat: d => String(d)
     },
     color: {
       domain: [
@@ -368,9 +400,57 @@ function divergentPlot() {
 
 <!-- toggle to go to visualizations -->
 ```js
-const opt = ["Over Time", "Diverging Genres", "By Author", "Days with Performances", "Author Share", "Author Bubble", "Calendar"];
-const vizOpt = Inputs.checkbox(opt, {label: "Visualization", value: ["Over Time"]});
-const viz = view(vizOpt);
+
+// Map route IDs / query params -> internal labels in the toggle list
+const vizLabelById = {
+  "over-time": "Over Time",
+  "genres": "Diverging Genres",
+  "authors": "By Author",
+  "days": "Days with Performances",
+
+  // Author share variants
+  "authorShare": "Author Share",
+  "author-shares": "Author Share",
+
+  // Author bubble variants
+  "author_bubble": "Author Bubble",
+  "author-bubble": "Author Bubble",
+
+  "calendar": "Calendar"
+};
+
+
+// Full list of visualization labels
+const opt = [
+  "Over Time",
+  "Diverging Genres",
+  "By Author",
+  "Days with Performances",
+  "Author Share",
+  "Author Bubble",
+  "Calendar"
+];
+
+// Read ?viz=... from the URL if we’re in a browser
+let vizParam = null;
+if (typeof window !== "undefined") {
+  const params = new URLSearchParams(window.location.search);
+  vizParam = params.get("viz");
+}
+
+// If vizParam matches one of our IDs, lock to that one; otherwise use the checkbox
+let viz;
+if (vizParam && vizLabelById[vizParam]) {
+  // Only that one visualization is "on"
+  viz = [vizLabelById[vizParam]];
+} else {
+  const vizOpt = Inputs.checkbox(opt, {
+    label: "Visualization",
+    value: ["Over Time"]
+  });
+  viz = view(vizOpt);
+}
+
 ```
 
 ```js
@@ -379,7 +459,7 @@ const divergingGenres = viz.includes("Diverging Genres");
 const byAuthor = viz.includes("By Author");
 const performanceDays = viz.includes("Days with Performances");
 const authorShare = viz.includes("Author Share");
-const bubble = viz.includes("Author Bubble");
+const authorBubble = viz.includes("Author Bubble");
 const calendar = viz.includes("Calendar");
 
 ```
@@ -536,12 +616,6 @@ const yearsInView = Array.from(
 
 yearsInView.slice(0,10).concat("...").concat(yearsInView.slice(-10))
 
-function asDate(x) {
-  if (x instanceof Date) return x;
-  if (typeof x === "number") return new Date(x);
-  if (typeof x === "string") return new Date(x.replace(" AD", ""));
-  return null;
-}
 ```
 
 ```js
@@ -568,7 +642,7 @@ function compareYearsChart(data) {
       // 👇 labels below instead of above
       Plot.axisFx({
         ticks: yearTicks,
-        tickFormat: d => d,
+        tickFormat: d => String(d),
         anchor: "bottom"
       })
     ]
@@ -580,23 +654,21 @@ function compareYearsChart(data) {
 ```
 
 ```js
-display(overTime ? html `<h2>Comparative Performances Over Time</h2>` : html`<div></div>`)
-```
-
-```js
-display(overTime
-  ? (formatted_data.length > 0
+if (overTime) {
+  display(html`<h2>Comparative Performances Over Time</h2>`);
+  display(
+    formatted_data.length > 0
       ? html`<div class="full-bleed">
           ${compareYearsChart(formatted_data)}
         </div>`
-      : html`<i>No data.</i>`)
-  : html`<div></div>`
-)
+      : html`<i>No data.</i>`
+  );
+}
 
-```
+if (divergingGenres) {
+  display(html`<h2>Comparative Performance Genres Over Time</h2>`);
+}
 
-```js
-display(divergingGenres ? html `<h2>Comparative Performance Genres Over Time</h2>` : html`<div></div>`)
 ```
 
 ```js
@@ -961,16 +1033,19 @@ origins.length > 0 && performanceDays ? document.getElementById("heatmap-contain
 
 
 ```
-
-
 </div>
 
 
 
-# Global Theatre Calendar (1748 - 1798)
-
 ```js
-import { injectCalendarStyles, buildEvents, renderCalendar, ORIGIN_COLOR } from "./calendar.js";
+// Heading for the calendar section – only when calendar viz is active
+display(
+  calendar
+    ? html`<h2>Global Theatre Calendar (1748 – 1798)</h2>`
+    : html`<div></div>`
+);
+
+import { injectCalendarStyles, buildEvents, renderCalendar, ORIGIN_COLOR } from "./components/calendar.js";
 
 // ==============================
 // 1) Load data again
@@ -984,7 +1059,6 @@ const nolaCsv   = await FileAttachment("data/new_o_frequent_performances.csv").c
 // 2) Helpers
 // ==============================
 function normKey(k){ return String(k||"").trim().toLowerCase().replace(/\s+/g," "); }
-
 
 // ==============================
 // 3) Normalize datasets
@@ -1041,7 +1115,7 @@ const nola = nolaRows.map((r,i) => {
 }).filter(d => d.date);
 
 // ==============================
-// 4) Combine and cap:
+// 4) Combine and cap
 //    - Danish / French / Dutch ≤ 1799-12-31
 //    - New Orleans ≤ 1812-12-31
 // ==============================
@@ -1064,32 +1138,28 @@ const COLOR = new Map([
 ]);
 try { for (const [k,c] of COLOR) ORIGIN_COLOR.set(k, c); } catch {}
 
-display(html`<div style="font:12px system-ui; margin:.25rem 0;">
-  Number of Performances per dataset (≤1799 Europe, ≤1812 New Orleans) —
-  Danish: <b>${Danish.filter(d => d.date <= CAP_NON_NOLA).length}</b> ·
-  French: <b>${French.filter(d => d.date <= CAP_NON_NOLA).length}</b> ·
-  Dutch: <b>${Dutch.filter(d => d.date <= CAP_NON_NOLA).length}</b> ·
-  New Orleans: <b>${nola.filter(d => d.date <= CAP).length}</b> ·
-  total after cap: <b>${allRows.length}</b>
-</div>`);
+// Summary text – only when calendar viz is active
+if (calendar) {
+  display(html`<div style="font:12px system-ui; margin:.25rem 0;">
+    Number of Performances displayed per dataset (≤1799 Europe, ≤1812 New Orleans) —
+    Danish: <b>${Danish.filter(d => d.date <= CAP_NON_NOLA).length}</b> ·
+    French: <b>${French.filter(d => d.date <= CAP_NON_NOLA).length}</b> ·
+    Dutch: <b>${Dutch.filter(d => d.date <= CAP_NON_NOLA).length}</b> ·
+    New Orleans: <b>${nola.filter(d => d.date <= CAP).length}</b> ·
+    total after cap: <b>${allRows.length}</b>
+  </div>`);
+}
 
-```
-
-```js
 // ==============================
-// 5) Controls and Mount Points
+// 5) Controls and mount points
+//    👉 uses global start_date / end_date / origins
 // ==============================
-const allDates = allRows.map(d => d.date);
-const minDate  = new Date(Math.min(...allDates));
-const maxDate  = new Date(Math.max(...allDates));
-const endDefault = new Date(Math.min(+maxDate, CAP));
 
-const startIn   = Inputs.date({ label: "Start", value: minDate });
-const endIn     = Inputs.date({ label: "End", value: endDefault });
-const modeIn    = Inputs.radio(["Month","Week","Day"], { label: "Calendar view", value: "Month" });
-const originIn  = Inputs.checkbox(["Danish","French","Dutch","New Orleans"], { label: "Datasets", value: ["Danish","French","Dutch","New Orleans"] });
-const overlayIn = Inputs.toggle({ label: "Overlay major events", value: true });
-const anchorIn  = Inputs.date({ label: "Date", value: minDate });
+// Calendar-specific controls only
+const modeIn       = Inputs.radio(["Month","Week","Day"], { label: "Calendar view", value: "Month" });
+const overlayIn    = Inputs.toggle({ label: "Overlay major events", value: true });
+const anchorIn     = Inputs.date({ label: "Date displayed", value: start_date });
+const includeNola  = Inputs.toggle({ label: "Include New Orleans (NOLA)", value: true });
 
 const nav = html`<div style="display:flex; gap:.5rem; align-items:center; margin:.25rem 0;">
   <button id="prev">◀ Prev</button><button id="next">Next ▶</button>
@@ -1099,25 +1169,30 @@ const nav = html`<div style="display:flex; gap:.5rem; align-items:center; margin
 const venuesMount = html`<div id="venues-mount"></div>`;
 const legendMount = html`<div id="legend-mount"></div>`;
 
-display(html`<div class="card" style="padding:.6rem; margin:.6rem 0;">
-  <div style="display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:.6rem;">
-    <div>${anchorIn}</div><div>${nav}</div>
-    <div>${modeIn}</div><div>${overlayIn}</div>
-    <div style="grid-column:1/-1">${originIn}</div>
-    <div style="grid-column:1/-1">${venuesMount}</div>
-    <div style="grid-column:1/-1">${legendMount}</div>
-  </div>
-</div>`);
-```
+// Only render the controls card if calendar viz is active
+if (calendar) {
+  display(html`<div class="card" style="padding:.6rem; margin:.6rem 0;">
+    <div style="display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:.6rem;">
+      <div>${anchorIn}</div><div>${nav}</div>
+      <div>${modeIn}</div><div>${overlayIn}</div>
+      <div style="grid-column:1/-1">${includeNola}</div>
+      <div style="grid-column:1/-1">${venuesMount}</div>
+      <div style="grid-column:1/-1">${legendMount}</div>
+    </div>
+  </div>`);
+}
 
-```js
 // ==============================
-// 6) Imperative render with stable Venues + color legend
+// 6) Imperative render with global filters
 // ==============================
 injectCalendarStyles();
 
 const CAL_ID = "calendar-colored";
-display(html`<div id="${CAL_ID}"></div>`);
+
+// Calendar container only when calendar is active
+if (calendar) {
+  display(html`<div id="${CAL_ID}"></div>`);
+}
 
 function capDate(d){ return new Date(Math.min(+asDate(d), CAP)); }
 
@@ -1131,8 +1206,17 @@ function buildVenuesInput(startDate, endDate, originsList) {
   return Inputs.checkbox(opts, { label: "Venues", value: opts });
 }
 
-// hold current venues input
-let venuesIn = buildVenuesInput(capDate(startIn.value), capDate(endIn.value), originIn.value);
+// Initial venues input, based on global filters
+const initialOriginsBase = origins.map(o =>
+  o === "danish" ? "Danish" :
+  o === "french" ? "French" :
+  o === "dutch"  ? "Dutch"  : o
+);
+const initialOriginsList = includeNola.value
+  ? [...initialOriginsBase, "New Orleans"]
+  : initialOriginsBase;
+
+let venuesIn = buildVenuesInput(capDate(start_date), capDate(end_date), initialOriginsList);
 venuesMount.replaceChildren(venuesIn);
 
 function venuesValue() {
@@ -1149,14 +1233,26 @@ function renderLegend(originsList) {
 }
 
 function rerender() {
-  const start = capDate(startIn.value);
-  const end   = capDate(endIn.value);
-  const anchor= capDate(anchorIn.value || start);
-  const mode  = modeIn.value;
-  const origins = originIn.value;
+  if (!calendar) return; // don't do anything if calendar viz isn't active
+
+  // Use global filters
+  const start = capDate(start_date);
+  const end   = capDate(end_date);
+
+  const baseOrigins = origins.map(o =>
+    o === "danish" ? "Danish" :
+    o === "french" ? "French" :
+    o === "dutch"  ? "Dutch"  : o
+  );
+  const originsList = includeNola.value
+    ? [...baseOrigins, "New Orleans"]
+    : baseOrigins;
+
+  const anchor = capDate(anchorIn.value || start);
+  const mode   = modeIn.value;
 
   // rebuild venues when the available list changes
-  const fresh = buildVenuesInput(start, end, origins);
+  const fresh = buildVenuesInput(start, end, originsList);
   const oldOpts = Array.from(venuesIn.options || []).map(x => x.textContent);
   const newOpts = Array.from(fresh.options || []).map(x => x.textContent);
   const changed = oldOpts.length !== newOpts.length || oldOpts.some((o,i)=>o!==newOpts[i]);
@@ -1164,8 +1260,9 @@ function rerender() {
     const prevSelection = venuesValue();
     venuesIn = fresh;
     // try to preserve previous selection where possible
-    const keep = newOpts.filter(v => prevSelection.includes(v));
-    venuesIn.value = keep.length ? keep : newOpts;
+    const newLabels = Array.from(venuesIn.options || []).map(x => x.textContent);
+    const keep = newLabels.filter(v => prevSelection.includes(v));
+    venuesIn.value = keep.length ? keep : newLabels;
     venuesIn.addEventListener("input", rerender);
     venuesMount.replaceChildren(venuesIn);
   }
@@ -1175,7 +1272,7 @@ function rerender() {
   // filter rows
   const filtered = allRows.filter(d =>
     d.date >= start && d.date <= end &&
-    origins.includes(d.origin) &&
+    originsList.includes(d.origin) &&
     (!selectedVenues.length || selectedVenues.includes(d.theater))
   );
 
@@ -1193,35 +1290,38 @@ function rerender() {
     { date: "1815-01-08", name: "Battle of New Orleans" }
   ] : [];
 
-  renderLegend(origins);
+  renderLegend(originsList);
 
   renderCalendar({ container: CAL_ID, mode, anchor, events, overlays });
 }
 
-// Wire controls
-[startIn, endIn, modeIn, originIn, overlayIn, anchorIn].forEach(inp => {
-  inp.addEventListener("input", rerender);
-});
-venuesIn.addEventListener("input", rerender);
+// Wire controls only when calendar viz is active
+if (calendar) {
+  [modeIn, overlayIn, anchorIn, includeNola].forEach(inp => {
+    inp.addEventListener("input", rerender);
+  });
+  venuesIn.addEventListener("input", rerender);
 
-// Prev/Next
-nav.querySelector("#prev").onclick = () => {
-  const a = capDate(anchorIn.value || startIn.value);
-  const mode = modeIn.value;
-  if (mode === "Month") a.setUTCMonth(a.getUTCMonth() - 1);
-  else if (mode === "Week") a.setUTCDate(a.getUTCDate() - 7);
-  else a.setUTCDate(a.getUTCDate() - 1);
-  anchorIn.value = a; anchorIn.dispatchEvent(new Event("input"));
-};
-nav.querySelector("#next").onclick = () => {
-  const a = capDate(anchorIn.value || startIn.value);
-  const mode = modeIn.value;
-  if (mode === "Month") a.setUTCMonth(a.getUTCMonth() + 1);
-  else if (mode === "Week") a.setUTCDate(a.getUTCDate() + 7);
-  else a.setUTCDate(a.getUTCDate() + 1);
-  anchorIn.value = a; anchorIn.dispatchEvent(new Event("input"));
-};
+  // Prev/Next
+  nav.querySelector("#prev").onclick = () => {
+    const a = capDate(anchorIn.value || start_date);
+    const mode = modeIn.value;
+    if (mode === "Month") a.setUTCMonth(a.getUTCMonth() - 1);
+    else if (mode === "Week") a.setUTCDate(a.getUTCDate() - 7);
+    else a.setUTCDate(a.getUTCDate() - 1);
+    anchorIn.value = a; anchorIn.dispatchEvent(new Event("input"));
+  };
+  nav.querySelector("#next").onclick = () => {
+    const a = capDate(anchorIn.value || start_date);
+    const mode = modeIn.value;
+    if (mode === "Month") a.setUTCMonth(a.getUTCMonth() + 1);
+    else if (mode === "Week") a.setUTCDate(a.getUTCDate() + 7);
+    else a.setUTCDate(a.getUTCDate() + 1);
+    anchorIn.value = a; anchorIn.dispatchEvent(new Event("input"));
+  };
 
-// First render
-rerender();
+  // First render
+  rerender();
+}
+
 ```

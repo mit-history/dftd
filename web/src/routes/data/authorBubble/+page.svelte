@@ -1,58 +1,56 @@
 <svelte:head>
-  <title>Performances by Author • Explore the Data</title>
+  <title>Author Bubble Map • Explore the Data</title>
 </svelte:head>
 
 <script>
   const baseNotebookUrl = "https://transnationalstages.net/data";
-  const notebookUrl = `${baseNotebookUrl}?viz=authors`;
+  const notebookUrl = `${baseNotebookUrl}?viz=authorBubble`;
 </script>
 
 
 <main class="viz-page">
-  <!-- <h1 class="title">Performances by Author</h1> -->
+  <!-- <h1 class="title">Authors by Location</h1> -->
 
-  <!-- Dummy timeline -->
   <!-- <section class="timeline">
     <div class="timeline-bar">
-      <span class="timeline-label">Timeline (placeholder – author presence across years)</span>
+      <span class="timeline-label">
+        Bubble visualization showing where authors appear across cities and time.
+      </span>
     </div>
   </section> -->
 
   <section class="viz-info">
-  <div class="chip">Performances by Author</div>
-
-  <h1>Comparing Author Influence Across Theatre Traditions</h1>
+  <div class="chip">Author Map</div>
+  <h1>Geographic Distribution of Performed Authors</h1>
 
   <p>
-    This visualization highlights how frequently different playwrights appear in the
-    Danish, French, and Dutch repertoires. Use it to trace patterns of influence,
-    measure the reach of major writers, and uncover how cultural preferences shift
-    across time and geographical regions.
+    This map visualizes where authors were performed across Europe. Bubble sizes
+    reflect the number of performances at each location, revealing cultural hubs
+    and regions of influence.
   </p>
 
   <ul class="keypoints">
-    <li>Select an author to examine their annual performance presence across cities.</li>
-    <li>Explore percentages and absolute counts to understand cultural dominance or decline.</li>
-    <li>View geographic patterns of performances to see where authors gained popularity.</li>
+    <li>Filter by origin or apply thresholds to highlight major authors.</li>
+    <li>Adjust year ranges to explore historical change over time.</li>
+    <li>Compare French, Dutch, and Danish locations side-by-side.</li>
   </ul>
 </section>
 
-  <!-- Interactive visualization -->
+
   <section class="viz-frame">
     <iframe
       src={notebookUrl}
-      title="Performances by Author Visualization"
+      title="Author Bubble Visualization"
       loading="lazy"
     ></iframe>
   </section>
 
-  <!-- Text below visualization
-  <section class="below-text">
+  <!-- <section class="below-text">
     <p>
-      This view helps you trace how often individual authors appear in each repertoire over time.
-      You might use it to compare local playwrights with international figures, identify periods
-      when a particular author dominates the stage, or see how long an author’s works persist in
-      a given city’s repertoire.
+      This tool visualizes authors across Amsterdam, Copenhagen, and Paris using bubbles whose
+      size corresponds to performance frequency. Adjustable time ranges and thresholds make it
+      easy to identify which authors dominate a given city, which ones overlap across regions,
+      and which appear only locally.
     </p>
   </section> -->
 </main>
