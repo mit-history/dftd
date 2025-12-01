@@ -3,18 +3,8 @@
 </svelte:head>
 
 <script>
-  import { page } from "$app/stores";
-
-  // Base URL of your notebook deployment
-  const baseNotebookUrl = "https://dftd.observablehq.cloud/dftd";
-
-  // reactive: whenever the route changes, this updates
-  $: vizId = $page.params.viz;
-
-  // full notebook embed URL
-  $: notebookUrl = `${baseNotebookUrl}?viz=${vizId}`;
+  const notebookUrl = "http://localhost:3000/?viz=authorShare";
 </script>
-
 
 
 <main class="viz-page">
