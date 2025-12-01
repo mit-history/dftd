@@ -319,7 +319,7 @@ function divergentPlot() {
 <div>
 
 ```js
-const opt = ["Over Time", "Diverging Genres", "By Author", "Days with Performances", "Author Share", "Author Bubble"];
+const opt = ["Over Time", "Diverging Genres", "By Author", "Days with Performances", "Author Share", "Author Bubble", "Calendar"];
 const vizOpt = Inputs.checkbox(opt, {label: "Visualization", value: ["Over Time"]});
 const viz = view(vizOpt);
 ```
@@ -886,4 +886,266 @@ origins.length > 0 && performanceDays ? document.getElementById("heatmap-contain
 
 ```
 
+
 </div>
+
+
+
+# Global Theatre Calendar (1748 - 1798)
+
+```js
+import { injectCalendarStyles, buildEvents, renderCalendar, ORIGIN_COLOR } from "./calendar.js";
+
+// ==============================
+// 1) Load data again
+// ==============================
+const FrenchRaw = await FileAttachment("data/french-performances.json").json();
+const DutchRaw  = await FileAttachment("data/dutch-performances.csv").csv({typed: true});
+const DanishRaw = await FileAttachment("data/danish-performances.json").json();
+const nolaCsv   = await FileAttachment("data/new_o_frequent_performances.csv").csv({typed: false});
+
+// ==============================
+// 2) Helpers
+// ==============================
+function normKey(k){ return String(k||"").trim().toLowerCase().replace(/\s+/g," "); }
+
+
+// ==============================
+// 3) Normalize datasets
+// ==============================
+const Danish = DanishRaw.map((perf, i) => {
+  const d = asDate(perf.date);
+  const works = perf.production?.works ?? [];
+  const titleFromWorks = works.map(w => w.title).filter(Boolean).join("; ");
+  return {
+    id: typeof perf.id === "string" ? perf.id : `Danish-${i}`,
+    date: d, year: d ? d.getUTCFullYear() : null,
+    title: titleFromWorks || perf.formatted_title || perf.production?.formatted_title || "Untitled",
+    origin: "Danish",
+    theater: perf.place?.name ?? perf.theater ?? perf.venue ?? "Unknown venue",
+    city: perf.place?.name ?? null
+  };
+}).filter(d => d.date);
+
+const French = FrenchRaw.map((r,i) => {
+  const d = asDate(r.date ?? r.startDate ?? r.start_date);
+  return {
+    id: r.id ?? `French-${i}`,
+    date: d, year: d ? d.getUTCFullYear() : (r.year ?? null),
+    title: r.title ?? r.headline ?? r.playTitle ?? r.production?.formatted_title ?? "Untitled",
+    origin: "French",
+    theater: r.place?.name ?? r.place ?? r.theater ?? r.venue ?? "Unknown venue",
+    city: r.city ?? r.place ?? null
+  };
+}).filter(d => d.date);
+
+const Dutch = DutchRaw.map((r,i) => {
+  const d = asDate(r.date ?? r.Date ?? r.performance_date ?? r.start_date);
+  return {
+    id: r.id ?? r.ID ?? `Dutch-${i}`,
+    date: d, year: d ? d.getUTCFullYear() : (r.year ?? r.Year ?? null),
+    title: r.title ?? r.Title ?? r.play ?? r.Play ?? "Untitled",
+    origin: "Dutch",
+    theater: r.theater ?? r.Theater ?? r.venue ?? r.Venue ?? r.place ?? r.Place ?? "Unknown venue",
+    city: r.city ?? r.City ?? null
+  };
+}).filter(d => d.date);
+
+const nolaRows = nolaCsv.map(obj => { const out = {}; for (const k of Object.keys(obj)) out[normKey(k)] = obj[k]; return out; });
+const nola = nolaRows.map((r,i) => {
+  const d = asDate(r["date of performance"] ?? r["date"]);
+  return {
+    id: r["issue #"] ?? `nola-${i}`,
+    date: d, year: d ? d.getUTCFullYear() : (r["year"] ?? null),
+    title: (r["works mentioned"] ?? "Untitled").trim(),
+    origin: "New Orleans",
+    theater: (r["performance location"] ?? r["loc of ad"] ?? "Unknown venue").trim(),
+    city: "New Orleans"
+  };
+}).filter(d => d.date);
+
+// ==============================
+// 4) Combine and cap:
+//    - Danish / French / Dutch ≤ 1799-12-31
+//    - New Orleans ≤ 1812-12-31
+// ==============================
+const CAP_NON_NOLA = Date.UTC(1799, 11, 31);
+const CAP          = Date.UTC(1812, 11, 31);  // global max
+
+const allRows = [
+  ...Danish.filter(d => d.date <= CAP_NON_NOLA),
+  ...French.filter(d => d.date <= CAP_NON_NOLA),
+  ...Dutch.filter(d => d.date <= CAP_NON_NOLA),
+  ...nola.filter(d => d.date <= CAP)          // NOLA up to 1812
+];
+
+// Color map + legend colors (keys match origin values now)
+const COLOR = new Map([
+  ["Danish",       "#ef4444"],
+  ["French",       "#3b82f6"],
+  ["Dutch",        "#16a34a"],
+  ["New Orleans",  "#a855f7"]
+]);
+try { for (const [k,c] of COLOR) ORIGIN_COLOR.set(k, c); } catch {}
+
+display(html`<div style="font:12px system-ui; margin:.25rem 0;">
+  Number of Performances per dataset (≤1799 Europe, ≤1812 New Orleans) —
+  Danish: <b>${Danish.filter(d => d.date <= CAP_NON_NOLA).length}</b> ·
+  French: <b>${French.filter(d => d.date <= CAP_NON_NOLA).length}</b> ·
+  Dutch: <b>${Dutch.filter(d => d.date <= CAP_NON_NOLA).length}</b> ·
+  New Orleans: <b>${nola.filter(d => d.date <= CAP).length}</b> ·
+  total after cap: <b>${allRows.length}</b>
+</div>`);
+
+```
+
+```js
+// ==============================
+// 5) Controls and Mount Points
+// ==============================
+const allDates = allRows.map(d => d.date);
+const minDate  = new Date(Math.min(...allDates));
+const maxDate  = new Date(Math.max(...allDates));
+const endDefault = new Date(Math.min(+maxDate, CAP));
+
+const startIn   = Inputs.date({ label: "Start", value: minDate });
+const endIn     = Inputs.date({ label: "End", value: endDefault });
+const modeIn    = Inputs.radio(["Month","Week","Day"], { label: "Calendar view", value: "Month" });
+const originIn  = Inputs.checkbox(["Danish","French","Dutch","New Orleans"], { label: "Datasets", value: ["Danish","French","Dutch","New Orleans"] });
+const overlayIn = Inputs.toggle({ label: "Overlay major events", value: true });
+const anchorIn  = Inputs.date({ label: "Date", value: minDate });
+
+const nav = html`<div style="display:flex; gap:.5rem; align-items:center; margin:.25rem 0;">
+  <button id="prev">◀ Prev</button><button id="next">Next ▶</button>
+</div>`;
+
+// Dedicated mount nodes so we *replace* contents instead of appending
+const venuesMount = html`<div id="venues-mount"></div>`;
+const legendMount = html`<div id="legend-mount"></div>`;
+
+display(html`<div class="card" style="padding:.6rem; margin:.6rem 0;">
+  <div style="display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:.6rem;">
+    <div>${anchorIn}</div><div>${nav}</div>
+    <div>${modeIn}</div><div>${overlayIn}</div>
+    <div style="grid-column:1/-1">${originIn}</div>
+    <div style="grid-column:1/-1">${venuesMount}</div>
+    <div style="grid-column:1/-1">${legendMount}</div>
+  </div>
+</div>`);
+```
+
+```js
+// ==============================
+// 6) Imperative render with stable Venues + color legend
+// ==============================
+injectCalendarStyles();
+
+const CAL_ID = "calendar-colored";
+display(html`<div id="${CAL_ID}"></div>`);
+
+function capDate(d){ return new Date(Math.min(+asDate(d), CAP)); }
+
+function buildVenuesInput(startDate, endDate, originsList) {
+  const opts = Array.from(new Set(
+    allRows
+      .filter(d => d.date >= startDate && d.date <= endDate && originsList.includes(d.origin))
+      .map(d => d.theater)
+      .filter(Boolean)
+  )).sort();
+  return Inputs.checkbox(opts, { label: "Venues", value: opts });
+}
+
+// hold current venues input
+let venuesIn = buildVenuesInput(capDate(startIn.value), capDate(endIn.value), originIn.value);
+venuesMount.replaceChildren(venuesIn);
+
+function venuesValue() {
+  const v = venuesIn.value;
+  return Array.isArray(v) ? v : [];
+}
+
+function renderLegend(originsList) {
+  const el = html`<div class="cal-legend">
+    ${originsList.map(o => html`<span class="cal-key"><span class="cal-dot" style="background:${COLOR.get(o) || '#999'}"></span>${o}</span>`)}
+    <span class="cal-key"><span class="cal-dot" style="background:#dbeafe"></span>major event</span>
+  </div>`;
+  legendMount.replaceChildren(el);
+}
+
+function rerender() {
+  const start = capDate(startIn.value);
+  const end   = capDate(endIn.value);
+  const anchor= capDate(anchorIn.value || start);
+  const mode  = modeIn.value;
+  const origins = originIn.value;
+
+  // rebuild venues when the available list changes
+  const fresh = buildVenuesInput(start, end, origins);
+  const oldOpts = Array.from(venuesIn.options || []).map(x => x.textContent);
+  const newOpts = Array.from(fresh.options || []).map(x => x.textContent);
+  const changed = oldOpts.length !== newOpts.length || oldOpts.some((o,i)=>o!==newOpts[i]);
+  if (changed) {
+    const prevSelection = venuesValue();
+    venuesIn = fresh;
+    // try to preserve previous selection where possible
+    const keep = newOpts.filter(v => prevSelection.includes(v));
+    venuesIn.value = keep.length ? keep : newOpts;
+    venuesIn.addEventListener("input", rerender);
+    venuesMount.replaceChildren(venuesIn);
+  }
+
+  const selectedVenues = venuesValue();
+
+  // filter rows
+  const filtered = allRows.filter(d =>
+    d.date >= start && d.date <= end &&
+    origins.includes(d.origin) &&
+    (!selectedVenues.length || selectedVenues.includes(d.theater))
+  );
+
+  // build events and attach per-origin color
+  const events = buildEvents(filtered, asDate, { places: selectedVenues }).map(e => ({
+    ...e,
+    color: COLOR.get(e.origin) || e.color
+  }));
+
+  const overlays = overlayIn.value ? [
+    { date: "1755-11-01", name: "Lisbon earthquake" },
+    { date: "1763-02-10", name: "Treaty of Paris" },
+    { date: "1776-07-04", name: "U.S. Independence" },
+    { date: "1803-12-20", name: "Louisiana Purchase (NOLA)" },
+    { date: "1815-01-08", name: "Battle of New Orleans" }
+  ] : [];
+
+  renderLegend(origins);
+
+  renderCalendar({ container: CAL_ID, mode, anchor, events, overlays });
+}
+
+// Wire controls
+[startIn, endIn, modeIn, originIn, overlayIn, anchorIn].forEach(inp => {
+  inp.addEventListener("input", rerender);
+});
+venuesIn.addEventListener("input", rerender);
+
+// Prev/Next
+nav.querySelector("#prev").onclick = () => {
+  const a = capDate(anchorIn.value || startIn.value);
+  const mode = modeIn.value;
+  if (mode === "Month") a.setUTCMonth(a.getUTCMonth() - 1);
+  else if (mode === "Week") a.setUTCDate(a.getUTCDate() - 7);
+  else a.setUTCDate(a.getUTCDate() - 1);
+  anchorIn.value = a; anchorIn.dispatchEvent(new Event("input"));
+};
+nav.querySelector("#next").onclick = () => {
+  const a = capDate(anchorIn.value || startIn.value);
+  const mode = modeIn.value;
+  if (mode === "Month") a.setUTCMonth(a.getUTCMonth() + 1);
+  else if (mode === "Week") a.setUTCDate(a.getUTCDate() + 7);
+  else a.setUTCDate(a.getUTCDate() + 1);
+  anchorIn.value = a; anchorIn.dispatchEvent(new Event("input"));
+};
+
+// First render
+rerender();
+```
