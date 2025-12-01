@@ -8,7 +8,7 @@
 
 
 <main class="viz-page">
-  <h1 class="title">Authors by Location</h1>
+  <!-- <h1 class="title">Authors by Location</h1> -->
 
   <!-- <section class="timeline">
     <div class="timeline-bar">
@@ -18,6 +18,24 @@
     </div>
   </section> -->
 
+  <section class="viz-info">
+  <div class="chip">Author Map</div>
+  <h1>Geographic Distribution of Performed Authors</h1>
+
+  <p>
+    This map visualizes where authors were performed across Europe. Bubble sizes
+    reflect the number of performances at each location, revealing cultural hubs
+    and regions of influence.
+  </p>
+
+  <ul class="keypoints">
+    <li>Filter by origin or apply thresholds to highlight major authors.</li>
+    <li>Adjust year ranges to explore historical change over time.</li>
+    <li>Compare French, Dutch, and Danish locations side-by-side.</li>
+  </ul>
+</section>
+
+
   <section class="viz-frame">
     <iframe
       src={notebookUrl}
@@ -26,14 +44,14 @@
     ></iframe>
   </section>
 
-  <section class="below-text">
+  <!-- <section class="below-text">
     <p>
       This tool visualizes authors across Amsterdam, Copenhagen, and Paris using bubbles whose
       size corresponds to performance frequency. Adjustable time ranges and thresholds make it
       easy to identify which authors dominate a given city, which ones overlap across regions,
       and which appear only locally.
     </p>
-  </section>
+  </section> -->
 </main>
 
 <style>
@@ -97,4 +115,50 @@
       height: 100vh;
     }
   }
+
+
+.viz-info {
+  max-width: 900px;
+  margin: 1.5rem auto;
+  padding: 1.2rem 1.5rem;
+  border-radius: 16px;
+  background: #fefce8;
+  border: 1px solid #facc15;
+  box-shadow: 0 8px 26px rgba(0,0,0,0.06);
+}
+
+.chip {
+  display: inline-block;
+  padding: 2px 10px;
+  background: #fde047;
+  color: #713f12;
+  border-radius: 999px;
+  font-size: .7rem;
+  margin-bottom: .4rem;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+}
+
+.viz-info h1 {
+  margin: 0 0 .5rem 0;
+  font-size: 1.4rem;
+}
+
+.keypoints {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: .5rem;
+}
+
+.keypoints li {
+  padding: .5rem .7rem;
+  background: #fef9c3;
+  border: 1px solid #fcd34d;
+  border-radius: .7rem;
+  font-size: .85rem;
+}
+
+
 </style>

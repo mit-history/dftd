@@ -8,7 +8,7 @@
 
 
 <main class="viz-page">
-  <h1 class="title">Author Shares</h1>
+  <!-- <h1 class="title">Author Shares</h1> -->
 
   <!-- <section class="timeline">
     <div class="timeline-bar">
@@ -17,6 +17,22 @@
       </span>
     </div>
   </section> -->
+<section class="viz-info">
+  <div class="chip">Author Share</div>
+  <h1>Performance Contribution by Author</h1>
+
+  <p>
+    This visualization highlights how often specific playwrights appear in
+    performance programs over time. Compare authors to understand influence,
+    popularity, and cultural reach.
+  </p>
+
+  <ul class="keypoints">
+    <li>Add authors to compare their yearly performance shares.</li>
+    <li>Toggle between total counts and percentage contributions.</li>
+    <li>Use thresholds to filter less frequently performed writers.</li>
+  </ul>
+</section>
 
   <section class="viz-frame">
     <iframe
@@ -26,14 +42,14 @@
     ></iframe>
   </section>
 
-  <section class="below-text">
+  <!-- <section class="below-text">
     <p>
       This visualization shows how a particular playwright’s works contribute to each city’s
       repertoire over time. By normalizing each author's performances as a percentage of that
       city's total output, you can compare influence across Amsterdam, Copenhagen, and Paris even
       when their overall volumes differ dramatically.
     </p>
-  </section>
+  </section> -->
 </main>
 
 <style>
@@ -97,4 +113,50 @@
       height: 100vh;
     }
   }
+
+
+.viz-info {
+  max-width: 900px;
+  margin: 1.5rem auto;
+  padding: 1.2rem 1.5rem;
+  border-radius: 16px;
+  background: #fefce8;
+  border: 1px solid #facc15;
+  box-shadow: 0 8px 26px rgba(0,0,0,0.06);
+}
+
+.chip {
+  display: inline-block;
+  padding: 2px 10px;
+  background: #fde047;
+  color: #713f12;
+  border-radius: 999px;
+  font-size: .7rem;
+  margin-bottom: .4rem;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+}
+
+.viz-info h1 {
+  margin: 0 0 .5rem 0;
+  font-size: 1.4rem;
+}
+
+.keypoints {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: .5rem;
+}
+
+.keypoints li {
+  padding: .5rem .7rem;
+  background: #fef9c3;
+  border: 1px solid #fcd34d;
+  border-radius: .7rem;
+  font-size: .85rem;
+}
+
+
 </style>

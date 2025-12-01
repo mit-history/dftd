@@ -8,7 +8,7 @@
 
 
 <main class="viz-page">
-  <h1 class="title">Global Theatre Calendar</h1>
+  <!-- <h1 class="title">Global Theatre Calendar</h1> -->
 
   <!-- Dummy timeline / context bar -->
   <!-- <section class="timeline">
@@ -19,6 +19,24 @@
     </div>
   </section> -->
 
+  <section class="viz-info">
+  <div class="chip">Calendar View</div>
+  <h1>Global Theatre Calendar (1748–1798 + New Orleans)</h1>
+
+  <p>
+    Explore how performance frequency fluctuated across Paris, Copenhagen, Amsterdam,
+    and New Orleans. Switch between Month, Week, and Day views, and compare activity
+    with major world events.
+  </p>
+
+  <ul class="keypoints">
+    <li>Filter by theatre to study venue-specific seasons.</li>
+    <li>Use overlays to reveal links between performances and historical events.</li>
+    <li>Navigate through time using the arrow controls.</li>
+  </ul>
+</section>
+
+
   <!-- Interactive visualization -->
   <section class="viz-frame">
     <iframe
@@ -28,7 +46,7 @@
     ></iframe>
   </section>
 
-  <!-- Text below visualization -->
+  <!-- Text below visualization
   <section class="below-text">
     <p>
       This calendar visualization lets you browse performances day by day across multiple cities.
@@ -37,7 +55,7 @@
       in theatrical activity. It is designed to make it easier to see moments of intensive
       performance, periods of silence, and how New Orleans enters the transatlantic theatre network.
     </p>
-  </section>
+  </section> -->
 </main>
 
 <style>
@@ -101,4 +119,50 @@
       height: 100vh;
     }
   }
+
+
+.viz-info {
+  max-width: 900px;
+  margin: 1.5rem auto;
+  padding: 1.2rem 1.5rem;
+  border-radius: 16px;
+  background: #fefce8;
+  border: 1px solid #facc15;
+  box-shadow: 0 8px 26px rgba(0,0,0,0.06);
+}
+
+.chip {
+  display: inline-block;
+  padding: 2px 10px;
+  background: #fde047;
+  color: #713f12;
+  border-radius: 999px;
+  font-size: .7rem;
+  margin-bottom: .4rem;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+}
+
+.viz-info h1 {
+  margin: 0 0 .5rem 0;
+  font-size: 1.4rem;
+}
+
+.keypoints {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: .5rem;
+}
+
+.keypoints li {
+  padding: .5rem .7rem;
+  background: #fef9c3;
+  border: 1px solid #fcd34d;
+  border-radius: .7rem;
+  font-size: .85rem;
+}
+
+
 </style>
