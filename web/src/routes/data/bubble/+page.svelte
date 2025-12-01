@@ -4,7 +4,7 @@
 
 <script>
   const baseNotebookUrl = "https://transnationalstages.net/data";
-  const notebookUrl = `${baseNotebookUrl}?viz=bubble`;
+  const notebookUrl = `${baseNotebookUrl}?viz=author-bubble`;
 </script>
 
 
