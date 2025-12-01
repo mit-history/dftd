@@ -333,7 +333,8 @@ const authorShare = viz.includes("Author Share");
 const bubble = viz.includes("Author Bubble");
 ```
 
-<div class="card" style="position:sticky;top:5px;">
+<div class="card" style="margin-bottom: 1rem;">
+
 
 <details open>
 
