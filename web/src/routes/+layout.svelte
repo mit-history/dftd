@@ -10,8 +10,8 @@
   }
 
   function handleClickOutside(event) {
-    isOpen = false;
-	}
+    isOpen = false;}
+
 
   function clickOutside(node) {
 
@@ -59,7 +59,7 @@
         <li><a href={base + '/'}>Home</a></li>
         <li><a href={base + '/About'}>About</a></li>
         <li><a href={base + '/Affiliates'}>Affiliated Projects</a></li>
-        <li><a href={base + '/Explore%20the%20Data'}>Explore the Data</a></li>
+        <li><a href={base + '/data'}>Explore the Data</a></li>
         <li><a href={base + '/Team'}>People</a></li>
       </ul>
     </div>
