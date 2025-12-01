@@ -2,7 +2,7 @@
 toc: false
 ---
 
-# Explore the Data
+<!-- # Explore the Data -->
 
 ```js
 const french = await FileAttachment("data/french-performances.json").json();
@@ -49,6 +49,50 @@ const danish = danish_raw.map((perf) => {
 
 ```
 
+
+```js
+html`<style>
+/* Remove Observable default centered column & padding */
+body,
+.observablehq {
+  margin: 0 !important;
+  padding: 0 !important;
+  max-width: none !important;
+  width: 100% !important;
+}
+
+/* Allow wide sections with side margins */
+.full-bleed {
+  width: 92vw !important;
+  margin-left: calc(50% - 46vw) !important;
+}
+
+/* Make Plot charts stretch to their container */
+svg.plot {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+/* Optional: soften background inside iframe */
+body {
+  background: #f5f5f4;
+}
+
+.days-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2rem;
+  padding: 1rem 2rem;
+}
+
+.days-grid > div {
+  flex: 1 1 500px;
+  min-width: 450px;
+}
+</style>`
+```
+
 ```js
 const data_origin = new Map();
 data_origin.set("french", french);
@@ -72,12 +116,15 @@ function percentageYearsChart(data) {
     x: { axis: null, paddingOuter: 0.2 },
     y: { grid: true, label: "Percentage" },
     color: { legend: true },
+    width: window.innerWidth,
+    height: 500,
     marks: [
       Plot.barY(data, {x: "origin", y: "percentage", fx: "year", fill: "origin", tip: true}),
       Plot.ruleY([0])
     ]
   });
 }
+
 ```
 
 ```js
@@ -99,7 +146,8 @@ const land = topojson.feature(world, world.objects.land)
 function mapPlot(data) {
   return Plot.plot({
     title: `Total number of performances of works by ${author},${start_date.getUTCFullYear()} - ${end_date.getFullYear()}`,
-    width: 400,
+    width: window.innerWidth,
+    height: 450,
     projection: {
       type: "azimuthal-equidistant",
       rotate: [-7, -50],
@@ -182,8 +230,8 @@ function genreLegend() {
 function divergentPlot() {
   return Plot.plot({
     title: `Diverging Genre Performance Chart (${start_date.getUTCFullYear()} - ${end_date.getFullYear()})`,
-    width: 1000,
-    height: 800,
+    width: window.innerWidth,
+    height: 700,
     x: {
       label: "Number of Performances",
       tickFormat: Math.abs
@@ -513,7 +561,7 @@ function compareYearsChart(data) {
     x: { axis: null, paddingOuter: 0.2 },
     y: { grid: true, label: "Performances", domain: [0, 366] },
     color: { legend: true },
-    width: 1000,
+    width: window.innerWidth,
     marginBottom: 60,
     marks: [
       Plot.barY(data, Plot.groupX({y2: "count"}, {x: "origin", fx: "year", fill: "origin", tip: true})),
@@ -537,7 +585,15 @@ display(overTime ? html `<h2>Comparative Performances Over Time</h2>` : html`<di
 ```
 
 ```js
-display(overTime ? (formatted_data.length > 0 ? compareYearsChart(formatted_data) : html`<i>No data.</i>`) : html`<div></div>`)
+display(overTime
+  ? (formatted_data.length > 0
+      ? html`<div class="full-bleed">
+          ${compareYearsChart(formatted_data)}
+        </div>`
+      : html`<i>No data.</i>`)
+  : html`<div></div>`
+)
+
 ```
 
 ```js
@@ -612,10 +668,13 @@ display(divergingGenres ? genreLegend() : html`<div></div>`);
 ```
 
 ```js
-display(divergingGenres ?
-  ((danish_filtered_data.length > 0  && french_filtered_data.length > 0) ? divergentPlot() : html`<i>No data.</i>`) :
-  html`<div></div>`
+display(divergingGenres
+  ? ((danish_filtered_data.length > 0 && french_filtered_data.length > 0)
+      ? html`<div class="full-bleed">${divergentPlot()}</div>`
+      : html`<i>No data.</i>`)
+  : html`<div></div>`
 )
+
 ```
 
 ```js
@@ -657,7 +716,15 @@ display(byAuthor ? html `<h3>Percentage by Author</h3>` : html`<div></div>`)
 ```
 
 ```js
-display(byAuthor ? author_data.length > 0 ? percentageYearsChart(author_data) : html`<i>No data.</i>` : html`<div></div>`)
+display(byAuthor
+  ? (author_data.length > 0
+      ? html`<div class="full-bleed">
+          ${percentageYearsChart(author_data)}
+        </div>`
+      : html`<i>No data.</i>`)
+  : html`<div></div>`
+)
+
 ```
 
 ```js
@@ -665,7 +732,15 @@ display(byAuthor ? html `<h3>Percentage by Location</h3>` : html`<div></div>`)
 ```
 
 ```js
-display(byAuthor ? author_counts ? mapPlot(author_counts) : html`<i>No data.</i>` : html`<div></div>`)
+display(byAuthor
+  ? (author_counts
+      ? html`<div class="full-bleed">
+          ${mapPlot(author_counts)}
+        </div>`
+      : html`<i>No data.</i>`)
+  : html`<div></div>`
+)
+
 ```
 
 ```js
@@ -680,17 +755,11 @@ const genre_data =
     : formatted_data.filter((d) => genres.includes(d.genre));
 ```
 
-<div style="
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 2rem;
-  max-width: 1500px;
-  margin: auto;
-">
-  <div id="line-chart-container" style="flex: 1 1 500px; min-width: 450px;"></div>
-  <div id="heatmap-container" style="flex: 1 1 500px; min-width: 450px;"></div>
+<div class="full-bleed days-grid">
+  <div id="line-chart-container"></div>
+  <div id="heatmap-container"></div>
 </div>
+
 
 ```js
 import {
@@ -747,13 +816,16 @@ const summarized_data = origins.map(origin =>
 document.getElementById("line-chart-container").innerHTML = "";
 document.getElementById("heatmap-container").innerHTML = "";
 
+const containerWidth = window.innerWidth * 0.45;
+
 origins.length > 0 && performanceDays ? document.getElementById("line-chart-container").append(
-    createMultipleAnimatedLines(summarized_data, { width: 700, height: 600 })
+  createMultipleAnimatedLines(summarized_data, { width: containerWidth, height: 600 })
 ) : html`<i>No data.</i>`
 
 origins.length > 0 && performanceDays ? document.getElementById("heatmap-container").append(
-  createHeatmap(genre_data, { width: 700, height: 600 })
+  createHeatmap(genre_data, { width: containerWidth, height: 600 })
 ) : html`<i>No data.</i>`
+
 
 ```
 

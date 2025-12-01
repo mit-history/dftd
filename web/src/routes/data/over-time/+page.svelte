@@ -3,7 +3,7 @@
 </svelte:head>
 
 <script>
-  // TODO: replace with your deployed Observable URL when ready
+  // TODO: replace with deployed Observable URL when ready
   const notebookUrl = "http://localhost:3000/";
 </script>
 
@@ -18,15 +18,6 @@
     </div>
   </section>
 
-  <!-- Interactive visualization -->
-  <section class="viz-frame">
-    <iframe
-      src={notebookUrl}
-      title="Performances Over Time Visualization"
-      loading="lazy"
-    ></iframe>
-  </section>
-
   <!-- Text below visualization -->
   <section class="below-text">
     <p>
@@ -36,11 +27,45 @@
       around major historical events or theatre reforms.
     </p>
   </section>
+
+  <!-- Interactive visualization -->
+  <section class="viz-frame">
+    <iframe
+      src={notebookUrl}
+      title="Performances Over Time Visualization"
+      loading="lazy"
+    ></iframe>
+  </section>
+
+
 </main>
 
 <style>
+
+  :global(body) {
+  background: #f5f5f4; /* warm light gray (Stone-100 from Tailwind palette) */
+}
+
+  .viz-frame {
+  width: 100vw;
+  margin-left: calc(50% - 50vw); /* full-width trick */
+  margin-top: 3rem;
+  margin-bottom: 3rem;
+
+  border-radius: 0; /* optional, can set to 12px if you want rounded corners */
+  border: none;
+}
+
+.viz-frame iframe {
+  width: 100%;
+  height: 85vh; /* taller */
+  border: none;
+}
+
+
+
   .viz-page {
-    max-width: 1100px;
+
     margin: 0 auto;
     padding: 4rem 1.5rem 4rem;
   }
@@ -71,18 +96,6 @@
     font-weight: 600;
   }
 
-  .viz-frame {
-    border-radius: 14px;
-    border: 1px solid #ddd;
-    overflow: hidden;
-    margin-bottom: 2rem;
-  }
-
-  .viz-frame iframe {
-    width: 100%;
-    height: 75vh;
-    border: none;
-  }
 
   .below-text p {
     max-width: 850px;

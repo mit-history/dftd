@@ -36,6 +36,11 @@
 </main>
 
 <style>
+  
+  :global(body) {
+  background: #f5f5f4; /* warm light gray (Stone-100 from Tailwind palette) */
+}
+
   .viz-page {
     max-width: 1100px;
     margin: 0 auto;

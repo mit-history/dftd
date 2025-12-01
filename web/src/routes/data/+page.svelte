@@ -53,13 +53,15 @@
   <!-- CONTENT BELOW HERO -->
   <section class="content">
 
-    <section class="header">
-      <h2>Explore the Data</h2>
-      <p class="overview">
-        Examine performances from Amsterdam, Copenhagen, and Paris using a collection of interactive data visualizations.
-        Choose a view below to open a detailed page containing a description and the interactive visualization with default settings.
-      </p>
-    </section>
+   <section class="desc-box">
+    <h2 class="desc-title">About These Tools</h2>
+    <p>
+      Our goal is to provide users with an intuitive way to explore centuries of European theatre performance data.
+      At present, you can compare information from Amsterdam, Copenhagen, and Paris between 1748 and 1798.
+      Visualizations allow you to examine annual trends, genre differences, author prominence, and seasonal patterns.
+    </p>
+</section>
+
 
     <section class="menu-grid">
       {#each visualizations as viz}
@@ -75,6 +77,13 @@
 </main>
 
 <style>
+
+  
+
+  :global(body) {
+  background: #f5f5f4; /* warm light gray (Stone-100 from Tailwind palette) */
+}
+
   /* === HERO FULL-BLEED === */
   .hero {
     position: relative;
@@ -168,6 +177,71 @@
     padding: 0 1.5rem 4rem;
     text-align: center;
   }
+  /* === DESCRIPTION TEXT === */
+.desc {
+  max-width: 850px;
+  margin: 3rem auto 2.5rem;
+  font-size: 1.15rem;
+  line-height: 1.75;
+  color: #333;
+  text-align: left;
+  padding: 0 0.5rem;
+}
+
+/* Optional: first-line emphasis */
+.desc::first-line {
+  font-weight: 600;
+}
+
+/* Optional: smooth fade-in on scroll */
+.desc {
+  opacity: 0;
+  transform: translateY(12px);
+  animation: fadeUp 0.7s ease-out forwards;
+}
+
+/* === OVERVIEW / DESCRIPTION BOX === */
+.desc-box {
+  max-width: 900px;
+  margin: 3rem auto;
+  padding: 2rem 2.2rem;
+
+  background: #ffffff;
+  border-radius: 14px;
+  border: 1px solid #e5e5e5;
+  box-shadow: 0 4px 18px rgba(0,0,0,0.06);
+
+  text-align: left;
+  animation: fadeUp 0.6s ease-out forwards;
+  opacity: 0;
+  transform: translateY(12px);
+}
+
+.desc-title {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  font-size: 1.45rem;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  color: #2a2a2a;
+}
+
+.desc-box p {
+  font-size: 1.12rem;
+  line-height: 1.7;
+  color: #444;
+  margin: 0;
+}
+
+/* fade animation */
+@keyframes fadeUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
 
 
   /* === PAGE TITLE + OVERVIEW === */
@@ -246,3 +320,33 @@
     }
   }
 </style>
+
+
+<!-- text from old explore the data page -->
+  <!-- <p class="desc">
+    Our ultimate goal is to allow users to explore multiple datasets simultaneously across the 1680-1750 period.
+    The search and visualization tools we provide at this time allow access to data from playhouses in Amsterdam,
+    Copenhagen, and Paris from 1748 to 1778. We plan to expand both the chronological and geographical scope of
+    our data as we move forward.
+    As an example, at present you can compare the number of annual performances in each of these three venues from 1748 to
+    1778 in a bar graph:
+  </p>
+
+  <div class="image-gallery">
+    <div class="image-block">
+      <img src={base + '/images/Screenshot  3.png'} alt="London Theater">
+    </div>
+    <p>You can also compare this data via a twinned line graph and heat map:</p>
+    <div class="image-block">
+      <img src={base + '/images/Screenshot 2.png'} alt="London Theater">
+    </div>
+    <p>We also provide a way to visualize the proportionality of various theatrical genres in our datasets:</p>
+    <div class="image-block">
+      <img src={base + '/images/Screenshot 3.png'} alt="London Theater">
+    </div>
+  </div>
+
+  <section class="link">
+    To view interactive versions of these visualizations, click <a href="/data" target="_blank">here.</a>
+  </section>
+</div> -->

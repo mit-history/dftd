@@ -12,7 +12,7 @@
   // trying to make explore the data nav transparent like home page, come back later
   const transparentNav = derived(page, ($page) => {
     const path = $page.url.pathname;
-    return path === base + '/' || path === base + '/Data';
+    return path === base + '/' || path === base + '/data';
   });
 </script>
 
