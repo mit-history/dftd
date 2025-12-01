@@ -415,6 +415,7 @@ const vizLabelById = {
   // Author bubble variants
   "author_bubble": "Author Bubble",
   "author-bubble": "Author Bubble",
+  "authorBubble": "Author Bubble",
 
   "calendar": "Calendar"
 };
@@ -753,12 +754,24 @@ const f = rangeInput({
   value: [1748, 1778],
   enableTextInput: true
 });
-const f_val = bubble?view(f):[0,0];
+const f_val = bubble ? view(f) : [0,0];
 
 ```
 
 ```js
-display(bubble? authorBubble(combined_data, 'french', 0, french_threshold_val, f_val[0], f_val[1], percent_absolute_val): html`<div></div>`);
+display(
+   bubble
+     ? authorBubble(
+         combined_data,
+        "french",
+        0,
+       french_threshold_val,
+        f_val[0],
+         f_val[1],
+         percent_absolute_val
+       )
+     : html`<div></div>`
+ );
 ```
 
 ```js
