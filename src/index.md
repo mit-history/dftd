@@ -3,7 +3,6 @@ toc: false
 ---
 
 
-
 ```js
 const french = await FileAttachment("data/french-performances.json").json();
 const dutch = await FileAttachment("data/dutch-performances.csv").csv({typed: true});
@@ -49,7 +48,7 @@ const danish = danish_raw.map((perf) => {
 
 ```
 
-
+<!-- styling of notebook -->
 ```js
 html`<style>
   body * { outline: 1px solid red !important; }
@@ -111,8 +110,6 @@ body {
   min-width: 450px;
 }
 </style>`
-
-
 
 ```
 
@@ -261,7 +258,8 @@ function divergentPlot() {
     },
     y: {
       label: "Year",
-      reverse: true
+      reverse: true,
+      tickFormat: d => String(d)
     },
     color: {
       domain: [
@@ -639,7 +637,7 @@ function compareYearsChart(data) {
       // 👇 labels below instead of above
       Plot.axisFx({
         ticks: yearTicks,
-        tickFormat: d => d,
+        tickFormat: d => String(d),
         anchor: "bottom"
       })
     ]
@@ -1030,16 +1028,11 @@ origins.length > 0 && performanceDays ? document.getElementById("heatmap-contain
 
 
 ```
-
-
 </div>
 
 
 
-
-
 ```js
-
 // Heading for the calendar section – only when calendar viz is active
 display(
   calendar
@@ -1047,7 +1040,7 @@ display(
     : html`<div></div>`
 );
 
-import { injectCalendarStyles, buildEvents, renderCalendar, ORIGIN_COLOR } from "./calendar.js";
+import { injectCalendarStyles, buildEvents, renderCalendar, ORIGIN_COLOR } from "./components/calendar.js";
 
 // ==============================
 // 1) Load data again
@@ -1117,7 +1110,7 @@ const nola = nolaRows.map((r,i) => {
 }).filter(d => d.date);
 
 // ==============================
-// 4) Combine and cap:
+// 4) Combine and cap
 //    - Danish / French / Dutch ≤ 1799-12-31
 //    - New Orleans ≤ 1812-12-31
 // ==============================
@@ -1143,7 +1136,7 @@ try { for (const [k,c] of COLOR) ORIGIN_COLOR.set(k, c); } catch {}
 // Summary text – only when calendar viz is active
 if (calendar) {
   display(html`<div style="font:12px system-ui; margin:.25rem 0;">
-    Number of Performances per dataset (≤1799 Europe, ≤1812 New Orleans) —
+    Number of Performances displayed per dataset (≤1799 Europe, ≤1812 New Orleans) —
     Danish: <b>${Danish.filter(d => d.date <= CAP_NON_NOLA).length}</b> ·
     French: <b>${French.filter(d => d.date <= CAP_NON_NOLA).length}</b> ·
     Dutch: <b>${Dutch.filter(d => d.date <= CAP_NON_NOLA).length}</b> ·
@@ -1153,19 +1146,15 @@ if (calendar) {
 }
 
 // ==============================
-// 5) Controls and Mount Points
+// 5) Controls and mount points
+//    👉 uses global start_date / end_date / origins
 // ==============================
-const allDates = allRows.map(d => d.date);
-const minDate  = new Date(Math.min(...allDates));
-const maxDate  = new Date(Math.max(...allDates));
-const endDefault = new Date(Math.min(+maxDate, CAP));
 
-const startIn   = Inputs.date({ label: "Start", value: minDate });
-const endIn     = Inputs.date({ label: "End", value: endDefault });
-const modeIn    = Inputs.radio(["Month","Week","Day"], { label: "Calendar view", value: "Month" });
-const originIn  = Inputs.checkbox(["Danish","French","Dutch","New Orleans"], { label: "Datasets", value: ["Danish","French","Dutch","New Orleans"] });
-const overlayIn = Inputs.toggle({ label: "Overlay major events", value: true });
-const anchorIn  = Inputs.date({ label: "Date", value: minDate });
+// Calendar-specific controls only
+const modeIn       = Inputs.radio(["Month","Week","Day"], { label: "Calendar view", value: "Month" });
+const overlayIn    = Inputs.toggle({ label: "Overlay major events", value: true });
+const anchorIn     = Inputs.date({ label: "Date", value: start_date });
+const includeNola  = Inputs.toggle({ label: "Include New Orleans (NOLA)", value: true });
 
 const nav = html`<div style="display:flex; gap:.5rem; align-items:center; margin:.25rem 0;">
   <button id="prev">◀ Prev</button><button id="next">Next ▶</button>
@@ -1181,7 +1170,7 @@ if (calendar) {
     <div style="display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:.6rem;">
       <div>${anchorIn}</div><div>${nav}</div>
       <div>${modeIn}</div><div>${overlayIn}</div>
-      <div style="grid-column:1/-1">${originIn}</div>
+      <div style="grid-column:1/-1">${includeNola}</div>
       <div style="grid-column:1/-1">${venuesMount}</div>
       <div style="grid-column:1/-1">${legendMount}</div>
     </div>
@@ -1189,7 +1178,7 @@ if (calendar) {
 }
 
 // ==============================
-// 6) Imperative render with stable Venues + color legend
+// 6) Imperative render with global filters
 // ==============================
 injectCalendarStyles();
 
@@ -1212,8 +1201,17 @@ function buildVenuesInput(startDate, endDate, originsList) {
   return Inputs.checkbox(opts, { label: "Venues", value: opts });
 }
 
-// hold current venues input
-let venuesIn = buildVenuesInput(capDate(startIn.value), capDate(endIn.value), originIn.value);
+// Initial venues input, based on global filters
+const initialOriginsBase = origins.map(o =>
+  o === "danish" ? "Danish" :
+  o === "french" ? "French" :
+  o === "dutch"  ? "Dutch"  : o
+);
+const initialOriginsList = includeNola.value
+  ? [...initialOriginsBase, "New Orleans"]
+  : initialOriginsBase;
+
+let venuesIn = buildVenuesInput(capDate(start_date), capDate(end_date), initialOriginsList);
 venuesMount.replaceChildren(venuesIn);
 
 function venuesValue() {
@@ -1232,14 +1230,24 @@ function renderLegend(originsList) {
 function rerender() {
   if (!calendar) return; // don't do anything if calendar viz isn't active
 
-  const start = capDate(startIn.value);
-  const end   = capDate(endIn.value);
-  const anchor= capDate(anchorIn.value || start);
-  const mode  = modeIn.value;
-  const origins = originIn.value;
+  // Use global filters
+  const start = capDate(start_date);
+  const end   = capDate(end_date);
+
+  const baseOrigins = origins.map(o =>
+    o === "danish" ? "Danish" :
+    o === "french" ? "French" :
+    o === "dutch"  ? "Dutch"  : o
+  );
+  const originsList = includeNola.value
+    ? [...baseOrigins, "New Orleans"]
+    : baseOrigins;
+
+  const anchor = capDate(anchorIn.value || start);
+  const mode   = modeIn.value;
 
   // rebuild venues when the available list changes
-  const fresh = buildVenuesInput(start, end, origins);
+  const fresh = buildVenuesInput(start, end, originsList);
   const oldOpts = Array.from(venuesIn.options || []).map(x => x.textContent);
   const newOpts = Array.from(fresh.options || []).map(x => x.textContent);
   const changed = oldOpts.length !== newOpts.length || oldOpts.some((o,i)=>o!==newOpts[i]);
@@ -1247,8 +1255,9 @@ function rerender() {
     const prevSelection = venuesValue();
     venuesIn = fresh;
     // try to preserve previous selection where possible
-    const keep = newOpts.filter(v => prevSelection.includes(v));
-    venuesIn.value = keep.length ? keep : newOpts;
+    const newLabels = Array.from(venuesIn.options || []).map(x => x.textContent);
+    const keep = newLabels.filter(v => prevSelection.includes(v));
+    venuesIn.value = keep.length ? keep : newLabels;
     venuesIn.addEventListener("input", rerender);
     venuesMount.replaceChildren(venuesIn);
   }
@@ -1258,7 +1267,7 @@ function rerender() {
   // filter rows
   const filtered = allRows.filter(d =>
     d.date >= start && d.date <= end &&
-    origins.includes(d.origin) &&
+    originsList.includes(d.origin) &&
     (!selectedVenues.length || selectedVenues.includes(d.theater))
   );
 
@@ -1276,21 +1285,21 @@ function rerender() {
     { date: "1815-01-08", name: "Battle of New Orleans" }
   ] : [];
 
-  renderLegend(origins);
+  renderLegend(originsList);
 
   renderCalendar({ container: CAL_ID, mode, anchor, events, overlays });
 }
 
 // Wire controls only when calendar viz is active
 if (calendar) {
-  [startIn, endIn, modeIn, originIn, overlayIn, anchorIn].forEach(inp => {
+  [modeIn, overlayIn, anchorIn, includeNola].forEach(inp => {
     inp.addEventListener("input", rerender);
   });
   venuesIn.addEventListener("input", rerender);
 
   // Prev/Next
   nav.querySelector("#prev").onclick = () => {
-    const a = capDate(anchorIn.value || startIn.value);
+    const a = capDate(anchorIn.value || start_date);
     const mode = modeIn.value;
     if (mode === "Month") a.setUTCMonth(a.getUTCMonth() - 1);
     else if (mode === "Week") a.setUTCDate(a.getUTCDate() - 7);
@@ -1298,7 +1307,7 @@ if (calendar) {
     anchorIn.value = a; anchorIn.dispatchEvent(new Event("input"));
   };
   nav.querySelector("#next").onclick = () => {
-    const a = capDate(anchorIn.value || startIn.value);
+    const a = capDate(anchorIn.value || start_date);
     const mode = modeIn.value;
     if (mode === "Month") a.setUTCMonth(a.getUTCMonth() + 1);
     else if (mode === "Week") a.setUTCDate(a.getUTCDate() + 7);

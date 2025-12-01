@@ -3,7 +3,9 @@
 </svelte:head>
 
 <script>
-  const notebookUrl = "http://localhost:3000/?viz=bubble";
+  const baseNotebookUrl = "https://dftd.observablehq.cloud/dftd";
+const notebookUrl = `${baseNotebookUrl}?viz=author_bubble#select-country-and-time-period`;
+
 </script>
 
 

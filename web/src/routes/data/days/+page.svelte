@@ -3,8 +3,13 @@
 </svelte:head>
 
 <script>
-  const notebookUrl = "http://localhost:3000/?viz=days"; // matches vizLabelById["days"]
+  const baseNotebookUrl = "https://dftd.observablehq.cloud/dftd";
+
+  // We still use the ?viz=... query param so the notebook knows which viz to show,
+  // and keep the #select-country-and-time-period anchor at the end.
+  const notebookUrl = `${baseNotebookUrl}?viz=days#select-country-and-time-period`;
 </script>
+
 
 
 <main class="viz-page">

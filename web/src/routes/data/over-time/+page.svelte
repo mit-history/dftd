@@ -3,7 +3,9 @@
 </svelte:head>
 
 <script>
-  const notebookUrl = "http://localhost:3000/?viz=over-time";
+const baseNotebookUrl = "https://dftd.observablehq.cloud/dftd";
+const notebookUrl = `${baseNotebookUrl}?viz=over-time#select-country-and-time-period`;
+
 </script>
 
 
