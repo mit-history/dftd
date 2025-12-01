@@ -1158,7 +1158,7 @@ if (calendar) {
 // Calendar-specific controls only
 const modeIn       = Inputs.radio(["Month","Week","Day"], { label: "Calendar view", value: "Month" });
 const overlayIn    = Inputs.toggle({ label: "Overlay major events", value: true });
-const anchorIn     = Inputs.date({ label: "Date", value: start_date });
+const anchorIn     = Inputs.date({ label: "Date displayed", value: start_date });
 const includeNola  = Inputs.toggle({ label: "Include New Orleans (NOLA)", value: true });
 
 const nav = html`<div style="display:flex; gap:.5rem; align-items:center; margin:.25rem 0;">

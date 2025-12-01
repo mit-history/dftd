@@ -3,7 +3,8 @@
 </svelte:head>
 
 <script>
-  const notebookUrl = "http://localhost:3000/?viz=over-time";
+  const baseNotebookUrl = "https://transnationalstages.net/data";
+  const notebookUrl = `${baseNotebookUrl}?viz=over-time`;
 </script>
 
 
