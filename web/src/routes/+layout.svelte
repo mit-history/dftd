@@ -95,7 +95,7 @@
   width: 100%;
   z-index: 1000;
   padding: 0.75rem 1.5rem;
-  background-color: rgb(95, 115, 89);
+  background-color: rgb(124, 149, 116);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
   transition: background-color 0.3s ease, box-shadow 0.3s ease;
   overflow-x: visible;
@@ -183,7 +183,7 @@ ul:not(.visible){
   left: -1.5rem;
   right: -1.5rem;
   flex-direction: column;
-  background-color: rgb(95, 115, 89);;
+  background-color: rgb(124, 149, 116);;
   width: calc(25% + 3rem);
   margin: 0;
   padding: 0;
@@ -263,7 +263,7 @@ ul:not(.visible) li:last-child a{
     left: -1.5rem;
     right: -1.5rem;
     flex-direction: column;
-    background-color: rgb(95, 115, 89);;
+    background-color: rgb(124, 149, 116);;
     width: calc(100% + 3rem);
     margin: 0;
     padding: 0;
