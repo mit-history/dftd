@@ -111,16 +111,16 @@ export function genreBubble(formatted_data, author){
   }, {})).map(c => ({genre: c[0], count: c[1]}));
 }
 
-export function authorBubble(data, origin, season = 0, threshold = 0, season_start, season_end, mode){
+export function authorBubble(data, origin, season = 0, threshold = [0,0], season_start, season_end, mode){
 
   const percent = mode == "percentage";
-  // console.log(data)
+  console.log(data)
   let authors = Object.entries(data.filter(d => (d.origin == origin) && (Number(d.year) <= season_end) && (Number(d.year) >= season_start)).reduce((acc, d) => {
       acc[d.author] = (acc[d.author] || 0) + 1;
       return acc;
   }, {})).map(c => {return {author: c[0], count: c[1]}});
   const performance_count = percent?authors.reduce((count, author) => {return count + author.count}, 0):1;
-  authors = percent?authors.filter(c => (100*c.count/performance_count >= threshold)):authors.filter(c => c.count >= threshold);
+  authors = percent?authors.filter(c => (100*c.count/performance_count >= threshold[0] && 100*c.count/performance_count <= threshold[1])):authors.filter(c => c.count >= threshold[0] && c.count <= threshold[1]);
 
 
   const percentage_sign = percent?"%":"";

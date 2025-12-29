@@ -738,15 +738,31 @@ const do_overall_threshold_val = bubble?view(do_overall_threshold):false;
 ```
 ```js
 display(bubble? html `<div></h2>` : html`<div></div>`);
-const overall_threshold = Inputs.number({value:1, label: 'Enter Threshold'});
-const overall_threshold_val = do_overall_threshold_val?view(overall_threshold):0;
+// const overall_threshold = Inputs.number({value:1, label: 'Enter Threshold'});
+// const overall_threshold_val = do_overall_threshold_val?view(overall_threshold):0;
+const overall_threshold = rangeInput({
+  min: 0,
+  max: percent_absolute_val=="percentage"?100:10000,
+  step: 1,
+  value: [0, 100],
+  enableTextInput: true
+});
+const overall_threshold_val = do_overall_threshold_val?view(overall_threshold):[0,0];
 ```
 
 
 ```js
 display(bubble? html `<h2>French</h2>` : html`<div></div>`);
-const french_threshold = Inputs.number({value:1, label: 'Enter Threshold'});
-const french_threshold_val = bubble? (do_overall_threshold_val?overall_threshold_val:view(french_threshold)):0;
+display(bubble&&!do_overall_threshold_val? html`<p>Threshold Range</p>`:html`<div></div>`);
+const french_threshold = rangeInput({
+  min: 0,
+  max: percent_absolute_val=="percentage"?100:10000,
+  step: 1,
+  value: [0, 100],
+  enableTextInput: true
+});
+const french_threshold_val = bubble? (do_overall_threshold_val?overall_threshold_val:view(french_threshold)):[0,0];
+display(bubble? html`<p>Year Range</p>`:html`<div></div>`);
 const f = rangeInput({
   min: 1748,
   max: 1798,
@@ -777,8 +793,16 @@ display(
 ```js
 
 display(bubble? html `<h2>Dutch</h2>` : html`<div></div>`);
-const dutch_threshold = Inputs.number({value:1, label: 'Enter Threshold'});
-const dutch_threshold_val = bubble? (do_overall_threshold_val?overall_threshold_val:view(dutch_threshold)):0;
+display(bubble&&!do_overall_threshold_val? html`<p>Threshold Range</p>`:html`<div></div>`);
+const dutch_threshold = rangeInput({
+  min: 0,
+  max: percent_absolute_val=="percentage"?100:10000,
+  step: 1,
+  value: [0, 100],
+  enableTextInput: true
+});
+const dutch_threshold_val = bubble? (do_overall_threshold_val?overall_threshold_val:view(dutch_threshold)):[0,0];
+display(bubble? html`<p>Year Range</p>`:html`<div></div>`);
 const du = rangeInput({
   min: 1748,
   max: 1798,
@@ -796,8 +820,16 @@ display(bubble? authorBubble(combined_data, 'dutch', 0, dutch_threshold_val, du_
 
 ```js
 display(bubble? html `<h2>Danish</h2>` : html`<div></div>`)
-const danish_threshold = Inputs.number({value:1, label: 'Enter Threshold'});
-const danish_threshold_val = bubble? (do_overall_threshold_val?overall_threshold_val:view(danish_threshold)):0;
+display(bubble&&!do_overall_threshold_val? html`<p>Threshold Range</p>`:html`<div></div>`);
+const danish_threshold = rangeInput({
+  min: 0,
+  max: percent_absolute_val=="percentage"?100:10000,
+  step: 1,
+  value: [0, 100],
+  enableTextInput: true
+});
+const danish_threshold_val = bubble? (do_overall_threshold_val?overall_threshold_val:view(danish_threshold)):[0,0];
+display(bubble? html`<p>Year Range</p>`:html`<div></div>`);
 const da = rangeInput({
   min: 1748,
   max: 1798,
