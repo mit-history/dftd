@@ -742,7 +742,7 @@ display(bubble? html `<div></h2>` : html`<div></div>`);
 // const overall_threshold_val = do_overall_threshold_val?view(overall_threshold):0;
 const overall_threshold = rangeInput({
   min: 0,
-  max: percent_absolute_val=="percentage"?100:10000,
+  max: percent_absolute_val=="percentage"?100:1000,
   step: 1,
   value: [0, 100],
   enableTextInput: true
@@ -756,7 +756,7 @@ display(bubble? html `<h2>French</h2>` : html`<div></div>`);
 display(bubble&&!do_overall_threshold_val? html`<p>Threshold Range</p>`:html`<div></div>`);
 const french_threshold = rangeInput({
   min: 0,
-  max: percent_absolute_val=="percentage"?100:10000,
+  max: percent_absolute_val=="percentage"?100:1000,
   step: 1,
   value: [0, 100],
   enableTextInput: true
@@ -796,7 +796,7 @@ display(bubble? html `<h2>Dutch</h2>` : html`<div></div>`);
 display(bubble&&!do_overall_threshold_val? html`<p>Threshold Range</p>`:html`<div></div>`);
 const dutch_threshold = rangeInput({
   min: 0,
-  max: percent_absolute_val=="percentage"?100:10000,
+  max: percent_absolute_val=="percentage"?100:1000,
   step: 1,
   value: [0, 100],
   enableTextInput: true
@@ -823,7 +823,7 @@ display(bubble? html `<h2>Danish</h2>` : html`<div></div>`)
 display(bubble&&!do_overall_threshold_val? html`<p>Threshold Range</p>`:html`<div></div>`);
 const danish_threshold = rangeInput({
   min: 0,
-  max: percent_absolute_val=="percentage"?100:10000,
+  max: percent_absolute_val=="percentage"?100:1000,
   step: 1,
   value: [0, 100],
   enableTextInput: true
