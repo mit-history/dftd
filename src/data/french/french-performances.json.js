@@ -35,7 +35,7 @@ export async function load() {
       return true;
     });
 
-    // console.log("✅ Formatted Plays (First 5 Records):", formattedPlays.slice(0, 5));
+    // console.log(" Formatted Plays (First 5 Records):", formattedPlays.slice(0, 5));
     return filteredPlays;
   } catch (error) {
     console.error("❌ Error loading plays:", error);

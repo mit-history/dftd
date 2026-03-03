@@ -1,4 +1,5 @@
 import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm"
+import { splitAuthorString } from "./data-normalizers.js";
 
 export function BubbleChart(data, {
   name = ([x]) => x, // alias for label
@@ -112,36 +113,67 @@ export function genreBubble(formatted_data, author){
 }
 
 export function authorBubble(data, origin, season = 0, threshold = 0, season_start, season_end, mode){
+  const percent = mode === "percentage";
 
-  const percent = mode == "percentage";
-  // console.log(data)
-  let authors = Object.entries(data.filter(d => (d.origin == origin) && (Number(d.year) <= season_end) && (Number(d.year) >= season_start)).reduce((acc, d) => {
-      acc[d.author] = (acc[d.author] || 0) + 1;
-      return acc;
-  }, {})).map(c => {return {author: c[0], count: c[1]}});
-  const performance_count = percent?authors.reduce((count, author) => {return count + author.count}, 0):1;
-  authors = percent?authors.filter(c => (100*c.count/performance_count >= threshold)):authors.filter(c => c.count >= threshold);
+  // Build counts. IMPORTANT:
+  // - Split multi-author strings ("A ; B") so each author gets credit.
+  // - Treat missing/empty authors as "Unknown" (instead of the literal key "null").
+  const counts = new Map();
 
+  for (const d of data) {
+    if (d.origin !== origin) continue;
 
-  const percentage_sign = percent?"%":"";
-  const percentage_multiplier = percent?100:1;
-  //make actual chart
+    const y = Number(d.year);
+    if (Number.isFinite(season_start) && y < season_start) continue;
+    if (Number.isFinite(season_end) && y > season_end) continue;
+
+    const names = splitAuthorString(d.author);
+    const effective = names.length ? names : ["Unknown"];
+
+    for (const name of effective) {
+      counts.set(name, (counts.get(name) || 0) + 1);
+    }
+  }
+
+  let authors = Array.from(counts, ([author, count]) => ({ author, count }));
+
+  const totalCount = authors.reduce((sum, a) => sum + a.count, 0);
+  const denom = percent ? (totalCount || 1) : 1;
+
+  // Apply threshold either in absolute count or percentage of total
+  if (percent) {
+    authors = authors.filter(a => (100 * a.count / denom) >= threshold);
+  } else {
+    authors = authors.filter(a => a.count >= threshold);
+  }
+
+  // Edge case: if threshold filters everything, show a small placeholder rather than blank.
+  if (!authors.length) {
+    authors = [{ author: "No authors in range", count: 1 }];
+  }
+
+  const percentage_sign = percent ? "%" : "";
+  const percentage_multiplier = percent ? 100 : 1;
+
+  console.log("origin:", origin, "sample authors:", authors.slice(0, 20));
   return BubbleChart(authors, {
-    //attempt to filter out first names for readability
+    // Attempt to shorten for readability
     label: d => {
-      const author = d.author||'unknown'
-      if(author.indexOf(' ') === -1)
-        return author;
-      if (author.indexOf('(') !== -1)
-        return author.substring(0, author.indexOf('('));
-      if (author.indexOf(',') !== -1)
-        return author.substring(0, author.indexOf(','));
-      return author.substring(author.lastIndexOf(' ')+1);
+      const a = d.author || "Unknown";
+      if (a === "Unknown" || a === "No authors in range") return a;
+      if (a.indexOf(" ") === -1) return a;
+      if (a.indexOf("(") !== -1) return a.substring(0, a.indexOf("(")).trim();
+      if (a.indexOf(",") !== -1) return a.substring(0, a.indexOf(",")).trim();
+      return a.substring(a.lastIndexOf(" ") + 1).trim();
     },
-    value: d => (d.count/performance_count)*percentage_multiplier,
-    title: d => `${d.author||'unknown'} - ${parseFloat(((d.count/performance_count)*percentage_multiplier).toPrecision(3))}${percentage_sign}`,
-    group: d => d.author[0],
+    value: d => (d.count / denom) * percentage_multiplier,
+    title: d => {
+      const val = (d.count / denom) * percentage_multiplier;
+      return `${d.author || "Unknown"} - ${parseFloat(val.toPrecision(3))}${percentage_sign}`;
+    },
+    // Null-safe, stable grouping for color
+    group: d => String(d.author || "Unknown").slice(0, 1).toUpperCase(),
     width: 700,
     fontSize: 10
-  })
+  });
 }
