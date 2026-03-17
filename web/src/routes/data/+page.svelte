@@ -98,9 +98,10 @@
 
 
 
-  :global(body) {
-  background: #f5f5f4; /* warm light gray (Stone-100 from Tailwind palette) */
-}
+  main.explore {
+    background: #f5f5f4; /* warm light gray (Stone-100 from Tailwind palette) */
+    min-height: 100vh;
+  }
 
   /* === HERO FULL-BLEED === */
   .hero {

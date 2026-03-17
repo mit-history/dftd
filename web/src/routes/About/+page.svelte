@@ -66,19 +66,6 @@
 }
 
 
-  :global(body) {
-    font-family: 'Inter', sans-serif;
-    color: #000000;
-    /* background-color: #f2f3f5; */
-    margin: 0;
-    /* padding: 0; */
-    /* max-width: 70%; */
-    /* margin: 3rem auto; */
-    /* padding: 0 1rem; */
-    line-height: 1.8;
-
-  }
-
 
   h1 {
     font-family: 'Inter', sans-serif;

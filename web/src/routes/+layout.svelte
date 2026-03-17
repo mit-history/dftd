@@ -80,7 +80,7 @@
   overflow-x: hidden;
   font-family: 'Inter', sans-serif;
   box-sizing: border-box;
-  background-color: rgb(246, 243, 222);
+  background-color: #F6F3DE;
 }
 
 *, *::before, *::after {
@@ -244,6 +244,7 @@ ul:not(.visible) li:last-child a{
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  background-color: #F6F3DE;
 }
 
 .page-content {
