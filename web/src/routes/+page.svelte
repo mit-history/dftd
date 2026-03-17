@@ -3,30 +3,25 @@
   import mapSvg from './assets/interstage_world_map.svg';
 </script>
 
-<svelte:head>
-  <title>Transnational Stages</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet" />
-</svelte:head>
+<div class="page-wrapper">
+  <section class="hero-container">
+    <div class="image-wrapper">
+      <img class="map-image" src={mapSvg} alt="Map of the Atlantic World" />
+    </div>
 
-
-<section class="intro-hero">
-  <img class="intro-video" src={mapSvg} alt="Map of Atlantic">
-  <div class="overlay"></div>
-
-  <div class="hero-text">
-    <h1>Transnational Stages</h1>
-    <h3 class="subtitle">Theatrical Circulation and Exchange in the Atlantic World, 1680–1850</h3>
-    <p class="intro">
-      From the seventeenth to the twentieth centuries in the Atlantic World plays and performers often crossed
-      land boundaries and oceans, creating new meanings and audience expectations as they did so.
-      <strong>Transnational Stages</strong> offers users the opportunity to study national datasets via
-      comparative visualization tools, thereby creating new insights into international theatrical trends
-      in the Early Modern and Modern periods.
-  </p>
-  </div>
-
-</section>
-
+    <div class="hero-text">
+      <h1>Transnational Stages</h1>
+      <h3 class="subtitle">Theatrical Circulation and Exchange in the Atlantic World, 1680–1850</h3>
+      <p class="intro">
+        From the seventeenth to the twentieth centuries in the Atlantic World plays and performers often crossed
+        land boundaries and oceans, creating new meanings and audience expectations as they did so.
+        <strong>Transnational Stages</strong> offers users the opportunity to study national datasets via
+        comparative visualization tools, thereby creating new insights into international theatrical trends
+        in the Early Modern and Modern periods.
+      </p>
+    </div>
+  </section>
+</div>
 
 <style>
   :global(body) {
@@ -36,97 +31,84 @@
     color: #000;
   }
 
-  .subtitle {
-    font-style: italic;
-  }
-
-  .intro-hero {
-    position: relative;
-    height: 100vh;
-    width: 100%;
-    overflow: hidden;
+  .page-wrapper {
+    background-color: #F6F3DE;
+    min-height: 100vh;
     display: flex;
-    align-items: center;
-    gap: 2rem;
-    padding: 2rem;
-  }
-
-  .intro-video {
-    flex: 1;
-    max-width: 50%;
-    /* aspect-ratio: 1/1; */
+    justify-content: center;
+    padding: 80px 50px 20px;
     width: 100%;
-    object-position: right center;
-    height: auto;
-    object-fit: cover;
-    display: block;
-    box-shadow: 0px 40px 60px -20px rgba(0, 0, 0, 0.4);
+    box-sizing: border-box;
   }
 
+  .hero-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 900px;
+    width: 100%;
+    gap: 1rem;
+  }
+
+  .image-wrapper {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+
+  .map-image {
+    width: 100%;
+    max-width: 700px;
+    height: auto;
+    display: block;
+    border-radius: 4px;
+    box-shadow: 0px 20px 50px -20px rgba(0, 0, 0, 0.3);
+    transform: translateY(-20px);
+  }
 
   .hero-text {
-    flex: 1;
-    text-align: left;
-    z-index: 2;
-    max-width: 40%;
-    padding: 0 1rem;
+    text-align: center;
   }
 
   .hero-text h1 {
-    font-family: 'Inter', sans-serif;
-    font-size: 3rem;
+    text-align: center;
+    font-size: clamp(2rem, 4vw, 3.2rem);
     font-weight: 700;
-    margin-bottom: 1rem;
+    margin: 0 0 0.35rem 0;
+    letter-spacing: 0em;
+    transform: translateY(-30px);
   }
 
-  .caption {
-    font-size: 0.9rem;
-    color: #555;
-    margin: 1.5rem;
-
-  }
-
-  .caption a {
-    text-decoration: none;
-    color: rgb(3, 29, 160);
-  }
-
-  .caption a:hover {
-    color: rgb(159, 17, 17);
+  .subtitle {
+    font-style: italic;
+    font-weight: 500;
+    font-size: 1.25rem;
+    margin-top: 0.25rem;
+    margin-bottom: 1.5rem;
+    color: #333;
+    transform: translateY(-30px);
   }
 
   .intro {
-    font-size: 1.05rem;
-    line-height: 1.7;
-    margin-bottom: 2rem;
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: #222;
+    margin: 0 auto;
+    transform: translateY(-40px);
   }
 
-  a {
-    color: #684c39;
-  }
-
-  a:hover {
-    text-decoration: underline;
-  }
-
-  @media (max-width: 786px){
-    .intro-hero{
-      flex-direction: column;
-      height: auto;
-      min-height: 100vh;
-      /* padding: 1rem; */
-      padding: 7rem 0rem;
+  /* Responsive Adjustments */
+  @media (max-width: 768px) {
+    .page-wrapper {
+      padding: 40px 15px;
+    }
+    
+    .hero-container {
+      gap: 2rem;
     }
 
-    .intro-video{
-      max-width: 80%;
-      width: 100%;
-    }
-
-    .hero-text{
-      max-width: 80%;
-      text-align: center;
-      padding: 1rem 0;
+    .hero-text h1 {
+      font-size: 2.2rem;
     }
   }
 </style>
