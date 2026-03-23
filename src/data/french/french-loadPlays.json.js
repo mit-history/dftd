@@ -1,11 +1,11 @@
 import fs from 'fs/promises';
 import path from 'path';
 
-const filePath = path.join(process.cwd(), 'src/data/french-plays.json');
+const filePath = path.join(process.cwd(), 'src/data/french/french-plays.json');
 
 export async function load() {
   try {
-    // console.log("🟢 Running loadPlays.js...");
+    // console.log(" Running loadPlays.js...");
 
     // Read the JSON file
     const data = await fs.readFile('src/data/french-plays.json', 'utf-8');
@@ -21,7 +21,7 @@ export async function load() {
       genre: play.genre
     }));
 
-    // console.log("✅ Formatted Plays (First 5 Records):", formattedPlays.slice(0, 5));
+    // console.log(" Formatted Plays (First 5 Records):", formattedPlays.slice(0, 5));
     return formattedPlays;
   } catch (error) {
     console.error("❌ Error loading plays:", error);

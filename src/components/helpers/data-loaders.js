@@ -1,4 +1,3 @@
-// src/components/data-loaders.js
 // Robust FileAttachment loaders (Observable Framework).
 
 export async function tryJson(FileAttachment, ...paths) {

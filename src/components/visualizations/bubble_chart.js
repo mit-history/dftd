@@ -1,5 +1,6 @@
-import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm"
-import { splitAuthorString } from "./data-normalizers.js";
+import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
+import { splitAuthorString } from "../helpers/data-normalizers.js";
+
 
 export function BubbleChart(data, {
   name = ([x]) => x, // alias for label
@@ -15,7 +16,7 @@ export function BubbleChart(data, {
   margin = 1, // default margins
   marginTop = margin, // top margin, in pixels
   marginRight = margin, // right margin, in pixels
-  marginBottom = margin, // bottom margin, in pixels
+  marginBottom = margin, // bottom margin, in pixels 
   marginLeft = margin, // left margin, in pixels
   groups, // array of group names (the domain of the color scale)
   colors = d3.schemeTableau10, // an array of colors (for groups)

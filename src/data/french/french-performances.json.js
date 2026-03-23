@@ -1,11 +1,13 @@
+// file to fetch and filter data from the api, outputs json
+
 import fs from "fs/promises";
 import path from "path";
 
-const filePath = path.join(process.cwd(), "src/data/french-plays.json");
+const filePath = path.join(process.cwd(), "src/data/french/french-plays.json");
 
 export async function load() {
   try {
-    // console.log("🟢 Running loadPlays.js...");
+    // console.log("Running loadPlays.js...");
 
     // Fetch data
     const response = await fetch(
@@ -35,7 +37,7 @@ export async function load() {
       return true;
     });
 
-    // console.log(" Formatted Plays (First 5 Records):", formattedPlays.slice(0, 5));
+    // console.log("Formatted Plays (First 5 Records):", formattedPlays.slice(0, 5));
     return filteredPlays;
   } catch (error) {
     console.error("❌ Error loading plays:", error);

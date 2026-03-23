@@ -1,4 +1,3 @@
-// data/danish/build-joined-light.js
 import fs from "node:fs";
 import path from "node:path";
 
@@ -88,7 +87,7 @@ const joined = performances.map((p) => {
 const outPath = path.join(DIR, "danish-performances-joined-light.json");
 fs.writeFileSync(outPath, JSON.stringify(joined));
 console.log(
-  `✅ Wrote ${path.relative(ROOT, outPath)} with ${joined.length} rows`
+  ` Wrote ${path.relative(ROOT, outPath)} with ${joined.length} rows`
 );
 
 // Optional quick sanity stats

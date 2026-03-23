@@ -1,4 +1,3 @@
-// src/components/performance-days.js
 // The imperative chart mounting logic for the "Days with Performances" visualization.
 
 export function renderPerformanceDays({

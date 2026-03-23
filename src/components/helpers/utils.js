@@ -1,4 +1,3 @@
-// src/components/utils.js
 // Small shared helpers for index.md and other pages.
 
 export function asDate(x) {

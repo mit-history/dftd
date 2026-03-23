@@ -1,6 +1,5 @@
-// src/components/viz-charts.js
-import * as Plot from "@observablehq/plot";
-import * as d3 from "d3";
+import * as Plot from "npm:@observablehq/plot";
+import * as d3 from "npm:d3";
 
 /**
  * Bar chart: performances per year, faceted by year, grouped by origin.

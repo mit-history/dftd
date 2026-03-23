@@ -1,4 +1,3 @@
-// src/components/viz-router.js
 // Encapsulate the viz checkbox + query param override logic.
 
 export function createVizToggle({ Inputs, view }, opts) {

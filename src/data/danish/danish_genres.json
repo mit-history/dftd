@@ -1,0 +1,1394 @@
+[
+  {
+    "id": 46,
+    "name": " comédie parade ",
+    "createdAt": "2025-03-20T11:09:16.842Z",
+    "updatedAt": "2025-03-20T11:09:16.842Z",
+    "works": {
+      "count": 1
+    },
+    "createdBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    },
+    "updatedBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    }
+  },
+  {
+    "id": 47,
+    "name": " Drame lyrique",
+    "createdAt": "2025-03-21T09:49:41.271Z",
+    "updatedAt": "2025-03-21T09:49:41.271Z",
+    "works": {
+      "count": 2
+    },
+    "createdBy": {
+      "id": 26,
+      "firstname": "Caroline",
+      "lastname": "Ermesjø",
+      "username": null
+    },
+    "updatedBy": {
+      "id": 26,
+      "firstname": "Caroline",
+      "lastname": "Ermesjø",
+      "username": null
+    }
+  },
+  {
+    "id": 31,
+    "name": "afterpiece",
+    "createdAt": "2024-12-12T08:26:26.583Z",
+    "updatedAt": "2024-12-12T08:26:26.583Z",
+    "works": {
+      "count": 5
+    },
+    "createdBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    },
+    "updatedBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    }
+  },
+  {
+    "id": 17,
+    "name": "Allegory",
+    "createdAt": "2024-09-08T13:39:31.237Z",
+    "updatedAt": "2024-09-08T13:45:52.943Z",
+    "works": {
+      "count": 1
+    },
+    "createdBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    },
+    "updatedBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    }
+  },
+  {
+    "id": 36,
+    "name": "azione drammatica",
+    "createdAt": "2025-01-06T13:51:36.827Z",
+    "updatedAt": "2025-01-06T13:51:40.483Z",
+    "works": {
+      "count": 1
+    },
+    "createdBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    },
+    "updatedBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    }
+  },
+  {
+    "id": 40,
+    "name": "azione teatrale",
+    "createdAt": "2025-01-08T13:27:49.257Z",
+    "updatedAt": "2025-01-08T13:27:49.257Z",
+    "works": {
+      "count": 1
+    },
+    "createdBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    },
+    "updatedBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    }
+  },
+  {
+    "id": 6,
+    "name": "Ballet",
+    "createdAt": "2024-09-07T14:16:14.029Z",
+    "updatedAt": "2024-09-07T14:16:14.029Z",
+    "works": {
+      "count": 229
+    },
+    "createdBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    },
+    "updatedBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    }
+  },
+  {
+    "id": 50,
+    "name": "bourgeois comedy",
+    "createdAt": "2025-05-04T12:41:00.209Z",
+    "updatedAt": "2025-05-05T08:05:41.074Z",
+    "works": {
+      "count": 1
+    },
+    "createdBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    },
+    "updatedBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    }
+  },
+  {
+    "id": 32,
+    "name": "Bourgeois tragedy",
+    "createdAt": "2024-12-17T11:27:17.287Z",
+    "updatedAt": "2024-12-17T11:27:17.287Z",
+    "works": {
+      "count": 2
+    },
+    "createdBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    },
+    "updatedBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    }
+  },
+  {
+    "id": 10,
+    "name": "Burlesque",
+    "createdAt": "2024-09-07T15:47:36.744Z",
+    "updatedAt": "2024-09-07T15:47:36.744Z",
+    "works": {
+      "count": 1
+    },
+    "createdBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    },
+    "updatedBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    }
+  },
+  {
+    "id": 59,
+    "name": "Comedia",
+    "createdAt": "2025-12-18T07:17:53.174Z",
+    "updatedAt": "2025-12-18T07:17:53.174Z",
+    "works": {
+      "count": 1
+    },
+    "createdBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    },
+    "updatedBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    }
+  },
+  {
+    "id": 41,
+    "name": "Comedia per musica",
+    "createdAt": "2025-02-11T06:30:56.764Z",
+    "updatedAt": "2025-02-11T06:31:02.283Z",
+    "works": {
+      "count": 2
+    },
+    "createdBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    },
+    "updatedBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    }
+  },
+  {
+    "id": 67,
+    "name": "Comédie épisodique",
+    "createdAt": "2026-03-07T10:43:28.948Z",
+    "updatedAt": "2026-03-07T10:43:28.948Z",
+    "works": {
+      "count": 1
+    },
+    "createdBy": {
+      "id": 45,
+      "firstname": "Rebekka",
+      "lastname": "Sand",
+      "username": null
+    },
+    "updatedBy": {
+      "id": 45,
+      "firstname": "Rebekka",
+      "lastname": "Sand",
+      "username": null
+    }
+  },
+  {
+    "id": 33,
+    "name": "Comédie mêlée d'ariettes",
+    "createdAt": "2024-12-18T14:24:30.291Z",
+    "updatedAt": "2024-12-18T14:24:30.291Z",
+    "works": {
+      "count": 41
+    },
+    "createdBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    },
+    "updatedBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    }
+  },
+  {
+    "id": 63,
+    "name": "Comédie mêlée de chants",
+    "createdAt": "2026-01-12T12:56:43.552Z",
+    "updatedAt": "2026-01-14T09:26:58.809Z",
+    "works": {
+      "count": 6
+    },
+    "createdBy": {
+      "id": 43,
+      "firstname": "Kirstine",
+      "lastname": "Val Hoppe",
+      "username": null
+    },
+    "updatedBy": {
+      "id": 43,
+      "firstname": "Kirstine",
+      "lastname": "Val Hoppe",
+      "username": null
+    }
+  },
+  {
+    "id": 65,
+    "name": "Comédie mêlée de Musique",
+    "createdAt": "2026-02-24T11:55:04.327Z",
+    "updatedAt": "2026-02-25T10:40:11.354Z",
+    "works": {
+      "count": 1
+    },
+    "createdBy": {
+      "id": 45,
+      "firstname": "Rebekka",
+      "lastname": "Sand",
+      "username": null
+    },
+    "updatedBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    }
+  },
+  {
+    "id": 66,
+    "name": "Comédie mêlée de vaudevilles",
+    "createdAt": "2026-01-12T12:56:43.552Z",
+    "updatedAt": "2026-01-14T09:26:58.809Z",
+    "works": {
+      "count": 3
+    },
+    "createdBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    },
+    "updatedBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    }
+  },
+  {
+    "id": 4,
+    "name": "Comédie-ballet",
+    "createdAt": "2024-09-05T23:10:08.544Z",
+    "updatedAt": "2024-09-05T23:10:08.544Z",
+    "works": {
+      "count": 8
+    },
+    "createdBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    },
+    "updatedBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    }
+  },
+  {
+    "id": 51,
+    "name": "Comédie-Lyrique",
+    "createdAt": "2025-05-10T13:14:04.569Z",
+    "updatedAt": "2025-05-10T13:14:04.569Z",
+    "works": {
+      "count": 3
+    },
+    "createdBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    },
+    "updatedBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    }
+  },
+  {
+    "id": 2,
+    "name": "Comedy",
+    "createdAt": "2023-01-27T11:01:32.877Z",
+    "updatedAt": "2023-01-27T11:01:32.877Z",
+    "works": {
+      "count": 339
+    },
+    "createdBy": null,
+    "updatedBy": null
+  },
+  {
+    "id": 12,
+    "name": "Comedy of manners",
+    "createdAt": "2024-09-07T22:28:15.562Z",
+    "updatedAt": "2024-09-08T13:46:07.177Z",
+    "works": {
+      "count": 1
+    },
+    "createdBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    },
+    "updatedBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    }
+  },
+  {
+    "id": 55,
+    "name": "Comic ballet",
+    "createdAt": "2025-09-14T16:01:11.756Z",
+    "updatedAt": "2025-09-14T16:01:11.756Z",
+    "works": {
+      "count": 2
+    },
+    "createdBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    },
+    "updatedBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    }
+  },
+  {
+    "id": 53,
+    "name": "Comic opera",
+    "createdAt": "2025-06-04T16:25:35.898Z",
+    "updatedAt": "2025-06-04T16:25:35.898Z",
+    "works": {
+      "count": 3
+    },
+    "createdBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    },
+    "updatedBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    }
+  },
+  {
+    "id": 7,
+    "name": "Divertissement",
+    "createdAt": "2024-09-07T14:23:16.166Z",
+    "updatedAt": "2024-09-07T14:23:16.166Z",
+    "works": {
+      "count": 17
+    },
+    "createdBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    },
+    "updatedBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    }
+  },
+  {
+    "id": 58,
+    "name": "Drama/Drame",
+    "createdAt": "2025-12-18T07:16:21.824Z",
+    "updatedAt": "2025-12-18T07:36:03.479Z",
+    "works": {
+      "count": 12
+    },
+    "createdBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    },
+    "updatedBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    }
+  },
+  {
+    "id": 57,
+    "name": "Dramatic romance",
+    "createdAt": "2025-12-10T21:35:36.617Z",
+    "updatedAt": "2025-12-10T21:35:36.617Z",
+    "works": {
+      "count": 0
+    },
+    "createdBy": {
+      "id": 46,
+      "firstname": "Mai",
+      "lastname": "Riis Kristensen",
+      "username": null
+    },
+    "updatedBy": {
+      "id": 46,
+      "firstname": "Mai",
+      "lastname": "Riis Kristensen",
+      "username": null
+    }
+  },
+  {
+    "id": 60,
+    "name": "Drame bourgeois",
+    "createdAt": "2025-12-18T07:38:46.199Z",
+    "updatedAt": "2025-12-18T07:38:46.199Z",
+    "works": {
+      "count": 1
+    },
+    "createdBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    },
+    "updatedBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    }
+  },
+  {
+    "id": 34,
+    "name": "Dramma giocoso per musica",
+    "createdAt": "2025-01-06T11:57:11.320Z",
+    "updatedAt": "2025-01-06T11:57:11.320Z",
+    "works": {
+      "count": 29
+    },
+    "createdBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    },
+    "updatedBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    }
+  },
+  {
+    "id": 37,
+    "name": "Dramma pastorale",
+    "createdAt": "2025-01-07T11:45:55.579Z",
+    "updatedAt": "2025-01-07T11:46:10.860Z",
+    "works": {
+      "count": 3
+    },
+    "createdBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    },
+    "updatedBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    }
+  },
+  {
+    "id": 23,
+    "name": "Dramma per musica",
+    "createdAt": "2024-10-07T19:05:39.948Z",
+    "updatedAt": "2024-10-07T19:05:39.948Z",
+    "works": {
+      "count": 28
+    },
+    "createdBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    },
+    "updatedBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    }
+  },
+  {
+    "id": 28,
+    "name": "Duodrama",
+    "createdAt": "2024-11-22T10:50:56.199Z",
+    "updatedAt": "2024-11-22T10:51:19.449Z",
+    "works": {
+      "count": 1
+    },
+    "createdBy": {
+      "id": 25,
+      "firstname": "Nete",
+      "lastname": "Rasmussen",
+      "username": null
+    },
+    "updatedBy": {
+      "id": 25,
+      "firstname": "Nete",
+      "lastname": "Rasmussen",
+      "username": null
+    }
+  },
+  {
+    "id": 69,
+    "name": "Epilogue",
+    "createdAt": "2026-03-17T08:34:39.183Z",
+    "updatedAt": "2026-03-17T08:34:39.183Z",
+    "works": {
+      "count": 1
+    },
+    "createdBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    },
+    "updatedBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    }
+  },
+  {
+    "id": 61,
+    "name": "Familiengemählde",
+    "createdAt": "2025-12-18T07:55:03.675Z",
+    "updatedAt": "2025-12-18T07:55:03.675Z",
+    "works": {
+      "count": 1
+    },
+    "createdBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    },
+    "updatedBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    }
+  },
+  {
+    "id": 8,
+    "name": "Farce",
+    "createdAt": "2024-09-07T14:48:28.400Z",
+    "updatedAt": "2024-09-07T14:48:28.400Z",
+    "works": {
+      "count": 9
+    },
+    "createdBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    },
+    "updatedBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    }
+  },
+  {
+    "id": 15,
+    "name": "heroic comedy",
+    "createdAt": "2024-09-08T08:14:58.065Z",
+    "updatedAt": "2024-09-08T08:14:58.065Z",
+    "works": {
+      "count": 6
+    },
+    "createdBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    },
+    "updatedBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    }
+  },
+  {
+    "id": 20,
+    "name": "Heroic drama",
+    "createdAt": "2024-09-17T07:38:04.537Z",
+    "updatedAt": "2024-09-17T07:38:04.537Z",
+    "works": {
+      "count": 7
+    },
+    "createdBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    },
+    "updatedBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    }
+  },
+  {
+    "id": 49,
+    "name": "history play",
+    "createdAt": "2025-03-28T12:54:33.177Z",
+    "updatedAt": "2025-03-28T12:54:33.177Z",
+    "works": {
+      "count": 8
+    },
+    "createdBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    },
+    "updatedBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    }
+  },
+  {
+    "id": 3,
+    "name": "Idyllic ballet",
+    "createdAt": "2023-03-05T16:35:14.153Z",
+    "updatedAt": "2023-03-05T16:49:05.304Z",
+    "works": {
+      "count": 2
+    },
+    "createdBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    },
+    "updatedBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    }
+  },
+  {
+    "id": 54,
+    "name": "Idyllic play",
+    "createdAt": "2025-08-12T08:30:10.917Z",
+    "updatedAt": "2025-08-12T08:30:10.917Z",
+    "works": {
+      "count": 1
+    },
+    "createdBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    },
+    "updatedBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    }
+  },
+  {
+    "id": 13,
+    "name": "Intermezzo",
+    "createdAt": "2024-09-08T07:21:15.162Z",
+    "updatedAt": "2024-09-08T13:46:17.502Z",
+    "works": {
+      "count": 24
+    },
+    "createdBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    },
+    "updatedBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    }
+  },
+  {
+    "id": 16,
+    "name": "Lustspiel",
+    "createdAt": "2024-09-08T12:48:38.002Z",
+    "updatedAt": "2024-09-08T13:46:22.608Z",
+    "works": {
+      "count": 85
+    },
+    "createdBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    },
+    "updatedBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    }
+  },
+  {
+    "id": 62,
+    "name": "Lyrical drama",
+    "createdAt": "2025-12-20T10:58:04.417Z",
+    "updatedAt": "2025-12-20T10:58:04.417Z",
+    "works": {
+      "count": 1
+    },
+    "createdBy": {
+      "id": 46,
+      "firstname": "Mai",
+      "lastname": "Riis Kristensen",
+      "username": null
+    },
+    "updatedBy": {
+      "id": 46,
+      "firstname": "Mai",
+      "lastname": "Riis Kristensen",
+      "username": null
+    }
+  },
+  {
+    "id": 44,
+    "name": "Melodrama",
+    "createdAt": "2025-03-12T16:54:40.096Z",
+    "updatedAt": "2025-03-12T16:54:40.096Z",
+    "works": {
+      "count": 2
+    },
+    "createdBy": {
+      "id": 38,
+      "firstname": "Sofie",
+      "lastname": "Kejlberg",
+      "username": null
+    },
+    "updatedBy": {
+      "id": 38,
+      "firstname": "Sofie",
+      "lastname": "Kejlberg",
+      "username": null
+    }
+  },
+  {
+    "id": 52,
+    "name": "Monodrama",
+    "createdAt": "2025-05-24T15:37:01.404Z",
+    "updatedAt": "2025-05-24T15:37:01.404Z",
+    "works": {
+      "count": 1
+    },
+    "createdBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    },
+    "updatedBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    }
+  },
+  {
+    "id": 64,
+    "name": "national drama/drame/schauspiel",
+    "createdAt": "2026-02-06T15:55:29.634Z",
+    "updatedAt": "2026-02-06T15:55:29.634Z",
+    "works": {
+      "count": 7
+    },
+    "createdBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    },
+    "updatedBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    }
+  },
+  {
+    "id": 24,
+    "name": "Opéra",
+    "createdAt": "2024-10-17T07:12:01.638Z",
+    "updatedAt": "2025-01-08T13:51:03.682Z",
+    "works": {
+      "count": 3
+    },
+    "createdBy": {
+      "id": 24,
+      "firstname": "Mille",
+      "lastname": "Carlsen",
+      "username": null
+    },
+    "updatedBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    }
+  },
+  {
+    "id": 35,
+    "name": "opera buffa",
+    "createdAt": "2025-01-06T12:03:18.937Z",
+    "updatedAt": "2025-01-06T12:03:18.937Z",
+    "works": {
+      "count": 3
+    },
+    "createdBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    },
+    "updatedBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    }
+  },
+  {
+    "id": 48,
+    "name": "opera comica",
+    "createdAt": "2025-03-27T16:29:52.872Z",
+    "updatedAt": "2025-03-27T16:29:52.872Z",
+    "works": {
+      "count": 1
+    },
+    "createdBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    },
+    "updatedBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    }
+  },
+  {
+    "id": 43,
+    "name": "opera seria",
+    "createdAt": "2025-02-25T10:31:37.876Z",
+    "updatedAt": "2025-02-25T10:31:37.876Z",
+    "works": {
+      "count": 0
+    },
+    "createdBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    },
+    "updatedBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    }
+  },
+  {
+    "id": 14,
+    "name": "Opéra-comique",
+    "createdAt": "2024-09-08T07:46:38.242Z",
+    "updatedAt": "2024-09-08T13:46:29.626Z",
+    "works": {
+      "count": 29
+    },
+    "createdBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    },
+    "updatedBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    }
+  },
+  {
+    "id": 29,
+    "name": "Operetta comica",
+    "createdAt": "2024-12-06T07:41:18.273Z",
+    "updatedAt": "2024-12-06T07:41:18.273Z",
+    "works": {
+      "count": 9
+    },
+    "createdBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    },
+    "updatedBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    }
+  },
+  {
+    "id": 22,
+    "name": "Pantomime",
+    "createdAt": "2024-09-17T08:25:03.653Z",
+    "updatedAt": "2024-09-17T08:25:03.653Z",
+    "works": {
+      "count": 11
+    },
+    "createdBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    },
+    "updatedBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    }
+  },
+  {
+    "id": 68,
+    "name": "Pantomime ballet",
+    "createdAt": "2026-03-15T21:04:18.584Z",
+    "updatedAt": "2026-03-15T21:04:18.584Z",
+    "works": {
+      "count": 1
+    },
+    "createdBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    },
+    "updatedBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    }
+  },
+  {
+    "id": 9,
+    "name": "Parody",
+    "createdAt": "2024-09-07T15:41:34.476Z",
+    "updatedAt": "2024-09-07T15:41:34.476Z",
+    "works": {
+      "count": 3
+    },
+    "createdBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    },
+    "updatedBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    }
+  },
+  {
+    "id": 5,
+    "name": "Pastoral",
+    "createdAt": "2024-09-06T06:02:25.589Z",
+    "updatedAt": "2024-09-06T06:02:25.589Z",
+    "works": {
+      "count": 16
+    },
+    "createdBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    },
+    "updatedBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    }
+  },
+  {
+    "id": 26,
+    "name": "prologue",
+    "createdAt": "2024-10-22T15:26:45.868Z",
+    "updatedAt": "2024-10-22T15:26:45.868Z",
+    "works": {
+      "count": 18
+    },
+    "createdBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    },
+    "updatedBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    }
+  },
+  {
+    "id": 11,
+    "name": "Satire",
+    "createdAt": "2024-09-07T22:26:24.167Z",
+    "updatedAt": "2024-09-07T22:26:24.167Z",
+    "works": {
+      "count": 3
+    },
+    "createdBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    },
+    "updatedBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    }
+  },
+  {
+    "id": 21,
+    "name": "Singspiel",
+    "createdAt": "2024-09-17T07:38:30.817Z",
+    "updatedAt": "2024-09-17T07:38:41.802Z",
+    "works": {
+      "count": 42
+    },
+    "createdBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    },
+    "updatedBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    }
+  },
+  {
+    "id": 18,
+    "name": "Skuespil/Schauspiel",
+    "createdAt": "2024-09-08T13:45:58.562Z",
+    "updatedAt": "2025-12-18T07:39:26.975Z",
+    "works": {
+      "count": 29
+    },
+    "createdBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    },
+    "updatedBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    }
+  },
+  {
+    "id": 42,
+    "name": "tightrope walking",
+    "createdAt": "2025-02-23T18:10:45.025Z",
+    "updatedAt": "2025-02-23T18:10:45.025Z",
+    "works": {
+      "count": 1
+    },
+    "createdBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    },
+    "updatedBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    }
+  },
+  {
+    "id": 39,
+    "name": "Tragedia per musica",
+    "createdAt": "2025-01-07T16:17:53.344Z",
+    "updatedAt": "2025-02-11T06:30:36.350Z",
+    "works": {
+      "count": 4
+    },
+    "createdBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    },
+    "updatedBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    }
+  },
+  {
+    "id": 56,
+    "name": "Tragédie-lyrique",
+    "createdAt": "2025-09-22T09:29:31.653Z",
+    "updatedAt": "2025-09-22T09:29:31.653Z",
+    "works": {
+      "count": 1
+    },
+    "createdBy": {
+      "id": 27,
+      "firstname": "Amalie",
+      "lastname": "Sønderby",
+      "username": null
+    },
+    "updatedBy": {
+      "id": 27,
+      "firstname": "Amalie",
+      "lastname": "Sønderby",
+      "username": null
+    }
+  },
+  {
+    "id": 1,
+    "name": "Tragedy",
+    "createdAt": "2023-01-19T09:22:36.345Z",
+    "updatedAt": "2024-06-06T14:54:58.101Z",
+    "works": {
+      "count": 22
+    },
+    "createdBy": null,
+    "updatedBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    }
+  },
+  {
+    "id": 19,
+    "name": "Tragi-comedy",
+    "createdAt": "2024-09-08T13:48:02.715Z",
+    "updatedAt": "2024-09-08T13:48:02.715Z",
+    "works": {
+      "count": 5
+    },
+    "createdBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    },
+    "updatedBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    }
+  },
+  {
+    "id": 25,
+    "name": "Trauerspiel",
+    "createdAt": "2024-10-22T14:36:11.093Z",
+    "updatedAt": "2024-10-22T14:36:11.093Z",
+    "works": {
+      "count": 15
+    },
+    "createdBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    },
+    "updatedBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    }
+  },
+  {
+    "id": 27,
+    "name": "Vaudeville",
+    "createdAt": "2024-11-03T14:55:45.613Z",
+    "updatedAt": "2024-11-03T14:55:45.613Z",
+    "works": {
+      "count": 2
+    },
+    "createdBy": {
+      "id": 25,
+      "firstname": "Nete",
+      "lastname": "Rasmussen",
+      "username": null
+    },
+    "updatedBy": {
+      "id": 25,
+      "firstname": "Nete",
+      "lastname": "Rasmussen",
+      "username": null
+    }
+  },
+  {
+    "id": 45,
+    "name": "Zauberstück",
+    "createdAt": "2025-03-18T14:58:42.611Z",
+    "updatedAt": "2025-03-18T14:58:42.611Z",
+    "works": {
+      "count": 1
+    },
+    "createdBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    },
+    "updatedBy": {
+      "id": 5,
+      "firstname": "Ulla",
+      "lastname": "Kallenbach",
+      "username": null
+    }
+  }
+]

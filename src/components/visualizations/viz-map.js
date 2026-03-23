@@ -1,7 +1,6 @@
-// src/components/viz-map.js
-import * as Plot from "@observablehq/plot";
-import * as d3 from "d3";
-import * as topojson from "topojson-client";
+import * as Plot from "npm:@observablehq/plot";
+import * as d3 from "npm:d3";
+import * as topojson from "npm:topojson-client";
 
 /**
  * Build land feature from a TopoJSON 'world' object (e.g., countries-110m.json).

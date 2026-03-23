@@ -1,4 +1,3 @@
-// src/components/styles.js
 // Global page styles extracted from index.md
 export function injectGlobalStyles(html) {
   return html`<style>

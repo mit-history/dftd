@@ -1,4 +1,3 @@
-// src/components/filters.js
 // Reusable UI controls (Inputs.*) extracted from index.md
 
 function ensureArray(v) {

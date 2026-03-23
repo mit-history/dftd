@@ -1,7 +1,3 @@
-// src/components/data-normalizers.js
-// Canonical normalization for dataset-specific schemas.
-// Goal: every visualization can rely on the same fields.
-//
 // Canonical performance shape (what we return):
 // {
 //   id: string,
@@ -11,6 +7,7 @@
 //   genre: string|null,
 //   author: string|null,     // "Name1 ; Name2" or null
 //   place: string|null,      // venue / city / place name where available
+//   origin: string           // "french" | "dutch" | "danish"
 // }
 
 function uniq(arr) {
@@ -79,7 +76,8 @@ export function normalizeFrench(raw, asDate) {
       title: safeStr(title),
       genre: safeStr(genre),
       author: safeStr(author),
-      place: safeStr(place)
+      place: safeStr(place),
+      origin: "french"
     };
   }).filter(Boolean);
 }
@@ -113,7 +111,8 @@ export function normalizeDutch(rawRows, asDate) {
       title: safeStr(title),
       genre: safeStr(genre),
       author: safeStr(author),
-      place: safeStr(place)
+      place: safeStr(place),
+      origin: "dutch",
     };
   }).filter(Boolean);
 }
@@ -128,60 +127,80 @@ export function normalizeDutch(rawRows, asDate) {
 //
 // joined rows contain:
 // { performance_id, work_ids: [...], contributors: [{ person_name, role_names:[...] }, ...] }
+
 export function normalizeDanishJoinedLight({ performances, works, joined }, asDate) {
-  if (!Array.isArray(performances) || !Array.isArray(works) || !Array.isArray(joined)) return [];
+  if (!Array.isArray(joined)) return [];
 
-  const perfIdToJoined = new Map(joined.map(r => [String(r.performance_id), r]));
+  const perfMeta = new Map(
+    Array.isArray(performances)
+      ? performances.map(p => [String(p.id), p])
+      : []
+  );
 
-  // workId -> { title, genres: [...] }
   const workMeta = new Map(
-    works.map(w => [
-      String(w.id),
-      {
-        title: pickFirst(w.title, w.formatted_title),
-        genres: (w.genres ?? []).map(g => pickFirst(g?.name, g?.title)).filter(Boolean)
-      }
-    ])
+    Array.isArray(works)
+      ? works.map(w => [
+          String(w.id),
+          {
+            title: pickFirst(w.title, w.formatted_title),
+            genres: Array.isArray(w.genres)
+              ? w.genres.map(g => pickFirst(g?.name, g?.title)).filter(Boolean)
+              : []
+          }
+        ])
+      : []
   );
 
   function joinedAuthors(joinedRow) {
-    // Adjust these keywords if your role list changes.
-    const AUTHOR_ROLE_WORDS = ["composer", "playwright", "librettist", "writer", "forfatter", "author"];
-    const names = (joinedRow?.contributors ?? [])
-      .filter(c => (c.role_names ?? []).some(r =>
-        AUTHOR_ROLE_WORDS.some(w => String(r).toLowerCase().includes(w))
-      ))
-      .map(c => c.person_name)
-      .filter(Boolean);
-
-    return uniq(names);
+    const AUTHOR_ROLE_WORDS = ["playwright", "librettist", "writer", "forfatter", "author"];
+    return uniq(
+      (joinedRow?.contributors ?? [])
+        .filter(c =>
+          (c.role_names ?? []).some(r =>
+            AUTHOR_ROLE_WORDS.some(w => String(r).toLowerCase().includes(w))
+          )
+        )
+        .map(c => c.person_name)
+        .filter(Boolean)
+    );
   }
 
-  return performances.map((perf, i) => {
-    const d = asDate(perf.date);
+  return joined.map((row, i) => {
+    const perf = perfMeta.get(String(row.performance_id)) ?? {};
+
+    const d = asDate(pickFirst(row.date, perf.date));
     if (!d || isNaN(+d)) return null;
 
-    const joinedRow = perfIdToJoined.get(String(perf.id));
-    const workIds = (joinedRow?.work_ids ?? []).map(String);
-
+    const workIds = (row.work_ids ?? []).map(String);
     const metas = workIds.map(id => workMeta.get(id)).filter(Boolean);
-    const allGenres = metas.flatMap(m => m.genres ?? []);
-    const titleFromWorks = metas.map(m => m.title).filter(Boolean).join("; ");
 
-    const authors = joinedAuthors(joinedRow);
+    const allGenres = uniq(metas.flatMap(m => m.genres ?? []));
+    const titleFromWorks = metas.map(m => m.title).filter(Boolean).join("; ");
+    const authors = joinedAuthors(row);
 
     return {
-      id: safeStr(pickFirst(perf.id, `danish-${i}`)),
+      id: safeStr(pickFirst(row.performance_id, perf.id, `danish-${i}`)),
       date: d,
       year: d.getUTCFullYear(),
-      title: safeStr(pickFirst(
-        titleFromWorks,
-        perf.formatted_title,
-        perf.production?.formatted_title
-      )),
-      genre: safeStr(allGenres.length ? allGenres[0] : null),
+      title: safeStr(
+        pickFirst(
+          row.formatted_title,
+          titleFromWorks,
+          perf.formatted_title,
+          perf.production?.formatted_title
+        )
+      ),
+      genre: safeStr(allGenres[0] ?? null),
       author: safeStr(authors.length ? authors.join(" ; ") : null),
-      place: safeStr(pickFirst(perf.place?.name, perf.theater, perf.venue))
+      place: safeStr(
+        pickFirst(
+          row.place_name,
+          perf.place?.name,
+          perf.theater,
+          perf.venue
+        )
+      ),
+      origin: "danish"
     };
   }).filter(Boolean);
 }

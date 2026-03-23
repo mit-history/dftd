@@ -1,4 +1,3 @@
-// src/components/calendar-app.js
 // Calendar mini-app. This version does NOT reload French/Dutch/Danish data.
 // Instead, pass already-normalized arrays from index.md so every visualization
 // uses the exact same canonical pipeline.
