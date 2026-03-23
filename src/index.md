@@ -28,6 +28,8 @@ import {
 } from "./components/helpers/filters.js";
 import { renderPerformanceDays } from "./components/visualizations/performance-days.js";
 import { renderCalendarApp } from "./components/visualizations/calendar-app.js";
+// debugging
+display(html`<p>imports loaded</p>`);
 ```
 
 ```js
@@ -39,7 +41,7 @@ display(injectGlobalStyles(html));
 // Load and normalize the data from each of our datasets
 
 // New Orleans
-const nola = await FileAttachment("data/new_orleans/new_o_frequent_performances.csv").csv({ typed: true });
+const nola = await FileAttachment("data/new_orleans/genre_two_level_FIXED.csv").csv({ typed: true });
 // might need to implement a normalizing filtr for the new orleans data
 
 // French
@@ -68,16 +70,39 @@ const combined_data = [
   ...french,
   ...dutch
 ];
+// debugging
+display(html`<p>data block loaded</p>`);
+display({
+  danish: danish?.length,
+  french: french?.length,
+  dutch: dutch?.length,
+  nola: nola?.length
+});
 
 ```
 
 ```js
 // Section for handling the routing and navigation for the visualizations
+const vizInput = Inputs.checkbox(
+  [
+    "Over Time",
+    "Diverging Genres",
+    "By Author",
+    "Author Share",
+    "Author Bubble",
+    "Days with Performances",
+    "Calendar"
+  ],
+  {
+    label: "Visualization",
+    value: ["Over Time"]
+  }
+);
 
-const vizInput = createVizToggle({ Inputs, view });
 display(vizInput);
 
-const viz = vizInput?.value ?? [];
+const viz = vizInput.value ?? [];
+
 const {
   overTime,
   divergingGenres,
@@ -90,28 +115,28 @@ const {
 
 ```
 
-<div class="card" style="margin-bottom: 1rem;">
-<details open>
-<summary>Filters</summary>
+## Filters
 
 ```js
 //  Universal visualization filters
 
 // Date filters
 const {
-  startDateObj_input,
-  endDateObj_input,
-  startDateObj: rawStartDateObj,
-  endDateObj: rawEndDateObj,
+  start_date_input,
+  end_date_input,
+  start_date,
+  end_date,
   randomizeDates
-} = createDateFilters({ Inputs, view }, { start: "1748-01-01", end: "1798-12-31" });
+} = createDateFilters(
+  { Inputs, view },
+  { start: "1748-01-01", end: "1798-12-31" }
+);
 
-const startDateObj =
-  rawStartDateObj instanceof Date ? rawStartDateObj : asDate(rawStartDateObj);
+const startDateObj = asDate(start_date);
+const endDateObj = asDate(end_date);
 
-const endDateObj =
-  rawEndDateObj instanceof Date ? rawEndDateObj : asDate(rawEndDateObj);
-
+display(start_date_input);
+display(end_date_input);
 
 // Dataset Origin filters
 const {
@@ -122,29 +147,27 @@ const {
   randomizeOrigins
 } = createOriginFilters({ Inputs, view }, ["danish", "dutch", "french"]);
 
-// normalized array
-const selectedOrigins =
-  Array.isArray(origins) ? origins :
-  Array.isArray(origins?.value) ? origins.value :
-  Array.isArray(originsSelect?.value) ? originsSelect.value :
-  Array.isArray(originsInput?.value) ? originsInput.value :
-  ["danish", "dutch", "french"];
 
+const selectedOrigins = origins ?? ["danish","dutch","french"];
 
 // Formatted_data depends on date + origins (and is used by genre + author filters)
 
+const formatted_data = combined_data.filter(d => {
+  const date = d.date instanceof Date ? d.date : asDate(d.date);
+  const origin = (d.origin ?? "").toLowerCase();
 
-const formatted_data = combined_data.filter(d =>
-  d.date instanceof Date &&
-  !isNaN(+d.date) &&
-  startDateObj instanceof Date &&
-  !isNaN(+startDateObj) &&
-  endDateObj instanceof Date &&
-  !isNaN(+endDateObj) &&
-  d.date >= startDateObj &&
-  d.date <= endDateObj &&
-  selectedOrigins.includes(d.origin)
-);
+  return (
+    date instanceof Date &&
+    !isNaN(+date) &&
+    date >= startDateObj &&
+    date <= endDateObj &&
+    selectedOrigins.includes(origin)
+  );
+}).map(d => ({
+  ...d,
+  date: d.date instanceof Date ? d.date : asDate(d.date),
+  origin: (d.origin ?? "").toLowerCase()
+}));
 
 
 // Genre filters
@@ -158,14 +181,10 @@ const { authorOptions, authorInput, author, randomizeAuthor } = createAuthorFilt
   { Inputs, view },
   { french, danish, dutch }
 );
-
-// Randomize button
-view(createRandomizeButton({ Inputs }, { randomizeDates, randomizeOrigins, randomizeAuthor }));
-
+display(start_date_input);
+display(end_date_input);
 ```
 
-</details>
-</div>
 
 ```js
 // Helpful sanity view (safe to delete)

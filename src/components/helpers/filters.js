@@ -39,12 +39,9 @@ export function createDateFilters({ Inputs, view }, defaults = { start: "1748-01
   return { start_date_input, end_date_input, start_date, end_date, randomizeDates };
 }
 
-export function createOriginFilters({ Inputs, view }, originOptions = ["danish", "dutch", "french"]) {
+export function createOriginFilters({ Inputs }, originOptions = ["danish", "dutch", "french"]) {
   const originsInput = Inputs.checkbox(originOptions, { label: "Origin", value: originOptions });
   const originsSelect = Inputs.toggle({ label: "Select All", value: true });
-
-  const origins = view(originsInput);
-  view(originsSelect);
 
   wireSelectAllToggle({ listInput: originsInput, toggleInput: originsSelect, allValues: originOptions });
 
@@ -55,7 +52,7 @@ export function createOriginFilters({ Inputs, view }, originOptions = ["danish",
     originsSelect.value = newValue.length === originOptions.length;
   };
 
-  return { originOptions, originsInput, originsSelect, origins, randomizeOrigins };
+  return { originOptions, originsInput, originsSelect, randomizeOrigins };
 }
 
 export function createGenreFilters({ Inputs, view }, { formatted_data, origins }) {

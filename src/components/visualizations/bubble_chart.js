@@ -16,7 +16,7 @@ export function BubbleChart(data, {
   margin = 1, // default margins
   marginTop = margin, // top margin, in pixels
   marginRight = margin, // right margin, in pixels
-  marginBottom = margin, // bottom margin, in pixels 
+  marginBottom = margin, // bottom margin, in pixels
   marginLeft = margin, // left margin, in pixels
   groups, // array of group names (the domain of the color scale)
   colors = d3.schemeTableau10, // an array of colors (for groups)

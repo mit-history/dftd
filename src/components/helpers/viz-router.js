@@ -43,13 +43,16 @@ export function createVizToggle({ Inputs, view }, opts) {
 }
 
 export function vizFlags(viz) {
+
+  const selected = Array.isArray(viz) ? viz : [];
   return {
-    overTime: viz.includes("Over Time"),
-    divergingGenres: viz.includes("Diverging Genres"),
-    byAuthor: viz.includes("By Author"),
-    performanceDays: viz.includes("Days with Performances"),
-    authorShare: viz.includes("Author Share"),
-    bubble: viz.includes("Author Bubble"),
-    calendar: viz.includes("Calendar")
+    overTime: selected.includes("Over Time"),
+    divergingGenres: selected.includes("Diverging Genres"),
+    byAuthor: selected.includes("By Author"),
+    performanceDays: selected.includes("Days with Performances"),
+    authorShare: selected.includes("Author Share"),
+    bubble: selected.includes("Author Bubble"),
+    calendar: selected.includes("Calendar")
   };
 }
+
