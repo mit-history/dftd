@@ -9,12 +9,10 @@ toc: true
 The following graphs show number of comedy performances per year.
 
 ```js
-import { filterComedyPerformances } from "./components/comedyCharts.js"; // [Added]
+import { filterComedyPerformances } from "./components/visualizations/comedyCharts.js"; // [Added]
 
-const danish_data = FileAttachment("data/danish-performances.csv").csv({
-  typed: true,
-});
-const french_data = FileAttachment("data/french-performances.json").json();
+const danish_data = FileAttachment("data/danish/danish-performances.json").json();
+const french_data = FileAttachment("data/french/french-performances.json").json();
 ```
 
 ```js
@@ -42,6 +40,7 @@ const danish_comedy = danish_data.filter(
     (d.genre.toLowerCase().includes("comed") ||
       d.genre.toLowerCase().includes("coméd"))
 );
+console.log(danish_comedy)
 display(yearChart(danish_comedy));
 ```
 
