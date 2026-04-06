@@ -6,6 +6,7 @@ toc: false
 ```js
 const french = await FileAttachment("data/french-performances.json").json();
 const dutch = await FileAttachment("data/dutch-performances.csv").csv({typed: true});
+const saintDomingue = await FileAttachment("data/saint_domingue/formatted_saint_domingue.json").json();
 
 // Load & normalize the Danish performances directly from the raw JSON
 const danish_raw = await FileAttachment("data/danish-performances.json").json();
@@ -492,7 +493,7 @@ const randomDates = () =>  {
 ```
 
 ```js
-const originOptions = ["danish", "dutch", "french"];
+const originOptions = ["danish", "dutch", "french", "saint domingue"];
 const originsInput = Inputs.checkbox(originOptions, {label: "Origin", value: originOptions});
 const originsSelect = Inputs.toggle({label: "Select All", value: true})
 const origins = view(originsInput);
@@ -608,6 +609,10 @@ const formatted_data = combined_data.filter(d => {
   const dt = asDate(d.date);
   return dt && dt > start_date && dt <= end_date && origins.includes(d.origin);
 });
+const formatted_stdmg = saintDomingue.filter(d => {
+  const dt = asDate(d.date);
+  return dt && dt > start_date && dt <= end_date && origins.includes(d.origin);
+});
 
 
 const yearsInView = Array.from(
@@ -621,6 +626,7 @@ yearsInView.slice(0,10).concat("...").concat(yearsInView.slice(-10))
 
 ```js
 function compareYearsChart(data) {
+  console.log(data)
   const years = Array.from(new Set(data.map(d => d.year).filter(Boolean))).sort((a, b) => a - b);
   const n = years.length;
   const step =
@@ -655,12 +661,13 @@ function compareYearsChart(data) {
 ```
 
 ```js
+const full_formatted_data = formatted_data.concat(formatted_stdmg);
 if (overTime) {
   display(html`<h2>Comparative Performances Over Time</h2>`);
   display(
-    formatted_data.length > 0
+    full_formatted_data.length > 0
       ? html`<div class="full-bleed">
-          ${compareYearsChart(formatted_data)}
+          ${compareYearsChart(full_formatted_data)}
         </div>`
       : html`<i>No data.</i>`
   );
@@ -738,8 +745,6 @@ const do_overall_threshold_val = bubble?view(do_overall_threshold):false;
 ```
 ```js
 display(bubble? html `<div></h2>` : html`<div></div>`);
-// const overall_threshold = Inputs.number({value:1, label: 'Enter Threshold'});
-// const overall_threshold_val = do_overall_threshold_val?view(overall_threshold):0;
 const overall_threshold = rangeInput({
   min: 0,
   max: percent_absolute_val=="percentage"?100:1000,
@@ -765,9 +770,9 @@ const french_threshold_val = bubble? (do_overall_threshold_val?overall_threshold
 display(bubble? html`<p>Year Range</p>`:html`<div></div>`);
 const f = rangeInput({
   min: 1748,
-  max: 1798,
+  max: 1793,
   step: 1,
-  value: [1748, 1778],
+  value: [1748, 1793],
   enableTextInput: true
 });
 const f_val = bubble ? view(f) : [0,0];
@@ -807,7 +812,7 @@ const du = rangeInput({
   min: 1748,
   max: 1798,
   step: 1,
-  value: [1748, 1778],
+  value: [1748, 1798],
   enableTextInput: true
 });
 const du_val = bubble?view(du):[0,0];
@@ -819,33 +824,32 @@ display(bubble? authorBubble(combined_data, 'dutch', 0, dutch_threshold_val, du_
 ```
 
 ```js
-display(bubble? html `<h2>Danish</h2>` : html`<div></div>`)
+display(bubble? html `<h2>Saint Domingue</h2>` : html`<div></div>`)
 display(bubble&&!do_overall_threshold_val? html`<p>Threshold Range</p>`:html`<div></div>`);
-const danish_threshold = rangeInput({
+const stdmg_threshold = rangeInput({
   min: 0,
   max: percent_absolute_val=="percentage"?100:1000,
   step: 1,
   value: [0, 100],
   enableTextInput: true
 });
-const danish_threshold_val = bubble? (do_overall_threshold_val?overall_threshold_val:view(danish_threshold)):[0,0];
+const stdmg_threshold_val = bubble? (do_overall_threshold_val?overall_threshold_val:view(stdmg_threshold)):[0,0];
 display(bubble? html`<p>Year Range</p>`:html`<div></div>`);
-const da = rangeInput({
-  min: 1748,
-  max: 1798,
+const sd = rangeInput({
+  min: 1764,
+  max: 1791,
   step: 1,
-  value: [1748, 1778],
+  value: [1764, 1791],
   enableTextInput: true
 });
-const da_val = bubble?view(da):[0,0];
+const sd_val = bubble?view(sd):[0,0];
 
 
 ```
 
 ```js
-display(bubble? authorBubble(combined_data, 'danish', 0, danish_threshold_val, da_val[0], da_val[1], percent_absolute_val): html`<div></div>`);
+display(bubble? authorBubble(saintDomingue, 'saint domingue', 0, stdmg_threshold_val, sd_val[0], sd_val[1], percent_absolute_val): html`<div></div>`);
 ```
-
 
 
 </div>
@@ -1001,8 +1005,8 @@ display(performanceDays ? html `<p> Selected genres: ${genres.length === 0 ? "No
 ```js
 const genre_data =
   genres.length === 0
-    ? formatted_data
-    : formatted_data.filter((d) => genres.includes(d.genre));
+    ? formatted_data.concat(formatted_stdmg)
+    : formatted_data.concat(formatted_stdmg).filter((d) => genres.includes(d.genre));
 ```
 
 <div class="full-bleed days-grid">
@@ -1050,6 +1054,11 @@ const originToData = {
   // if you ever add dutch_filtered_data, put it here too
   dutch: combined_data
     .filter(d => d.origin === "dutch")
+    .filter(d => {
+      const dt = asDate(d.date);
+      return dt && dt >= start_date && dt <= end_date;
+    }),
+  'saint domingue': saintDomingue
     .filter(d => {
       const dt = asDate(d.date);
       return dt && dt >= start_date && dt <= end_date;

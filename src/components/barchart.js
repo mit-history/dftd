@@ -176,7 +176,7 @@ export function createMultipleAnimatedLines(groups, { width = 900, height = 500,
   .attr("font-size", `${baseFontSize}px`)
   .text("Max: 366 days");
 
-  const color = d3.scaleOrdinal().domain(groups.map(g => g.label)).range(["red", "blue", "green"]);
+  const color = d3.scaleOrdinal().domain(groups.map(g => g.label)).range(["red", "blue", "green", "purple"]);
 
   const line = d3.line()
     .x(d => x(d.year))
