@@ -34,7 +34,7 @@ display(html`<p>imports loaded</p>`);
 
 ```js
 // Global styles
-display(injectGlobalStyles(html));
+// display(injectGlobalStyles(html));
 ```
 
 ```js
@@ -103,15 +103,27 @@ display(vizInput);
 
 const viz = vizInput.value ?? [];
 
-const {
-  overTime,
-  divergingGenres,
-  byAuthor,
-  performanceDays,
-  authorShare,
-  bubble,
-  calendar
-} = vizFlags(viz);
+// const {
+//   overTime,
+//   divergingGenres,
+//   byAuthor,
+//   performanceDays,
+//   authorShare,
+//   bubble,
+//   calendar
+// } = vizFlags(viz);
+
+//this is just for testing/debugging purposes, since 
+//it seems currently these values aren't being updated
+//when the input value changes
+
+const overTime = true;
+const divergingGenres = true;
+const byAuthor = true;
+const performanceDays = true;
+const authorShare = true;
+const bubble = true;
+const calendar = true;
 
 ```
 
@@ -132,8 +144,8 @@ const {
   { start: "1748-01-01", end: "1798-12-31" }
 );
 
-const startDateObj = asDate(start_date);
-const endDateObj = asDate(end_date);
+const startDateObj = asDate(start_date_input.value);
+const endDateObj = asDate(end_date_input.value);
 
 display(start_date_input);
 display(end_date_input);
