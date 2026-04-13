@@ -114,7 +114,8 @@ export function genreBubble(formatted_data, author){
 export function authorBubble(data, origin, season = 0, threshold = [0,0], season_start, season_end, mode){
 
   const percent = mode == "percentage";
-  console.log(data)
+
+  //filter unwanted data; convert to list of {author: str, count: number} objects
   let authors = Object.entries(data.filter(d => (d.origin == origin) && (Number(d.year) <= season_end) && (Number(d.year) >= season_start)).reduce((acc, d) => {
       acc[d.author] = (acc[d.author] || 0) + 1;
       return acc;

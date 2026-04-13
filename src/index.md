@@ -493,7 +493,7 @@ const randomDates = () =>  {
 ```
 
 ```js
-const originOptions = ["danish", "dutch", "french", "saint domingue"];
+const originOptions = ["danish", "dutch", "french", "saint-domingue"];
 const originsInput = Inputs.checkbox(originOptions, {label: "Origin", value: originOptions});
 const originsSelect = Inputs.toggle({label: "Select All", value: true})
 const origins = view(originsInput);
@@ -747,7 +747,7 @@ const do_overall_threshold_val = bubble?view(do_overall_threshold):false;
 display(bubble? html `<div></h2>` : html`<div></div>`);
 const overall_threshold = rangeInput({
   min: 0,
-  max: percent_absolute_val=="percentage"?100:1000,
+  max: percent_absolute_val=="percentage"?100:combined_data.length,
   step: 1,
   value: [0, 100],
   enableTextInput: true
@@ -761,7 +761,7 @@ display(bubble? html `<h2>French</h2>` : html`<div></div>`);
 display(bubble&&!do_overall_threshold_val? html`<p>Threshold Range</p>`:html`<div></div>`);
 const french_threshold = rangeInput({
   min: 0,
-  max: percent_absolute_val=="percentage"?100:1000,
+  max: percent_absolute_val=="percentage"?100:combined_data.filter(d => d.origin == 'french').length,
   step: 1,
   value: [0, 100],
   enableTextInput: true
@@ -801,7 +801,7 @@ display(bubble? html `<h2>Dutch</h2>` : html`<div></div>`);
 display(bubble&&!do_overall_threshold_val? html`<p>Threshold Range</p>`:html`<div></div>`);
 const dutch_threshold = rangeInput({
   min: 0,
-  max: percent_absolute_val=="percentage"?100:1000,
+  max: percent_absolute_val=="percentage"?100:combined_data.filter(d => d.origin == 'dutch').length,
   step: 1,
   value: [0, 100],
   enableTextInput: true
@@ -824,11 +824,11 @@ display(bubble? authorBubble(combined_data, 'dutch', 0, dutch_threshold_val, du_
 ```
 
 ```js
-display(bubble? html `<h2>Saint Domingue</h2>` : html`<div></div>`)
+display(bubble? html `<h2>saint-domingue</h2>` : html`<div></div>`)
 display(bubble&&!do_overall_threshold_val? html`<p>Threshold Range</p>`:html`<div></div>`);
 const stdmg_threshold = rangeInput({
   min: 0,
-  max: percent_absolute_val=="percentage"?100:1000,
+  max: percent_absolute_val=="percentage"?100:combined_data.filter(d => d.origin == 'saint-domingue').length,
   step: 1,
   value: [0, 100],
   enableTextInput: true
@@ -848,7 +848,7 @@ const sd_val = bubble?view(sd):[0,0];
 ```
 
 ```js
-display(bubble? authorBubble(saintDomingue, 'saint domingue', 0, stdmg_threshold_val, sd_val[0], sd_val[1], percent_absolute_val): html`<div></div>`);
+display(bubble? authorBubble(saintDomingue, 'saint-domingue', 0, stdmg_threshold_val, sd_val[0], sd_val[1], percent_absolute_val): html`<div></div>`);
 ```
 
 
@@ -1058,7 +1058,7 @@ const originToData = {
       const dt = asDate(d.date);
       return dt && dt >= start_date && dt <= end_date;
     }),
-  'saint domingue': saintDomingue
+  'saint-domingue': saintDomingue
     .filter(d => {
       const dt = asDate(d.date);
       return dt && dt >= start_date && dt <= end_date;
