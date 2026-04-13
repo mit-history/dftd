@@ -824,7 +824,7 @@ display(bubble? authorBubble(combined_data, 'dutch', 0, dutch_threshold_val, du_
 ```
 
 ```js
-display(bubble? html `<h2>saint-domingue</h2>` : html`<div></div>`)
+display(bubble? html `<h2>Saint-Domingue</h2>` : html`<div></div>`)
 display(bubble&&!do_overall_threshold_val? html`<p>Threshold Range</p>`:html`<div></div>`);
 const stdmg_threshold = rangeInput({
   min: 0,
