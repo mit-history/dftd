@@ -53,136 +53,16 @@ function getTheme() {
     totalBar: isDarkMode ? "#ffffff" : "#313338",
     totalLabel: isDarkMode ? "#ffffff" : "#313338",
 
-    authorLabel: isDarkMode ? "#313338" : "#ffffff",
-    authorLabelStroke: isDarkMode ? "#ffffff" : "#313338",
+    authorLabel: isDarkMode ? "#ffffff" : "#313338",
 
     bg: isDarkMode ? "#1e1e1e" : "#ffffff",
     textureBG: isDarkMode ? "#ffffff" : "#1e1e1e",
     textureStrokeGray: isDarkMode ? "#999999" : "#313338",
 
-    combinedBar: isDarkMode ? "#4b5563" : "#a2b1c5ff"
+    combinedBar: isDarkMode ? "#ffffff" : "#000000"
   };
 }
 
-/* =============================================================================
-   Chart animations
-============================================================================= */
-function morphBetweenCharts(
-  prevPlot,
-  nextPlot,
-  {
-    selector = ".total-bars, .total-bars rect",
-    duration = 800,
-    ease = d3.easeCubicInOut,
-  } = {}
-) {
-  const prevRects = d3
-    .select(prevPlot)
-    .selectAll(selector)
-    .filter(function () {
-      return this.tagName === "rect";
-    })
-    .interrupt()
-    .nodes();
-
-  const nextRects = d3
-    .select(nextPlot)
-    .selectAll(selector)
-    .filter(function () {
-      return this.tagName === "rect";
-    })
-    .interrupt()
-    .nodes();
-
-  let animated = 0;
-
-  nextRects.forEach((rect, i) => {
-    const next = d3.select(rect);
-    const prev = prevRects[i];
-    if (!prev) return;
-
-    const y0 = +prev.getAttribute("y");
-    const h0 = +prev.getAttribute("height");
-    const y1 = +next.attr("y");
-    const h1 = +next.attr("height");
-
-    next
-      .attr("y", y0)
-      .attr("height", h0)
-      .transition()
-      .duration(duration)
-      .ease(ease)
-      .attr("y", y1)
-      .attr("height", h1);
-
-    animated++;
-  });
-
-  if (animated) {
-    d3.select(nextPlot)
-      .selectAll(
-        "text:not(g[aria-label='x-axis'] text):not(g[aria-label='y-axis'] text)"
-      )
-      .attr("opacity", 0)
-      .transition()
-      .delay(duration * 0.5)
-      .duration(duration * 0.5)
-      .attr("opacity", 1);
-  }
-
-  return animated > 0;
-}
-
-function riseBars(
-  plot,
-  { duration = 800, stagger = 5, selector = ".total-bars rect" } = {}
-) {
-  if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
-
-  const rects = d3
-    .select(plot)
-    .selectAll(selector)
-    .filter(function () {
-      const y = Number(this.getAttribute("y"));
-      const h = Number(this.getAttribute("height"));
-      return Number.isFinite(y) && Number.isFinite(h);
-    });
-
-  rects
-    .attr("data-y", function () {
-      return this.getAttribute("y");
-    })
-    .attr("data-h", function () {
-      return this.getAttribute("height");
-    })
-    .attr("y", function () {
-      const y = Number(this.getAttribute("data-y"));
-      const h = Number(this.getAttribute("data-h"));
-      return (Number.isFinite(y) ? y : 0) + (Number.isFinite(h) ? h : 0);
-    })
-    .attr("height", 0)
-    .transition()
-    .duration(duration)
-    .delay((_, i) => i * stagger)
-    .ease(d3.easeCubicOut)
-    .attr("y", function () {
-      return this.getAttribute("data-y");
-    })
-    .attr("height", function () {
-      return this.getAttribute("data-h");
-    });
-
-  d3
-    .select(plot)
-    .selectAll(
-      "text:not(g[aria-label='x-axis'] text):not(g[aria-label='y-axis'] text)"
-    )
-    .attr("opacity", 0)
-    .transition()
-    .duration(400)
-    .delay(duration * 0.7)
-    .attr("opacity", 1);
-}
 
 /* =============================================================================
    Author Compare Bus
@@ -197,9 +77,10 @@ const initialAuthors = [
 ];
 
 export function emitAuthorsToCompare(authors) {
-  const list = [...new Set(authors)].filter(Boolean);
+  const unique = [...new Set(authors)].filter(Boolean);
+  const list = unique.slice(-3);
   authorsCompareBus.dispatchEvent(
-    new CustomEvent("authors:update", { detail: { authors: list } })
+    new CustomEvent("authors:update", { detail: { authors: list, exceeded: unique.length > 3 } })
   );
 }
 authorsCompareBus.addEventListener("authors:update", (e) => {
@@ -218,18 +99,24 @@ export const clearAuthorsToCompare = () => emitAuthorsToCompare([]);
 /* =============================================================================
    Texture / Pattern Templates
 ============================================================================= */
-const stripeTexture = (id, stroke, bg, step = 6) => `
+const stripeTexture = (id, stroke, bg, step = 6) => {
+  const h = Math.max(1, step / 3);
+  return `
   <pattern id="${id}" width="${step}" height="${step}" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
     <rect width="${step}" height="${step}" fill="${bg}"/>
-    <rect x="0" y="${(step - 2) / 2}" width="${step}" height="2" fill="${stroke}" opacity="0.9"/>
+    <rect x="0" y="${(step - h) / 2}" width="${step}" height="${h}" fill="${stroke}" opacity="0.9"/>
   </pattern>`;
+};
 
-const polkaDotTexture = (id, stroke, bg) => `
-  <pattern id="${id}" width="12" height="12" patternUnits="userSpaceOnUse">
-    <rect width="12" height="12" fill="${bg}"/>
-    <circle cx="3.5" cy="3.5" r="1.5" fill="${stroke}" opacity="0.9"/>
-    <circle cx="9.5" cy="9.5" r="1.5" fill="${stroke}" opacity="0.9"/>
+const polkaDotTexture = (id, stroke, bg, step = 6) => {
+  const r = Math.max(0.4, step * 0.18);
+  return `
+  <pattern id="${id}" width="${step}" height="${step}" patternUnits="userSpaceOnUse">
+    <rect width="${step}" height="${step}" fill="${bg}"/>
+    <circle cx="${step * 0.25}" cy="${step * 0.25}" r="${r}" fill="${stroke}" stroke="${theme.bg}" stroke-width="${Math.max(0.2, r * 0.2)}" opacity="0.9"/>
+    <circle cx="${step * 0.75}" cy="${step * 0.75}" r="${r}" fill="${stroke}" stroke="${theme.bg}" stroke-width="${Math.max(0.2, r * 0.2)}" opacity="0.9"/>
   </pattern>`;
+};
 
 const solidTexture = (id, stroke, _bg, step = 6, opaqueSolid = false) => `
   <pattern id="${id}" width="${step}" height="${step}" patternUnits="userSpaceOnUse">
@@ -244,19 +131,19 @@ function buildAuthorOriginPatterns(
   opaqueSolid = false
 ) {
   const temp = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  
   const templates = [
-    (id, s, b) => stripeTexture(id, s, b),
-    (id, s, b) => polkaDotTexture(id, s, b),
-    (id, s, b) => solidTexture(id, s, b, 6, opaqueSolid),
+    (id, s, b) => stripeTexture(id, s, b, 5),
+    (id, s, b) => solidTexture(id, s, b, 5, opaqueSolid),
+    (id, s, b) => polkaDotTexture(id, s, b, 4.5),
   ];
 
   const urlBy = new Map();
   const defs = [];
   const origins = Object.keys(theaterColorMap);
 
-  // First author is solid (no pattern); start at i = 1
-  for (let i = 1; i < authors.length; i++) {
-    const tpl = templates[(i - 1) % templates.length];
+  for (let i = 0; i < authors.length; i++) {
+    const tpl = templates[i % templates.length];
     const perOrigin = new Map();
 
     for (const origin of origins) {
@@ -276,16 +163,16 @@ function buildAuthorGrayPatterns(authors, bgColor, idPrefix = "combined-") {
   const temp = document.createElementNS("http://www.w3.org/2000/svg", "svg");
   const defs = [];
   const urlByAuthor = new Map();
-
+  
   const templates = [
-    (id, s, b) => stripeTexture(id, s, b),
-    (id, s, b) => polkaDotTexture(id, s, b),
-    (id, s, b) => solidTexture(id, s, b, 6, /* opaqueSolid */ true),
+    (id, s, b) => stripeTexture(id, s, b, 5),
+    (id, s, b) => solidTexture(id, s, b, 5, /* opaqueSolid */ true),
+    (id, s, b) => polkaDotTexture(id, s, b, 4.5),
   ];
 
-  for (let i = 1; i < authors.length; i++) {
+  for (let i = 0; i < authors.length; i++) {
     const id = `${idPrefix}author-${i}`;
-    defs.push(templates[(i - 1) % templates.length](
+    defs.push(templates[i % templates.length](
       id,
       theme.combinedBar,
       bgColor
@@ -320,36 +207,14 @@ function renderPatternLegend(legendEl, authors, bg = "#ffffff") {
 
   const svg = createSvg("svg", {
     width: "100%",
-    height: String(24 + (totalRows - 1) * (swatchH + pad)),
+    height: String(pad + totalRows * (swatchH + pad)),
   });
   svg.style.display = "block";
   svg.appendChild(defs.cloneNode(true));
 
-  // First author: solid dark gray box
-  const firstY = pad;
-  const g0 = createSvg("g");
-  const r0 = createSvg("rect", {
-    x: 0,
-    y: firstY,
-    width: swatchW,
-    height: swatchH,
-    rx: 2,
-  });
-  r0.setAttribute("fill", theme.textureStrokeGray);
-  r0.setAttribute("stroke", theme.text);
-  const t0 = createSvg("text", {
-    x: swatchW + 8,
-    y: firstY + swatchH - 2,
-    "font-size": 12,
-  });
-  t0.setAttribute("fill", theme.textMuted);
-  t0.textContent = authors[0];
-  g0.append(r0, t0);
-  svg.appendChild(g0);
-
   const origins = Object.keys(theaterColorMap);
-  authors.slice(1).forEach((name, idx) => {
-    const y = pad + (idx + 1) * (swatchH + pad);
+  authors.forEach((name, idx) => {
+    const y = pad + idx * (swatchH + pad);
     const g = createSvg("g");
 
     const rect = createSvg("rect", {
@@ -359,7 +224,7 @@ function renderPatternLegend(legendEl, authors, bg = "#ffffff") {
       height: swatchH,
       rx: 2,
     });
-    rect.setAttribute("fill", `url(#legend-tex-a${idx + 1}-${origins[0]})`);
+    rect.setAttribute("fill", `url(#legend-tex-a${idx}-${origins[0]})`);
     rect.setAttribute("stroke", "#333");
 
     const label = createSvg("text", {
@@ -380,37 +245,52 @@ function renderPatternLegend(legendEl, authors, bg = "#ffffff") {
 /* =============================================================================
    Label helpers
 ============================================================================= */
-function makeAuthorLabels(mode, labels, fontScale) {
-  const yTop = mode === "percent" ? (d) => d.y_pct : (d) => d.y_days;
+function makeAuthorLabels(labels, fontScale) {
+  const yTop = (d) => d.y_pct;
+
+  // Approximate dimensions to calculate how many characters fit
+  const minYear = d3.min(labels, (d) => d.year) ?? 1748;
+  const maxYear = d3.max(labels, (d) => d.year) ?? 1778;
+  const yearSpan = Math.max(1, maxYear - minYear);
+  // Plot defaults: width 1000, approx margin left 40, right 20 -> ~940 inner
+  const pxPerYear = 940 / yearSpan;
+  const charPx = fontScale * 0.55; // Approx pixel width per char
+
+  const clampText = (str, d) => {
+    const barWidthData = d.x2 - d.x1;
+    const barPx = barWidthData * pxPerYear;
+    const maxChars = Math.floor((barPx - 4) / charPx); // 4px whitespace inside
+    
+    if (maxChars <= 0) return "";
+    if (str.length > maxChars) {
+      if (maxChars <= 1) return "";
+      return str.slice(0, maxChars - 1) + "…";
+    }
+    return str;
+  };
 
   return [
     Plot.text(labels, {
-      x: "year",
+      x: "xMid",
       y: yTop,
-      text: (d) => `${d.authorDays}`,
+      text: (d) => clampText(`${d.authorDays}`, d),
       textAnchor: "middle",
       fontWeight: "bold",
       fontSize: fontScale,
       fill: theme.authorLabel,
       clip: false,
       dy: -20,
-      stroke: theme.authorLabelStroke,
-      strokeWidth: 5,
-      paintOrder: "stroke",
     }),
     Plot.text(labels, {
-      x: "year",
+      x: "xMid",
       y: yTop,
-      text: (d) => `${d.authorPct.toFixed(1)}%`,
+      text: (d) => clampText(`${d.authorPct.toFixed(1)}%`, d),
       textAnchor: "middle",
       fontWeight: "bold",
       fontSize: fontScale,
       fill: theme.authorLabel,
       clip: false,
       dy: -8,
-      stroke: theme.authorLabelStroke,
-      strokeWidth: 3,
-      paintOrder: "stroke",
     }),
   ];
 }
@@ -490,12 +370,16 @@ export function authorShareChart(author, formatted_data) {
     const authorLabels = [];
     let maxStackPct = 0;
 
+    const authorCount = authors.length;
+    const totalWidth = 0.8;
+    const barWidth = totalWidth / authorCount;
+
     for (const year of allYears) {
       const total = totalDaysByYear.get(year) ?? 0;
-      let offDays = 0;
-      let offPct = 0;
+      let maxAuthorPctForYear = 0;
 
-      for (const an of authors) {
+      for (let j = 0; j < authorCount; j++) {
+        const an = authors[j];
         const origCounts = origins.map(
           (o) => countMap.get(an)?.get(year)?.get(o) ?? 0
         );
@@ -503,8 +387,14 @@ export function authorShareChart(author, formatted_data) {
         if (!authorDays) continue;
 
         const authorPct = total ? (authorDays / total) * 100 : 0;
-        let wDays = offDays;
-        let wPct = offPct;
+        maxAuthorPctForYear = Math.max(maxAuthorPctForYear, authorPct);
+
+        let wDays = 0;
+        let wPct = 0;
+
+        const x1 = year - totalWidth / 2 + j * barWidth;
+        const x2 = x1 + barWidth;
+        const xMid = (x1 + x2) / 2;
 
         for (let i = 0; i < origins.length; i++) {
           const c = origCounts[i] || 0;
@@ -522,6 +412,9 @@ export function authorShareChart(author, formatted_data) {
             daysEnd: wDays + c,
             percentStart: wPct,
             percentEnd: wPct + p,
+            x1,
+            x2,
+            xMid,
           });
 
           wDays += c;
@@ -533,19 +426,21 @@ export function authorShareChart(author, formatted_data) {
           author: an,
           authorDays,
           authorPct,
-          y_days: offDays + authorDays,
-          y_pct: offPct + authorPct,
+          y_days: authorDays,
+          y_pct: authorPct,
+          x1,
+          x2,
+          xMid,
         });
-
-        offDays += authorDays;
-        offPct += authorPct;
       }
 
-      maxStackPct = Math.max(maxStackPct, offPct);
+      maxStackPct = Math.max(maxStackPct, maxAuthorPctForYear);
     }
 
     const perYearTotals = allYears.map((year) => ({
       year,
+      x1: year - 0.45,
+      x2: year + 0.45,
       totalDays: totalDaysByYear.get(year) ?? 0,
     }));
     return { segments, authorLabels, perYearTotals, maxStackPct, authors };
@@ -562,10 +457,13 @@ export function authorShareChart(author, formatted_data) {
         author: lab.author,
         count: lab.authorDays,
         percent: lab.authorPct,
-        daysStart: lab.y_days - lab.authorDays,
-        daysEnd: lab.y_days,
-        percentStart: lab.y_pct - lab.authorPct,
-        percentEnd: lab.y_pct,
+        daysStart: 0,
+        daysEnd: lab.authorDays,
+        percentStart: 0,
+        percentEnd: lab.authorPct,
+        x1: lab.x1,
+        x2: lab.x2,
+        xMid: lab.xMid,
       });
     }
 
@@ -576,122 +474,31 @@ export function authorShareChart(author, formatted_data) {
   }
 
   /* ---------- Mark builders ---------- */
-  function renderDaysMode(chartData) {
-    const { segments, perYearTotals, authors } = chartData;
-    const yMax = d3.max(perYearTotals, (d) => d.totalDays) ?? 0;
-    const marks = [];
-
-    if (showTotalBars) {
-      const totalDaysLabels = Plot.text(
-        perYearTotals.map((d) => ({ ...d, _y: d.totalDays + 1.0 })),
-        {
-          x: "year",
-          y: (d) => d._y,
-          text: (d) => `${d.totalDays}`,
-          textAnchor: "middle",
-          fontWeight: "bold",
-          fontSize: fontScale,
-          fill: theme.totalLabel,
-          clip: false,
-          dy: -6,
-        }
-      );
-
-      marks.push(
-        Plot.barY(perYearTotals, {
-          x: "year",
-          y: "totalDays",
-          fill: theme.totalBar,
-          className: "total-bars",
-          tip: {
-            channels: {
-              Year: (d) => d.year,
-              Performances: (d) => d.totalDays,
-            },
-            format: {
-              Year: (v) => `${v}`,
-              x: false,
-              y: false,
-            },
-          },
-        }),
-        totalDaysLabels
-      );
-    }
-
-    // Author shares (always shown)
-    marks.push(
-      Plot.barY(segments, {
-        x: "year",
-        y: "daysEnd",
-        y1: "daysStart",
-        fill: "origin",
-        opacity: 0.9,
-        tip: {
-          channels: {
-            Author: (d) => d.author,
-            "Share of total": (d) => d.percent,
-            "Author days": (d) => d.count,
-          },
-          format: {
-            "Share of total": (v) => `${v.toFixed(2)}%`,
-            "Author days": (v) => v,
-            x: false,
-            y: false,
-          },
-        },
-      }),
-      Plot.ruleY([0])
-    );
-
-    return {
-      config: {
-        y: {
-          label: "Number of Performances",
-          grid: true,
-          domain: [0, yMax],
-        },
-        title: `Author(s): ${authors.join("; ")} — Days`,
-      },
-      marks,
-    };
-  }
-
-  function renderPercentMode(chartData, ceiling) {
-    const { segments, perYearTotals, authorLabels, authors } = chartData;
-    const c = Math.min(100, Math.round(Number.isFinite(ceiling) ? ceiling : 100));
+  function renderPercentMode(chartData) {
+    const { segments, authors } = chartData;
+    const c = Math.min(100, Math.ceil(chartData.maxStackPct ?? 100));
     const extraSpace = (chartData.maxStackPct ?? 0) * 0.06;
 
     const marks = [];
 
-    // Optional total bar in percent mode
-    if (showTotalBars) {
-      marks.push(
-        Plot.barY(perYearTotals, {
-          x: "year",
-          y: c + extraSpace,
-          fill: theme.totalBar,
-          className: "total-bars",
-          inset: 0,
-        })
-      );
-    }
-
     // Author share bars (always shown)
     marks.push(
-      Plot.barY(segments, {
-        x: "year",
-        y: "percentEnd",
+      Plot.rectY(segments, {
+        x1: "x1",
+        x2: "x2",
         y1: "percentStart",
+        y2: "percentEnd",
         fill: "origin",
         opacity: 0.9,
         tip: {
           channels: {
+            Year: (d) => d.year,
             Author: (d) => d.author,
             "% of total": (d) => d.percent,
             "Author days": (d) => d.count,
           },
           format: {
+            Year: (v) => `${v}`,
             "% of total": (v) => `${v.toFixed(2)}%`,
             "Author days": (v) => v,
             x: false,
@@ -716,14 +523,12 @@ export function authorShareChart(author, formatted_data) {
         )} — % of total (0–${c}%)`,
       },
       marks,
-      labelsData: authorLabels,
     };
   }
 
   function textureOverlayMarks(
     segments,
     authors,
-    space = "days",
     bg = theme.textureBG
   ) {
     const { defs, urlBy } = buildAuthorOriginPatterns(
@@ -734,11 +539,7 @@ export function authorShareChart(author, formatted_data) {
       /* opaqueSolid */ false
     );
 
-    const yTop = space === "days" ? "daysEnd" : "percentEndClamped";
-    const yBot = space === "days" ? "daysStart" : "percentStartClamped";
-
     const data = segments
-      .filter((s) => authors.indexOf(s.author) > 0)
       .map((s) => ({
         ...s,
         _tex: urlBy.get(s.author)?.get(s.origin) || "none",
@@ -746,10 +547,11 @@ export function authorShareChart(author, formatted_data) {
 
     return [
       () => defs,
-      Plot.barY(data, {
-        x: "year",
-        y: yTop,
-        y1: yBot,
+      Plot.rectY(data, {
+        x1: "x1",
+        x2: "x2",
+        y1: "percentStartClamped",
+        y2: "percentEndClamped",
         fill: "_tex",
         stroke: null,
         opacity: 1,
@@ -764,15 +566,12 @@ export function authorShareChart(author, formatted_data) {
       bg,
       "chart-combined-"
     );
-    const fillOf = (a) =>
-      authors.indexOf(a) === 0 ? theme.combinedBar : urlByAuthor.get(a) || theme.combinedBar ;
+    const fillOf = (a) => urlByAuthor.get(a) || theme.combinedBar;
     return { defs, fillOf };
   }
 
   /* ---------- UI ---------- */
-  let mode = "days";
   let showLabels = true;
-  let showTotalBars = true;
   let combineOrigins = false;
 
   const wrapper = createEl("div", { styles: { display: "grid", gap: "8px" } });
@@ -781,8 +580,10 @@ export function authorShareChart(author, formatted_data) {
   const authorsBar = createEl("div", {
     styles: { fontSize: "12px", color: theme.textMuted },
   });
-  const renderAuthorsLabel = (list) => {
-    authorsBar.innerHTML = `<b>Authors To Compare: [${(list ?? []).join("; ")}]`;
+  const renderAuthorsLabel = (list, exceeded = false) => {
+    authorsBar.innerHTML = `<b>Authors To Compare:</b> [${(list ?? []).join("; ")}]${
+      exceeded ? ' <span style="color: #ef4444; font-weight: bold; margin-left: 8px;">(3 authors max!)</span>' : ""
+    }`;
   };
   renderAuthorsLabel(latestAuthorsToCompare);
 
@@ -790,48 +591,6 @@ export function authorShareChart(author, formatted_data) {
   const authorLegend = createEl("div", {
     styles: { display: "grid", gap: "6px", marginTop: "4px", width: "fit-content" },
   });
-
-  // Mode controls
-  const controls = createEl("div", {
-    styles: { display: "flex", gap: "8px", alignItems: "center" },
-  });
-  const modeLabel = createEl("span", {
-    styles: { fontSize: "14px", color: theme.textMuted },
-    props: { textContent: "Mode:" },
-  });
-
-  const modeButton = createEl("button", {
-    styles: {
-      display: "inline-flex",
-      alignItems: "center",
-      justifyContent: "center",
-      height: "32px",
-      padding: "0 10px",
-      border: "1px solid theme.bg",
-      borderRadius: "6px",
-      background: theme.bg,
-      color: theme.textureBG,
-      cursor: "pointer",
-      font: "inherit",
-    },
-  });
-
-  const hint = createEl("span", {
-    styles: { fontSize: "12px", whiteSpace: "nowrap" },
-    props: { textContent: "‘#’ = days, ‘%’ = percent" },
-  });
-
-  const percentSlider = createEl("input", {
-    styles: {
-      width: "160px",
-      display: "none",
-      marginLeft: "6px",
-      cursor: "pointer",
-    },
-    props: { type: "range", min: "1", max: "100", step: "1", value: "100" },
-  });
-
-  controls.append(modeLabel, modeButton, hint, percentSlider);
 
   const labelsToggle = createEl("label", {
     styles: {
@@ -845,23 +604,6 @@ export function authorShareChart(author, formatted_data) {
     html: `<input type="checkbox" style="transform: translateY(1px);" checked> Show author labels`,
   });
   const labelsCheckbox = labelsToggle.querySelector("input");
-
-  const totalsToggle = createEl("label", {
-    styles: {
-      display: "inline-flex",
-      alignItems: "center",
-      gap: "8px",
-      fontSize: "12px",
-      color: theme.textMuted,
-      paddingLeft: "2px",
-    },
-    html: `<input type="checkbox" style="transform: translateY(1px);" checked> Show total performances`,
-  });
-  const totalsCheckbox = totalsToggle.querySelector("input");
-  totalsCheckbox.addEventListener("change", () => {
-    showTotalBars = !!totalsCheckbox.checked;
-    update();
-  });
 
   const combineToggle = createEl("label", {
     styles: {
@@ -884,23 +626,12 @@ export function authorShareChart(author, formatted_data) {
 
   // Layout
   wrapper.append(
-    controls,
     labelsToggle,
-    totalsToggle,
     combineToggle,
     authorsBar,
     authorLegend,
     chartHost
   );
-
-  // Pause graph animation when adjusting slider
-  let isScrubbing = false;
-  percentSlider.addEventListener("pointerdown", () => (isScrubbing = true));
-  percentSlider.addEventListener("pointerup", () => (isScrubbing = false));
-  percentSlider.addEventListener("pointercancel", () => (isScrubbing = false));
-  percentSlider.addEventListener("blur", () => (isScrubbing = false));
-
-  let lastChartPlot = null;
 
   /* ---------- Render/update ---------- */
   function update(init = false) {
@@ -909,44 +640,22 @@ export function authorShareChart(author, formatted_data) {
 
     // Update UI colors to current theme
     authorsBar.style.color = theme.textMuted;
-    modeLabel.style.color = theme.textMuted;
     labelsToggle.style.color = theme.textMuted;
-    totalsToggle.style.color = theme.textMuted;
     combineToggle.style.color = theme.textMuted;
-    modeButton.style.background = theme.bg;
 
     chartHost.innerHTML = "";
     const chartData = deriveStacked();
     const { authors } = chartData;
 
-    // Single background used for pattern defs in this render,
-    // depending on light/dark mode and whether totals are shown.
     const isDark = checkDarkMode();
-    const patternBG = showTotalBars
-    ? (isDark ? "#ffffff" : "#313338")
-    : (isDark ? "#1e1e1e" : "#ffffff");
+    const patternBG = isDark ? "#1e1e1e" : "#ffffff";
 
-    // Slider min = tallest bar (maxStackPct) → 100
-    if (init || mode === "percent") {
-      percentSlider.min = String(
-        Math.min(100, Math.ceil(chartData.maxStackPct ?? 0))
-      );
-    }
-
-    const sliderMinNum = Number(percentSlider.min) || 1;
-    const sliderValNum = Number(percentSlider.value);
-    const ceiling = Math.max(
-      sliderMinNum,
-      Math.min(100, Number.isFinite(sliderValNum) ? sliderValNum : 100)
-    );
+    const ceiling = Math.min(100, Math.ceil(chartData.maxStackPct ?? 100));
 
     const combined = combineOrigins ? combineSegmentsByAuthor(chartData) : null;
 
     // 1. Start from the *normal* chart for this mode
-    const base =
-      mode === "days"
-        ? renderDaysMode(chartData)
-        : renderPercentMode(chartData, ceiling);
+    const base = renderPercentMode(chartData);
 
     let marks = [...base.marks];
     let baseConfig = base.config;
@@ -954,24 +663,15 @@ export function authorShareChart(author, formatted_data) {
     if (!combineOrigins) {
       // Original behavior (origins stacked + texture overlay),
       // using patternBG consistently.
-      const overlay =
-        mode === "days"
-          ? textureOverlayMarks(
-              chartData.segments,
-              chartData.authors,
-              "days",
-              patternBG
-            )
-          : textureOverlayMarks(
-              chartData.segments.map((s) => ({
-                ...s,
-                percentEndClamped: Math.min(s.percentEnd, ceiling),
-                percentStartClamped: Math.min(s.percentStart, ceiling),
-              })),
-              chartData.authors,
-              "pct",
-              patternBG
-            );
+      const overlay = textureOverlayMarks(
+        chartData.segments.map((s) => ({
+          ...s,
+          percentEndClamped: Math.min(s.percentEnd, ceiling),
+          percentStartClamped: Math.min(s.percentStart, ceiling),
+        })),
+        chartData.authors,
+        patternBG
+      );
 
       marks.push(...overlay);
     } else {
@@ -981,81 +681,55 @@ export function authorShareChart(author, formatted_data) {
       );
       const defsMark = () => defs;
 
-      const AUTHOR_BARS_INDEX = 1;
+      const AUTHOR_BARS_INDEX = 0;
 
       const baseWithoutAuthorBars = marks.filter((_, i) => i !== AUTHOR_BARS_INDEX);
 
-      const combinedBarMark =
-        mode === "days"
-          ? Plot.barY(
-              combined.map((s) => ({ ...s, _fill: fillOf(s.author) })),
-              {
-                x: "year",
-                y: "daysEnd",
-                y1: "daysStart",
-                fill: "_fill",
-                opacity: 1,
-                stroke: null,
-                tip: {
-                  channels: {
-                    Author: (d) => d.author,
-                    "Author days": (d) => d.count,
-                  },
-                  format: {
-                    "Author days": (v) => v,
-                    x: false,
-                    y: false,
-                  },
-                },
-              }
-            )
-          : Plot.barY(
-              combined.map((s) => ({
-                ...s,
-                percentEnd: Math.min(s.percentEnd, ceiling),
-                percentStart: Math.min(s.percentStart, ceiling),
-                _fill: fillOf(s.author),
-              })),
-              {
-                x: "year",
-                y: "percentEnd",
-                y1: "percentStart",
-                fill: "_fill",
-                opacity: 1,
-                stroke: null,
-                tip: {
-                  channels: {
-                    Author: (d) => d.author,
-                    "% of total": (d) => d.percent,
-                    "Author days": (d) => d.count,
-                  },
-                  format: {
-                    "% of total": (v) => `${v.toFixed(2)}%`,
-                    "Author days": (v) => v,
-                    x: false,
-                    y: false,
-                  },
-                },
-              }
-            );
+      const combinedBarMark = Plot.rectY(
+        combined.map((s) => ({
+          ...s,
+          percentEnd: Math.min(s.percentEnd, ceiling),
+          percentStart: Math.min(s.percentStart, ceiling),
+          _fill: fillOf(s.author),
+        })),
+        {
+          x1: "x1",
+          x2: "x2",
+          y1: "percentStart",
+          y2: "percentEnd",
+          fill: "_fill",
+          opacity: 1,
+          stroke: null,
+          tip: {
+            channels: {
+              Year: (d) => d.year,
+              Author: (d) => d.author,
+              "% of total": (d) => d.percent,
+              "Author days": (d) => d.count,
+            },
+            format: {
+              Year: (v) => `${v}`,
+              "% of total": (v) => `${v.toFixed(2)}%`,
+              "Author days": (v) => v,
+              x: false,
+              y: false,
+            },
+          },
+        }
+      );
 
       marks = [defsMark, ...baseWithoutAuthorBars, combinedBarMark];
 
       baseConfig = {
         ...baseConfig,
-        title:
-          mode === "days"
-            ? `Author(s): ${chartData.authors.join(
-                "; "
-              )} — Days (combined)`
-            : `Author(s): ${chartData.authors.join(
-                "; "
-              )} — % of total (combined, 0–${ceiling}%)`,
+        title: `Author(s): ${chartData.authors.join(
+          "; "
+        )} — % of total (combined, 0–${ceiling}%)`,
       };
     }
 
     if (showLabels) {
-      marks.push(...makeAuthorLabels(mode, chartData.authorLabels, fontScale));
+      marks.push(...makeAuthorLabels(chartData.authorLabels, fontScale));
     }
 
     const plot = Plot.plot({
@@ -1072,45 +746,19 @@ export function authorShareChart(author, formatted_data) {
     chartHost.append(plot);
 
     plot.style.fontSize = `${11 * fontScale}px`;
-    modeButton.textContent = mode === "days" ? "#" : "%";
-    percentSlider.style.display = mode === "percent" ? "inline-block" : "none";
 
     // Legend texture background is white
     renderPatternLegend(authorLegend, authors, "#ffffff");
-
-    const duration = isScrubbing ? 0 : 800;
-    const morphed = morphBetweenCharts(lastChartPlot, plot, {
-      duration,
-      ease: d3.easeCubicInOut,
-    });
-    if (!isScrubbing && !morphed) {
-      riseBars(plot, {
-        duration: 800,
-        stagger: 5,
-        selector: ".total-bars rect",
-      });
-    }
-    lastChartPlot = plot;
   }
 
   /* ---------- Events ---------- */
-  modeButton.addEventListener("click", () => {
-    mode = mode === "days" ? "percent" : "days";
-    if (mode === "percent") percentSlider.value = "100";
-    update();
-  });
-
-  percentSlider.addEventListener("input", () => {
-    if (mode === "percent") update();
-  });
-
   labelsCheckbox.addEventListener("change", () => {
     showLabels = !!labelsCheckbox.checked;
     update();
   });
 
   authorsCompareBus.addEventListener("authors:update", (e) => {
-    renderAuthorsLabel(e.detail.authors);
+    renderAuthorsLabel(e.detail.authors, e.detail.exceeded);
     update();
   });
 
