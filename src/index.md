@@ -130,11 +130,13 @@ const data_origin = new Map();
 data_origin.set("french", french);
 data_origin.set("danish", danish);
 data_origin.set("dutch", dutch);
+data_origin.set("saint-domingue", saintDomingue);
 
 const combined_data = [
   ...danish,
   ...french.map(d => ({ ...d, origin: "french" })),
-  ...dutch.map(d => ({ ...d, origin: "dutch" }))
+  ...dutch.map(d => ({ ...d, origin: "dutch" })),
+  ...saintDomingue.map(d => ({ ...d, origin: "saint-domingue" }))
 ];
 
 ```
@@ -687,6 +689,8 @@ import {
   emitAuthorsToCompare,
   addAuthorToCompare,
   clearAuthorsToCompare,
+  authorsCompareBus,
+  latestAuthorsToCompare
 } from "./components/author-share.js";
 
 if (authorShare) {
@@ -697,28 +701,40 @@ if (authorShare) {
 ```
 
 ```js
-let authorsToCompare = [];
 
 if (authorShare) {
-  view(
-    Inputs.button("Add author", {
-      value: null,
-      reduce: () => {
-        addAuthorToCompare(author);
-        return null;
-      }
-    })
-  );
+  const container = document.createElement("div");
+  let currentAuthors = latestAuthorsToCompare;
+  
+  const renderControls = () => {
+    container.innerHTML = "";
+    if (currentAuthors.length >= 3) {
+      const msg = document.createElement("div");
+      msg.style.color = "#ef4444";
+      msg.style.fontWeight = "bold";
+      msg.style.marginBottom = "8px";
+      msg.textContent = "Cannot add more authors to chart!";
+      container.appendChild(msg);
+    } else {
+      const btn = Inputs.button("Add author", {
+        reduce: () => {
+          addAuthorToCompare(author);
+          return null;
+        }
+      });
+      container.appendChild(btn);
+    }
+  };
 
-  view(
-    Inputs.button("Clear authors", {
-      value: null,
-      reduce: () => {
-        clearAuthorsToCompare();
-        return null;
-      }
-    })
-  );
+  renderControls();
+  const updateHandler = (e) => {
+    currentAuthors = e.detail.authors;
+    renderControls();
+  };
+  authorsCompareBus.addEventListener("authors:update", updateHandler);
+  invalidation.then(() => authorsCompareBus.removeEventListener("authors:update", updateHandler));
+  
+  display(container);
 } else {
   display(html`<div></div>`)
 }
@@ -1192,7 +1208,8 @@ const COLOR = new Map([
   ["Danish",       "#ef4444"],
   ["French",       "#3b82f6"],
   ["Dutch",        "#16a34a"],
-  ["New Orleans",  "#a855f7"]
+  ["New Orleans",  "#a855f7"],
+  ["Saint-Domingue", "#6cc5b0"]
 ]);
 try { for (const [k,c] of COLOR) ORIGIN_COLOR.set(k, c); } catch {}
 
