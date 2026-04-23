@@ -1,12 +1,30 @@
 <script>
   import { base } from '$app/paths';
-  import mapSvg from './assets/interstage_world_map.svg';
+  import mapSvg from './assets/interstage_world_map_empty.svg';
+  import { markers } from './markers_config.js';
 </script>
 
 <div class="page-wrapper">
   <section class="hero-container">
     <div class="image-wrapper">
-      <img class="map-image" src={mapSvg} alt="Map of the Atlantic World" />
+      <div class="map-container">
+        <img class="map-image" src={mapSvg} alt="Map of the Atlantic World" />
+        <!-- Map markers generated dynamically from markers.js -->
+        {#each markers as marker}
+          <div 
+            class="marker" 
+            style="
+              width: {marker.width};
+              top: {marker.top}; 
+              left: {marker.left}; 
+              -webkit-mask-image: url('{marker.src}'); 
+              mask-image: url('{marker.src}');
+              -webkit-clip-path: {marker.clipPath};
+              clip-path: {marker.clipPath};
+            "
+          ></div>
+        {/each}
+      </div>
     </div>
 
     <div class="hero-text">
@@ -47,7 +65,7 @@
     align-items: center;
     max-width: 900px;
     width: 100%;
-    gap: 1rem;
+    transform: translateY(-30px);
   }
 
   .image-wrapper {
@@ -56,14 +74,54 @@
     justify-content: center;
   }
 
+  .map-container {
+    position: relative;
+    width: 100%;
+    max-width: 700px; /* map size */
+    margin-bottom: 1rem; /* height of text below map */
+    transform: translateY(10px);
+  }
+
   .map-image {
     width: 100%;
-    max-width: 700px;
     height: auto;
     display: block;
     border-radius: 4px;
     box-shadow: 0px 20px 50px -20px rgba(0, 0, 0, 0.3);
-    transform: translateY(-20px);
+  }
+
+  .marker {
+    position: absolute;
+    height: 80px; /* Modify this value to set your desired height */
+    scale: 78%;
+    
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: bottom center;
+    mask-position: bottom center;
+    
+    background-color: #2e332b; /* default marker color */
+    
+    -webkit-user-select: none;
+    user-select: none;
+
+    /* for debugging purposes */
+    /* -webkit-mask-image: none !important;
+    mask-image: none !important;
+    background-color: rgba(255, 0, 0, 0.5) !important; */
+    
+    transform: translate(-53%, -100%);
+    transition: transform 0.2s ease, background-color 0.2s ease, filter 0.2s ease;
+    cursor: pointer;
+  }
+
+  .marker:hover {
+    transform: translate(-50%, -110%) scale(1.1);
+    background-color: #fafafa; /* Exact hex color on hover (blue) */
+    filter: drop-shadow(0 4px 6px rgba(0,0,0,0.4));
+    z-index: 10;
   }
 
   .hero-text {
@@ -76,7 +134,6 @@
     font-weight: 700;
     margin: 0 0 0.35rem 0;
     letter-spacing: 0em;
-    transform: translateY(-30px);
   }
 
   .subtitle {
@@ -84,9 +141,8 @@
     font-weight: 500;
     font-size: 1.25rem;
     margin-top: 0.25rem;
-    margin-bottom: 1.5rem;
+    margin-bottom: 0.5rem; /* Reduced to pull the paragraph up */
     color: #333;
-    transform: translateY(-30px);
   }
 
   .intro {
@@ -94,7 +150,7 @@
     line-height: 1.8;
     color: #222;
     margin: 0 auto;
-    transform: translateY(-40px);
+    transform: translateY(6px);
   }
 
   /* Responsive Adjustments */
