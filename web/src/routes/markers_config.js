@@ -40,7 +40,8 @@ export const markers = [
     top: '37.5%',
     left: '79.8%',
     width: '60px',
-    clipPath: generateClipPath('60px')
+    clipPath: generateClipPath('60px'),
+    popupImage: '/french_graph.png'
   },
 
   {

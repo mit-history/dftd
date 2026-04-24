@@ -670,7 +670,7 @@ if (overTime) {
   display(html`<h2>Comparative Performances Over Time</h2>`);
   display(
     full_formatted_data.length > 0
-      ? html`<div class="full-bleed">
+      ? html`<div class="full-bleed" id="french-graph-container">
           ${compareYearsChart(full_formatted_data)}
         </div>`
       : html`<i>No data.</i>`

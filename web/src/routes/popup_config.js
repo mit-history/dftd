@@ -1,7 +1,7 @@
 export const popupContent = {
   'paris': {
     title: 'Paris, France',
-    description: 'TBA',
+    description: 'Performance data from the Comédie-Française for the years 1680-1793.',
   },
   'amsterdam': {
     title: 'Amsterdam, Netherlands',
