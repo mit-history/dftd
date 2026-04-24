@@ -2,29 +2,81 @@
   import { base } from '$app/paths';
   import mapSvg from './assets/interstage_world_map_empty.svg';
   import { markers } from './markers_config.js';
+  import { fade } from 'svelte/transition';
+  import { popupContent } from './popup_config.js';
+
+  const ZOOM_SCALE = 2.4;
+  let selectedMarkerId = null;
+
+  $: selectedMarker = markers.find(m => m.id === selectedMarkerId);
+  $: isRightSide = selectedMarker ? parseFloat(selectedMarker.left) > 50 : false;
+  $: activeTransform = selectedMarker ? calculateTransform(selectedMarker) : 'translate(0%, 0%) scale(1)';
+
+  function calculateTransform(m) {
+    const px = parseFloat(m.left);
+    const py = parseFloat(m.top);
+    
+    // centralize zoom to around markers
+    let tx = 50 - (px * ZOOM_SCALE);
+    let ty = 50 - (py * ZOOM_SCALE);
+    
+    // clamp within map borders
+    const minTx = 100 - (100 * ZOOM_SCALE);
+    const minTy = 100 - (100 * ZOOM_SCALE);
+    
+    tx = Math.max(minTx, Math.min(0, tx));
+    ty = Math.max(minTy, Math.min(0, ty));
+    
+    return `translate(${tx.toFixed(2)}%, ${ty.toFixed(2)}%) scale(${ZOOM_SCALE})`;
+  }
+
+  function handleMarkerClick(id, event) {
+    event.stopPropagation();
+    selectedMarkerId = id;
+  }
+
+  function clearSelection() {
+    selectedMarkerId = null;
+  }
 </script>
 
-<div class="page-wrapper">
+<div class="page-wrapper" style="overflow-x: hidden;">
   <section class="hero-container">
-    <div class="image-wrapper">
-      <div class="map-container">
-        <img class="map-image" src={mapSvg} alt="Map of the Atlantic World" />
-        <!-- Map markers generated dynamically from markers.js -->
-        {#each markers as marker}
-          <div 
-            class="marker" 
-            style="
-              width: {marker.width};
-              top: {marker.top}; 
-              left: {marker.left}; 
-              -webkit-mask-image: url('{marker.src}'); 
-              mask-image: url('{marker.src}');
-              -webkit-clip-path: {marker.clipPath};
-              clip-path: {marker.clipPath};
-            "
-          ></div>
-        {/each}
+    <div class="image-wrapper" style="position: relative;">
+      <!-- svelte-ignore a11y-click-events-have-key-events -->
+      <!-- svelte-ignore a11y-no-static-element-interactions -->
+      <div class="map-container" 
+           on:click={clearSelection}
+           class:zoomed={!!selectedMarkerId}
+      >
+        <div class="map-content" style="transform: {activeTransform};">
+          <img class="map-image" src={mapSvg} alt="Map of the Atlantic World" />
+          {#each markers as marker}
+            <div 
+              class="marker {selectedMarkerId === marker.id ? 'selected' : ''}" 
+              on:click={(e) => handleMarkerClick(marker.id, e)}
+              style="
+                width: {marker.width};
+                top: {marker.top}; 
+                left: {marker.left}; 
+                -webkit-mask-image: url('{marker.src}'); 
+                mask-image: url('{marker.src}');
+                -webkit-clip-path: {marker.clipPath};
+                clip-path: {marker.clipPath};
+              "
+            ></div>
+          {/each}
+        </div>
       </div>
+
+      {#if selectedMarker}
+        <div class="popup-panel {isRightSide ? 'left' : 'right'}" transition:fade={{ duration: 250 }}>
+          <h2>{popupContent[selectedMarker.id]?.title || selectedMarker.name}</h2>
+          <div class="placeholder-box"></div>
+          <p>{popupContent[selectedMarker.id]?.description || `Content for ${selectedMarker.name} coming soon.`}</p>
+          <p style="font-size: 0.85rem; color: #666; margin-top: 1rem;"><i>Click anywhere on the map to zoom out.</i></p>
+        </div>
+      {/if}
     </div>
 
     <div class="hero-text">
@@ -80,19 +132,32 @@
     max-width: 700px; /* map size */
     margin-bottom: 1rem; /* height of text below map */
     transform: translateY(10px);
+    z-index: 1;
+    border-radius: 4px;
+    box-shadow: 0px 20px 50px -20px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+  }
+
+  .map-content {
+    width: 100%;
+    height: 100%;
+    transform-origin: 0 0;
+    transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+  }
+
+  .map-container.zoomed {
+    z-index: 5;
   }
 
   .map-image {
     width: 100%;
     height: auto;
     display: block;
-    border-radius: 4px;
-    box-shadow: 0px 20px 50px -20px rgba(0, 0, 0, 0.3);
   }
 
   .marker {
     position: absolute;
-    height: 80px; /* Modify this value to set your desired height */
+    height: 80px;
     scale: 78%;
     
     -webkit-mask-size: contain;
@@ -102,7 +167,7 @@
     -webkit-mask-position: bottom center;
     mask-position: bottom center;
     
-    background-color: #2e332b; /* default marker color */
+    background-color: #2e332b;
     
     -webkit-user-select: none;
     user-select: none;
@@ -117,12 +182,38 @@
     cursor: pointer;
   }
 
-  .marker:hover {
+  .marker:hover, .marker.selected {
     transform: translate(-50%, -110%) scale(1.1);
-    background-color: #fafafa; /* Exact hex color on hover (blue) */
+    background-color: #fafafa;
     filter: drop-shadow(0 4px 6px rgba(0,0,0,0.4));
     z-index: 10;
   }
+
+  .popup-panel {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 320px;
+    background: #F6F3DE;
+    border-radius: 12px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+    padding: 2rem;
+    z-index: 100;
+    box-sizing: border-box;
+  }
+  .popup-panel h2 {
+    margin-top: 0;
+    color: #2e332b;
+  }
+  .placeholder-box {
+    width: 100%;
+    height: 120px;
+    background: #e9e9e9;
+    border-radius: 6px;
+    margin-bottom: 1rem;
+  }
+  .popup-panel.left { left: 0; }
+  .popup-panel.right { right: 0; }
 
   .hero-text {
     text-align: center;
@@ -141,7 +232,7 @@
     font-weight: 500;
     font-size: 1.25rem;
     margin-top: 0.25rem;
-    margin-bottom: 0.5rem; /* Reduced to pull the paragraph up */
+    margin-bottom: 0.5rem;
     color: #333;
   }
 
