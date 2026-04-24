@@ -75,11 +75,6 @@
       {#if selectedMarker}
         <div class="popup-panel {isRightSide ? 'left' : 'right'}" transition:fade={{ duration: 250 }}>
           <h2>{popupContent[selectedMarker.id]?.title || selectedMarker.name}</h2>
-          {#if selectedMarker.popupImage}
-            <img class="popup-image" src={selectedMarker.popupImage} alt="Data for {selectedMarker.name}" />
-          {:else}
-            <div class="placeholder-box"></div>
-          {/if}
           <p class="description-text">{popupContent[selectedMarker.id]?.description || `Content for ${selectedMarker.name} coming soon.`}</p>
           <p style="font-size: 0.85rem; color: #666; margin-top: 1rem;"><i>Click anywhere on the map to zoom out.</i></p>
         </div>
@@ -200,7 +195,7 @@
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    width: 480px; 
+    width: 320px; 
     background: #F6F3DE;
     border-radius: 12px;
     box-shadow: 0 20px 50px rgba(0,0,0,0.3);
@@ -212,24 +207,9 @@
     margin-top: 0;
     color: #2e332b;
   }
-  .placeholder-box {
-    width: 100%;
-    height: 120px;
-    background: #e9e9e9;
-    border-radius: 6px;
-    margin-bottom: 0.5rem;
-  }
-  .popup-image {
-    width: 100%;
-    height: auto;
-    background: #fff;
-    border: 8px solid #1e1e1e; /* Dark border around the image */
-    box-sizing: border-box;
-    border-radius: 6px;
-    margin-bottom: 0.5rem;
-  }
   .description-text {
     margin-top: 0.25rem;
+    white-space: pre-line;
   }
   .popup-panel.left { left: 0; }
   .popup-panel.right { right: 0; }

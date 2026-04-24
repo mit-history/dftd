@@ -5,27 +5,27 @@ export const popupContent = {
   },
   'amsterdam': {
     title: 'Amsterdam, Netherlands',
-    description: 'TBA',
+    description: 'Performance data for Schouwburg Theater, 1748-1798.',
   },
   'copenhagen': {
     title: 'Copenhagen, Denmark',
-    description: 'TBA',
+    description: 'Performance data for the Royal Danish Theater, 1748-1798.',
   },
   'madrid': {
     title: 'Madrid, Spain',
-    description: 'TBA',
+    description: 'Performance data for Teatro de la Cruz, 1748-1800.\nPerformance data for Teatro del Principe, 1748-1800.',
   },
   'london': {
     title: 'London, England',
-    description: 'TBA',
+    description: 'Performance data for Drury Lane Theater, 1766-1800.\nPerformance data for Covent Garden Theater, 1766-1800.',
   },
   'saint-domingue': {
     title: 'Saint-Domingue',
-    description: 'TBA',
+    description: 'Performance data for all theaters, 1764-1791.',
   },
   'new orleans': {
     title: 'New Orleans, Louisiana',
-    description: 'TBA',
+    description: 'Performance data for all theaters, 1805-1813.',
   }
   
 };
