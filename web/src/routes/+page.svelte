@@ -16,8 +16,11 @@
     const px = parseFloat(m.left);
     const py = parseFloat(m.top);
     
-    // centralize zoom to around markers
-    let tx = 50 - (px * ZOOM_SCALE);
+    // Shift the focal point left or right to make room for the wider popup
+    const targetX = (px > 50) ? 70 : 30;
+
+    // centralize zoom to around shifted target
+    let tx = targetX - (px * ZOOM_SCALE);
     let ty = 50 - (py * ZOOM_SCALE);
     
     // clamp within map borders
@@ -119,7 +122,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    max-width: 900px;
+    max-width: 1000px; /* Widened slightly to give the popup more breathing room */
     width: 100%;
     transform: translateY(-30px);
   }
