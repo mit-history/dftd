@@ -7,7 +7,7 @@ toc: false
 const french = await FileAttachment("data/french-performances.json").json();
 const dutch = await FileAttachment("data/dutch-performances.csv").csv({typed: true});
 const saintDomingue = await FileAttachment("data/saint_domingue/formatted_saint_domingue.json").json();
-const london = await FileAttachment('data/theatronomics/formatted_london.json').json()
+const london = await FileAttachment('data/london/formatted_london.json').json()
 const coventGarden = london.filter(d => d.place == "Covent Garden");
 const druryLane = london.filter(d => d.place == "Drury Lane")
 
@@ -723,7 +723,7 @@ if (authorShare) {
 if (authorShare) {
   const container = document.createElement("div");
   let currentAuthors = latestAuthorsToCompare;
-  
+
   const renderControls = () => {
     container.innerHTML = "";
     if (currentAuthors.length >= 3) {
@@ -751,7 +751,7 @@ if (authorShare) {
   };
   authorsCompareBus.addEventListener("authors:update", updateHandler);
   invalidation.then(() => authorsCompareBus.removeEventListener("authors:update", updateHandler));
-  
+
   display(container);
 } else {
   display(html`<div></div>`)
