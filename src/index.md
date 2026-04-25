@@ -7,6 +7,9 @@ toc: false
 const french = await FileAttachment("data/french-performances.json").json();
 const dutch = await FileAttachment("data/dutch-performances.csv").csv({typed: true});
 const saintDomingue = await FileAttachment("data/saint_domingue/formatted_saint_domingue.json").json();
+const london = await FileAttachment('data/theatronomics/formatted_london.json').json()
+const coventGarden = london.filter(d => d.place == "Covent Garden");
+const druryLane = london.filter(d => d.place == "Drury Lane")
 
 // Load & normalize the Danish performances directly from the raw JSON
 const danish_raw = await FileAttachment("data/danish-performances.json").json();
@@ -493,7 +496,7 @@ const randomDates = () =>  {
 ```
 
 ```js
-const originOptions = ["danish", "dutch", "french", "saint-domingue"];
+const originOptions = ["danish", "dutch", "french", "saint-domingue", 'covent garden', 'drury lane'];
 const originsInput = Inputs.checkbox(originOptions, {label: "Origin", value: originOptions});
 const originsSelect = Inputs.toggle({label: "Select All", value: true})
 const origins = view(originsInput);
@@ -613,6 +616,21 @@ const formatted_stdmg = saintDomingue.filter(d => {
   const dt = asDate(d.date);
   return dt && dt > start_date && dt <= end_date && origins.includes(d.origin);
 });
+const formatted_london = london.filter(d => {
+  const dt = asDate(d.date);
+  return dt && dt > start_date && dt <= end_date && origins.includes(d.origin);
+});
+console.log('covent garden', coventGarden);
+const formatted_cv = coventGarden.filter(d => {
+  const dt = asDate(d.date);
+  return dt && dt > start_date && dt <= end_date && origins.includes('covent garden');
+});
+console.log('formatted covent garden', formatted_cv);
+
+const formatted_dl = druryLane.filter(d => {
+  const dt = asDate(d.date);
+  return dt && dt > start_date && dt <= end_date && origins.includes('drury lane');
+})
 
 
 const yearsInView = Array.from(
@@ -639,7 +657,7 @@ function compareYearsChart(data) {
     title: `Compare performances per year, ${start_date.getFullYear()}–${end_date.getFullYear()}`,
     fx: { label: null, padding: 0.1 },
     x: { axis: null, paddingOuter: 0.2 },
-    y: { grid: true, label: "Performances", domain: [0, 366] },
+    y: { grid: true, label: "Performances", domain: [0, 366*2] },
     color: { legend: true },
     width: window.innerWidth,
     marginBottom: 60,
@@ -661,7 +679,7 @@ function compareYearsChart(data) {
 ```
 
 ```js
-const full_formatted_data = formatted_data.concat(formatted_stdmg);
+const full_formatted_data = formatted_data.concat(formatted_stdmg).concat(formatted_cv.map(d => {d.origin = 'covent garden'; return d})).concat(formatted_dl.map(d => {d.origin = 'drury lane'; return d}));
 if (overTime) {
   display(html`<h2>Comparative Performances Over Time</h2>`);
   display(
@@ -728,6 +746,17 @@ import { rangeInput } from "./components/range_input.js";
 ```
 
 ```js
+const maxes = {}
+for(const loc of [combined_data.filter(d => d.origin == 'french'), combined_data.filter(d => d.origin == 'dutch'), coventGarden, druryLane, saintDomingue]){
+  maxes[loc[0].origin] = Math.max(...Object.values(loc.reduce((acc, d) => {
+      acc[d.author] = (acc[d.author] || 0) + 1;
+      return acc;
+  }, {})))
+}
+console.log('maxes', maxes)
+```
+
+```js
 display(bubble ? html `<h2>Authors Performed By Location</h2>` : html`<div></div>`);
 ```
 
@@ -747,9 +776,9 @@ const do_overall_threshold_val = bubble?view(do_overall_threshold):false;
 display(bubble? html `<div></h2>` : html`<div></div>`);
 const overall_threshold = rangeInput({
   min: 0,
-  max: percent_absolute_val=="percentage"?100:combined_data.length,
+  max: percent_absolute_val=="percentage"?100:Math.max(...Object.values(maxes)),
   step: 1,
-  value: [0, 100],
+  value: [0, percent_absolute_val=="percentage"?100:Math.max(...Object.values(maxes))],
   enableTextInput: true
 });
 const overall_threshold_val = do_overall_threshold_val?view(overall_threshold):[0,0];
@@ -761,9 +790,9 @@ display(bubble? html `<h2>French</h2>` : html`<div></div>`);
 display(bubble&&!do_overall_threshold_val? html`<p>Threshold Range</p>`:html`<div></div>`);
 const french_threshold = rangeInput({
   min: 0,
-  max: percent_absolute_val=="percentage"?100:combined_data.filter(d => d.origin == 'french').length,
+  max: percent_absolute_val=="percentage"?100:maxes.french,
   step: 1,
-  value: [0, 100],
+  value: [0, percent_absolute_val=="percentage"?100:maxes.french],
   enableTextInput: true
 });
 const french_threshold_val = bubble? (do_overall_threshold_val?overall_threshold_val:view(french_threshold)):[0,0];
@@ -801,9 +830,9 @@ display(bubble? html `<h2>Dutch</h2>` : html`<div></div>`);
 display(bubble&&!do_overall_threshold_val? html`<p>Threshold Range</p>`:html`<div></div>`);
 const dutch_threshold = rangeInput({
   min: 0,
-  max: percent_absolute_val=="percentage"?100:combined_data.filter(d => d.origin == 'dutch').length,
+  max: percent_absolute_val=="percentage"?100:maxes.dutch,
   step: 1,
-  value: [0, 100],
+  value: [0, percent_absolute_val=="percentage"?100:maxes.dutch],
   enableTextInput: true
 });
 const dutch_threshold_val = bubble? (do_overall_threshold_val?overall_threshold_val:view(dutch_threshold)):[0,0];
@@ -828,9 +857,9 @@ display(bubble? html `<h2>Saint-Domingue</h2>` : html`<div></div>`)
 display(bubble&&!do_overall_threshold_val? html`<p>Threshold Range</p>`:html`<div></div>`);
 const stdmg_threshold = rangeInput({
   min: 0,
-  max: percent_absolute_val=="percentage"?100:combined_data.filter(d => d.origin == 'saint-domingue').length,
+  max: percent_absolute_val=="percentage"?100:maxes['saint-domingue'],
   step: 1,
-  value: [0, 100],
+  value: [0, percent_absolute_val=="percentage"?100:maxes['saint-domingue']],
   enableTextInput: true
 });
 const stdmg_threshold_val = bubble? (do_overall_threshold_val?overall_threshold_val:view(stdmg_threshold)):[0,0];
@@ -849,6 +878,62 @@ const sd_val = bubble?view(sd):[0,0];
 
 ```js
 display(bubble? authorBubble(saintDomingue, 'saint-domingue', 0, stdmg_threshold_val, sd_val[0], sd_val[1], percent_absolute_val): html`<div></div>`);
+```
+
+```js
+display(bubble? html `<h2>Covent Garden</h2>` : html`<div></div>`)
+display(bubble&&!do_overall_threshold_val? html`<p>Threshold Range</p>`:html`<div></div>`);
+const cv_threshold = rangeInput({
+  min: 0,
+  max: percent_absolute_val=="percentage"?100:maxes['covent garden'],
+  step: 1,
+  value: [0, percent_absolute_val=="percentage"?100:maxes['covent garden']],
+  enableTextInput: true
+});
+const cv_threshold_val = bubble? (do_overall_threshold_val?overall_threshold_val:view(cv_threshold)):[0,0];
+display(bubble? html`<p>Year Range</p>`:html`<div></div>`);
+const cv = rangeInput({
+  min: 1766,
+  max: 1800,
+  step: 1,
+  value: [1766, 1800],
+  enableTextInput: true
+});
+const cv_val = bubble?view(cv):[0,0];
+
+
+```
+
+```js
+display(bubble? authorBubble(coventGarden, 'covent garden', 0, cv_threshold_val, cv_val[0], cv_val[1], percent_absolute_val): html`<div></div>`);
+```
+
+```js
+display(bubble? html `<h2>Drury Lane</h2>` : html`<div></div>`)
+display(bubble&&!do_overall_threshold_val? html`<p>Threshold Range</p>`:html`<div></div>`);
+const dl_threshold = rangeInput({
+  min: 0,
+  max: percent_absolute_val=="percentage"?100:maxes['drury lane'],
+  step: 1,
+  value: [0, percent_absolute_val=="percentage"?100:maxes['drury lane']],
+  enableTextInput: true
+});
+const dl_threshold_val = bubble? (do_overall_threshold_val?overall_threshold_val:view(dl_threshold)):[0,0];
+display(bubble? html`<p>Year Range</p>`:html`<div></div>`);
+const dl = rangeInput({
+  min: 1766,
+  max: 1800,
+  step: 1,
+  value: [1766, 1800],
+  enableTextInput: true
+});
+const dl_val = bubble?view(dl):[0,0];
+
+
+```
+
+```js
+display(bubble? authorBubble(druryLane, 'drury lane', 0, dl_threshold_val, dl_val[0], dl_val[1], percent_absolute_val): html`<div></div>`);
 ```
 
 
@@ -1062,7 +1147,17 @@ const originToData = {
     .filter(d => {
       const dt = asDate(d.date);
       return dt && dt >= start_date && dt <= end_date;
-    })
+    }),
+  'covent garden': coventGarden
+    .filter(d => {
+      const dt = asDate(d.date);
+      return dt && dt >= start_date && dt <= end_date;
+    }),
+  'drury lane': druryLane
+    .filter(d => {
+      const dt = asDate(d.date);
+      return dt && dt >= start_date && dt <= end_date;
+    }),
 };
 
 // build the list in the order the user selected
