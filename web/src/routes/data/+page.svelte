@@ -4,47 +4,59 @@
   const visualizations = [
     {
       id: "over-time",
-      title: "Performances Over Time",
+      category: "Annual Performance Comparison",
+      title: "Annual Performance Counts",
       description:
         "Compare annual performance counts across Amsterdam, Copenhagen, and Paris within the selected date range."
     },
-    {
-      id: "genres",
-      title: "Genres Across Cities",
-      description:
-        "Explore how comedy, drama, ballet, and other genres shift across repertoires over time."
-    },
-    {
-      id: "authors",
-      title: "Performances by Author",
-      description:
-        "See how frequently different playwrights appear in each dataset, and compare author influence across cities."
-    },
+    // {
+    //   id: "genres",
+    //   title: "Genres Across Cities",
+    //   description:
+    //     "Explore how comedy, drama, ballet, and other genres shift across repertoires over time."
+    // },
+    // {
+    //   id: "authors",
+    //   title: "Performances by Author",
+    //   description:
+    //     "See how frequently different playwrights appear in each dataset, and compare author influence across cities."
+    // },
     {
       id: "days",
-      title: "Days with Performances",
+      category: "Annual Performance Comparison",
+      title: "Animated Line Chart Showing Annual Performance Totals",
       description:
         "View daily patterns of performances, highlighting seasonality and repertoire activity across the year."
     },
     {
       id: "calendar",
+      category: "Performance Calendar",
       title: "Global Theatre Calendar",
       description:
         "Browse a calendrical view of performances across Amsterdam, Copenhagen, Paris, and New Orleans, with filters for date range, venue, and historical overlays."
     },
     {
       id: "authorShare",
-      title: "Author Share",
+      category: "Authors",
+      title: "Author Presence in Repertories - Bar Graph",
       description:
         "Compare how much of each city’s repertoire is accounted for by a chosen author, using percentage-based stacked bar charts over time."
     },
     {
       id: "bubble",
-      title: "Author Bubble",
+      category: "Authors",
+      title: "Author Presence in Repertories - Bubble Graph.",
       description:
         "Explore where authors are performed with bubble visualizations by city, time window, and frequency thresholds."
     }
   ];
+
+  const categories = [
+    "Authors",
+    "Genres",
+    "Annual Performance Comparison",
+    "Performance Calendar"
+  ]
 </script>
 
 <svelte:head>
@@ -81,7 +93,7 @@
 </section>
 
 
-    <section class="menu-grid">
+    <!-- <section class="menu-grid">
       {#each visualizations as viz}
         <a href={base + "/data/" + viz.id} class="card">
           <h3>{viz.title}</h3>
@@ -89,12 +101,101 @@
           <span class="arrow">Open visualization →</span>
         </a>
       {/each}
+    </section> -->
+
+    <section class="categories-list">
+      {#each categories as cat}
+      <div class="category-card">
+        <h2>{cat}</h2>
+        {#each visualizations.filter(d => d.category === cat) as viz}
+          <div class="visualization-link">
+            <a href={base + "/data/" + viz.id}>
+              <h3>{viz.title}
+              <span class="arrow">→</span></h3>
+            </a>
+          </div>
+          {/each}
+      </div>
+      {/each}
     </section>
 
   </section>
 </main>
 
 <style>
+
+  .categories-list{
+    display: flex;
+    flex-direction: column;
+    margin-top: 1rem;
+    gap: 1.8rem;
+    text-align: left;
+  }
+
+  .category-card {
+    display: flex;
+    flex-direction: column;
+    padding: 1.75rem 1.5rem;
+    border-radius: 14px;
+    text-decoration: none;
+    border: 1px solid #e4e4e4;
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.04);
+    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s;
+    color: inherit;
+  }
+
+  .category-card h2 {
+    margin: 0 0 0.5rem;
+    font-size: 1.25rem;
+    font-weight: 600;
+  }
+
+  .category-card div:first-of-type{
+    padding-top: 1rem;
+  }
+
+  .category-card div:last-of-type{
+    padding-bottom: 1rem;
+  }
+
+  .category-card h3 {
+    color: #555;
+    font-size: 0.97rem;
+    line-height: 1.5;
+  }
+
+  .visualization-link{
+    padding: 0.5rem;
+    display: flex;
+    align-items: center;
+    border-radius: 1rem;
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+  }
+
+  .visualization-link .arrow {
+    margin-top: auto;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #2b6cb0;
+  }
+
+  .visualization-link:hover,
+  .visualization-link:focus-visible {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.07);
+    /* border: 1px; */
+    /* border: solid 1px #2b6cb0; */
+  }
+
+  .visualization-link a{
+    text-decoration: none;
+  }
+
+
+
+
+
 
 
 
