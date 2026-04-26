@@ -22,6 +22,13 @@
     //     "See how frequently different playwrights appear in each dataset, and compare author influence across cities."
     // },
     {
+      id: "heat-map",
+      category: "Annual Performance Comparison",
+      title: "Heat Map Showing Performance Patterns",
+      description: ""
+
+    },
+    {
       id: "days",
       category: "Annual Performance Comparison",
       title: "Animated Line Chart Showing Annual Performance Totals",
@@ -45,7 +52,7 @@
     {
       id: "bubble",
       category: "Authors",
-      title: "Author Presence in Repertories - Bubble Graph.",
+      title: "Author Presence in Repertories - Bubble Graph",
       description:
         "Explore where authors are performed with bubble visualizations by city, time window, and frequency thresholds."
     }

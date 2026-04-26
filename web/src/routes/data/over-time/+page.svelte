@@ -30,20 +30,8 @@
   </section> -->
 
   <section class="viz-info">
-  <div class="chip">Over Time</div>
-  <h1>Performances Across the Years (1748–1798)</h1>
-
-  <p>
-    This visualization compares annual performance activity across French, Danish,
-    and Dutch theatres. Use it to identify long-term growth, disruptions, or cultural
-    transitions reflected in the theatrical record.
-  </p>
-
-  <ul class="keypoints">
-    <li>Filter by origin to focus on a single theatrical tradition.</li>
-    <li>Adjust date ranges to examine specific historical periods.</li>
-    <li>Hover over bars to view year-by-year performance counts.</li>
-  </ul>
+  <div class="chip">Annual Performance Comparison</div>
+  <h1>Annual Performance Counts</h1>
 </section>
 
 

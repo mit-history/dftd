@@ -20,20 +20,8 @@
   </section> -->
 
   <section class="viz-info">
-  <div class="chip">Author Map</div>
-  <h1>Geographic Distribution of Performed Authors</h1>
-
-  <p>
-    This map visualizes where authors were performed across Europe. Bubble sizes
-    reflect the number of performances at each location, revealing cultural hubs
-    and regions of influence.
-  </p>
-
-  <ul class="keypoints">
-    <li>Filter by origin or apply thresholds to highlight major authors.</li>
-    <li>Adjust year ranges to explore historical change over time.</li>
-    <li>Compare French, Dutch, and Danish locations side-by-side.</li>
-  </ul>
+  <div class="chip">Authors</div>
+  <h1>Author Presence in Repertories - Bubble Graph</h1>
 </section>
 
 

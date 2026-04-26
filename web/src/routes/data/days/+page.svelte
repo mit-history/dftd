@@ -19,20 +19,8 @@
   </section> -->
 
   <section class="viz-info">
-  <div class="chip">Days with Performances</div>
-  <h1>Daily Rhythms of Theatrical Activity</h1>
-
-  <p>
-    Examine how frequently performances occurred throughout each year. The animated
-    line and heatmap views reveal seasonal patterns, holiday gaps, and annual cycles
-    across theatre cultures.
-  </p>
-
-  <ul class="keypoints">
-    <li>Compare daily activity across countries using grouped lines.</li>
-    <li>Use the heatmap to identify high or low performance-density periods.</li>
-    <li>Filter by genre to explore specific artistic traditions.</li>
-  </ul>
+  <div class="chip">Annual Performance Comparison</div>
+  <h1>Animated Line Chart Showing Annual Performance Totals</h1>
 </section>
 
   <!-- Interactive visualization -->
