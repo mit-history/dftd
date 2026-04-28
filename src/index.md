@@ -413,6 +413,7 @@ const vizLabelById = {
   "genres": "Diverging Genres",
   "authors": "By Author",
   "days": "Days with Performances",
+  "heat-map": "Heat Map",
 
   // Author share variants
   "authorShare": "Author Share",
@@ -430,6 +431,7 @@ const vizLabelById = {
 // Full list of visualization labels
 const opt = [
   "Over Time",
+  "Heat Map",
   "Diverging Genres",
   "By Author",
   "Days with Performances",
@@ -469,7 +471,8 @@ const performanceDays = viz.includes("Days with Performances");
 const authorShare = viz.includes("Author Share");
 const bubble = viz.includes("Author Bubble");
 const calendar = viz.includes("Calendar");
-const nolaBubble = viz.includes("NOLA Genre Bubble")
+const nolaBubble = viz.includes("NOLA Genre Bubble");
+const heatMap = viz.includes("Heat Map");
 
 ```
 
@@ -685,7 +688,7 @@ function compareYearsChart(data) {
 ```js
 const full_formatted_data = formatted_data.concat(formatted_stdmg).concat(formatted_cv.map(d => {d.origin = 'covent garden'; return d})).concat(formatted_dl.map(d => {d.origin = 'drury lane'; return d}));
 if (overTime) {
-  display(html`<h2>Comparative Performances Over Time</h2>`);
+  // display(html`<h2>Comparative Performances Over Time</h2>`);
   display(
     full_formatted_data.length > 0
       ? html`<div class="full-bleed" id="french-graph-container">
@@ -696,7 +699,7 @@ if (overTime) {
 }
 
 if (divergingGenres) {
-  display(html`<h2>Comparative Performance Genres Over Time</h2>`);
+  // display(html`<h2>Comparative Performance Genres Over Time</h2>`);
 }
 
 ```
@@ -712,7 +715,7 @@ import {
 } from "./components/author-share.js";
 
 if (authorShare) {
-  display(html`<h2>Author Performance Contribution Percentage</h2>`);
+  // display(html`<h2>Author Performance Contribution Percentage</h2>`);
   display(authorShareChart(author, formatted_data));
   } else
   display(html`<div></div>`)
@@ -775,7 +778,7 @@ console.log('maxes', maxes)
 ```
 
 ```js
-display(bubble ? html `<h2>Authors Performed By Location</h2>` : html`<div></div>`);
+// display(bubble ? html `<h2>Authors Performed By Location</h2>` : html`<div></div>`);
 ```
 
 ```js
@@ -1101,7 +1104,7 @@ display(byAuthor
 ```
 
 ```js
-display(performanceDays ? html `<h2>Animated Line Chart and Heatmap of Days with Performances</h2>` : html`<div></div>`)
+// display(performanceDays ? html `<h2>Animated Line Chart of Days with Performances</h2>` : html`<div></div>`)
 display(performanceDays ? html `<p> Selected genres: ${genres.length === 0 ? "None" : genres.length === genreOptions.length ? "All" : genres.join(", ")} </p>` : html`<div></div>`)
 ```
 
@@ -1194,10 +1197,6 @@ origins.length > 0 && performanceDays ? document.getElementById("line-chart-cont
   createMultipleAnimatedLines(summarized_data, { width: containerWidth, height: 600 })
 ) : html`<i>No data.</i>`
 
-origins.length > 0 && performanceDays ? document.getElementById("heatmap-container").append(
-  createHeatmap(genre_data, { width: containerWidth, height: 600 })
-) : html`<i>No data.</i>`
-
 
 ```
 </div>
@@ -1205,12 +1204,21 @@ origins.length > 0 && performanceDays ? document.getElementById("heatmap-contain
 
 
 ```js
+// display(heatMap ? html `<h2>Heatmap of Days with Performances</h2>` : html`<div></div>`)
+
+display(origins.length > 0 && heatMap ? createHeatmap(genre_data, { width: containerWidth, height: 600 }) : html`<i>No data.</i>`)
+
+```
+
+
+
+```js
 // Heading for the calendar section – only when calendar viz is active
-display(
-  calendar
-    ? html`<h2>Global Theatre Calendar (1748 – 1798)</h2>`
-    : html`<div></div>`
-);
+// display(
+//   calendar
+//     ? html`<h2>Global Theatre Calendar (1748 – 1798)</h2>`
+//     : html`<div></div>`
+// );
 
 import { injectCalendarStyles, buildEvents, renderCalendar, ORIGIN_COLOR } from "./components/calendar.js";
 
