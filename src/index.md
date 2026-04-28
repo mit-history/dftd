@@ -731,18 +731,18 @@ if (authorShare) {
           const normalize = (str) => String(str || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 
           let datalist = document.getElementById("author-share-datalist");
-          if (!datalist) {
-            datalist = document.createElement("datalist");
-            datalist.id = "author-share-datalist";
-            authorOptions.forEach(opt => {
-              if (opt && opt !== "No author") {
-                const option = document.createElement("option");
-                option.value = opt;
-                datalist.appendChild(option);
-              }
-            });
-            document.body.appendChild(datalist);
-          }
+          if (datalist) datalist.remove();
+          
+          datalist = document.createElement("datalist");
+          datalist.id = "author-share-datalist";
+          authorOptions.forEach(opt => {
+            if (opt && opt !== "No author") {
+              const option = document.createElement("option");
+              option.value = opt;
+              datalist.appendChild(option);
+            }
+          });
+          document.body.appendChild(datalist);
 
           const textWidget = Inputs.text({ placeholder: "Type author name..." });
           const textInput = textWidget.querySelector("input");
@@ -752,9 +752,13 @@ if (authorShare) {
             const rawVal = textInput.value.trim();
             if (!rawVal) return;
             const normSearch = normalize(rawVal);
+            const searchWords = normSearch.split(/\s+/);
             
             let match = authorOptions.find(a => normalize(a) === normSearch) || 
-                        authorOptions.find(a => normalize(a).includes(normSearch));
+                        authorOptions.find(a => {
+                          const normA = normalize(a);
+                          return searchWords.every(word => normA.includes(word));
+                        });
                         
             if (match && match !== "No author") {
               addAuthorToCompare(match);
