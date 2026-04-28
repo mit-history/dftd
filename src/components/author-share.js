@@ -39,7 +39,7 @@ function createSvg(tag, attrs = {}) {
 }
 
 function checkDarkMode() {
-  return (
+  return (  
     window.matchMedia &&
     window.matchMedia("(prefers-color-scheme: dark)").matches
   );
@@ -186,7 +186,7 @@ function buildAuthorGrayPatterns(authors, bgColor, idPrefix = "combined-") {
 /* =============================================================================
    Legend
 ============================================================================= */
-function renderPatternLegend(legendEl, authors, bg = "#ffffff") {
+function renderPatternLegend(legendEl, authors, bg = "transparent") {
   legendEl.innerHTML = "";
   legendEl.style.display = !authors || authors.length < 2 ? "none" : "grid";
   if (!authors || authors.length < 2) return;
@@ -210,8 +210,7 @@ function renderPatternLegend(legendEl, authors, bg = "#ffffff") {
   });
   svg.style.display = "block";
   svg.appendChild(defs.cloneNode(true));
-
-  const origins = Object.keys(theaterColorMap);
+const origins = Object.keys(theaterColorMap);
   authors.forEach((name, idx) => {
     const y = pad + idx * (swatchH + pad);
     const g = createSvg("g");
@@ -224,7 +223,7 @@ function renderPatternLegend(legendEl, authors, bg = "#ffffff") {
       rx: 2,
     });
     rect.setAttribute("fill", `url(#legend-tex-a${idx}-${origins[0]})`);
-    rect.setAttribute("stroke", "#333");
+    rect.setAttribute("stroke", theme.textMuted);
 
     const label = createSvg("text", {
       x: swatchW + 8,
@@ -286,7 +285,7 @@ function makeAuthorLabels(labels, fontScale) {
 /* =============================================================================
    Main chart
 ============================================================================= */
-export function authorShareChart(author, formatted_data) {
+export function authorShareChart(author, formatted_data, controlsContainer) {
   // --- DEBUG: Check for Saint-Domingue data ---
   const sdData = formatted_data.filter(d => d.origin === "saint-domingue");
   console.log(`Found ${sdData.length} records for Saint-Domingue!`, sdData);
@@ -319,7 +318,7 @@ export function authorShareChart(author, formatted_data) {
     x: { label: "Year", tickFormat: "d", ticks },
     color: {
       domain: origins,
-      range: origins.map((k) => theaterColorMap[k]),
+      range: origins.map(o => theaterColorMap[o] || "#999"),
       legend: true,
     },
     marginTop: 16,
@@ -328,6 +327,36 @@ export function authorShareChart(author, formatted_data) {
   // Re-renders chart when color mode changes
   const mq = window.matchMedia("(prefers-color-scheme: dark)");
   mq.addEventListener("change", () => update());
+
+  /* ---------- Mark builders ---------- */
+  function textureOverlayMarks(segments, authors, bg) {
+    const { defs, urlBy } = buildAuthorOriginPatterns(
+      authors,
+      bg,
+      undefined,
+      "chart-",
+      false
+    );
+
+    const data = segments.map((s) => ({
+      ...s,
+      _tex: urlBy.get(s.author)?.get(s.origin) || "none",
+    }));
+
+    return [
+      () => defs,
+      Plot.rectY(data, {
+        x1: "x1",
+        x2: "x2",
+        y1: "daysStart",
+        y2: "daysEnd",
+        fill: "_tex",
+        stroke: null,
+        opacity: 1,
+        pointerEvents: "none",
+      }),
+    ];
+  }
 
   /* ---------- Data builders ---------- */
   function deriveStacked() {
@@ -390,7 +419,7 @@ export function authorShareChart(author, formatted_data) {
         const xMid = (x1 + x2) / 2;
 
         for (let i = 0; i < origins.length; i++) {
-          const c = origCounts[i] || 0;
+          const c = origCounts[i] || 0; 
           const p = total ? (c / total) * 100 : 0;
           
           if (!c) continue;
@@ -460,89 +489,10 @@ export function authorShareChart(author, formatted_data) {
     );
   }
 
-  /* ---------- Mark builders ---------- */
-  function renderCountMode(chartData) {
-    const { segments, authors, maxStackCount } = chartData;
-    const extraSpace = (maxStackCount ?? 0) * 0.1;
-
-    const marks = [];
-
-    // Author share bars (always shown)
-    marks.push(
-      Plot.rectY(segments, {
-        x1: "x1",
-        x2: "x2",
-        y1: "daysStart",
-        y2: "daysEnd",
-        fill: "origin",
-        opacity: 0.9,
-        tip: {
-          channels: {
-            Year: (d) => d.year,
-            Author: (d) => d.author,
-            "% of total": (d) => d.percent,
-            "Author days": (d) => d.count,
-          },
-          format: {
-            Year: (v) => `${v}`,
-            "% of total": (v) => `${v.toFixed(2)}%`,
-            "Author days": (v) => v,
-            x: false,
-            y: false,
-          },
-        },
-      }),
-      Plot.ruleY([0])
-    );
-
-    return {
-      config: {
-        y: {
-          label: "Number of performance days",
-          domain: [0, (maxStackCount || 10) + extraSpace],
-          tickFormat: "d",
-          grid: true,
-          nice: true,
-        },
-        title: `Author(s): ${authors.join("; ")} — Number of performance days`,
-      },
-      marks,
-    };
-  }
-
-  function textureOverlayMarks(
-    segments,
-    authors,
-    bg = theme.textureBG
-  ) {
-    const { defs, urlBy } = buildAuthorOriginPatterns(
-      authors,
-      bg,
-      undefined,
-      /* idPrefix */ "chart-",
-      /* opaqueSolid */ false
-    );
-
-    const data = segments
-      .map((s) => ({
-        ...s,
-        _tex: urlBy.get(s.author)?.get(s.origin) || "none",
-      }));
-
-    return [
-      () => defs,
-      Plot.rectY(data, {
-        x1: "x1",
-        x2: "x2",
-        y1: "daysStart",
-        y2: "daysEnd",
-        fill: "_tex",
-        stroke: null,
-        opacity: 1,
-        pointerEvents: "none",
-      }),
-    ];
-  }
+  const sharedTip = {
+    channels: { Year: "year", Author: "author", "% of total": "percent", "Author days": "count" },
+    format: { Year: (v) => `${v}`, "% of total": (v) => `${v.toFixed(2)}%`, "Author days": true, x: false, y: false },
+  };
 
   function makeCombinedFills(authors, bg = theme.textureBG) {
     const { defs, urlByAuthor } = buildAuthorGrayPatterns(
@@ -610,36 +560,17 @@ export function authorShareChart(author, formatted_data) {
   };
   renderAuthorsLabel(latestAuthorsToCompare);
 
-  // Legend (no outer box)
-  const authorLegend = createEl("div", {
-    styles: { display: "grid", gap: "6px", marginTop: "4px", width: "fit-content" },
-  });
+  const createToggle = (text, checked) => {
+    const lbl = createEl("label", {
+      styles: { display: "inline-flex", alignItems: "center", gap: "8px", fontSize: "12px", color: theme.textMuted, paddingLeft: "2px" },
+      html: `<input type="checkbox" style="transform: translateY(1px);"${checked ? " checked" : ""}> ${text}`,
+    });
+    return [lbl, lbl.querySelector("input")];
+  };
 
-  const labelsToggle = createEl("label", {
-    styles: {
-      display: "inline-flex",
-      alignItems: "center",
-      gap: "8px",
-      fontSize: "12px",
-      color: theme.textMuted,
-      paddingLeft: "2px",
-    },
-    html: `<input type="checkbox" style="transform: translateY(1px);" checked> Show author labels`,
-  });
-  const labelsCheckbox = labelsToggle.querySelector("input");
+  const [labelsToggle, labelsCheckbox] = createToggle("Show author labels", true);
 
-  const combineToggle = createEl("label", {
-    styles: {
-      display: "inline-flex",
-      alignItems: "center",
-      gap: "8px",
-      fontSize: "12px",
-      color: theme.textMuted,
-      paddingLeft: "2px",
-    },
-    html: `<input type="checkbox" style="transform: translateY(1px);"> Combine theater types`,
-  });
-  const combineCheckbox = combineToggle.querySelector("input");
+  const [combineToggle, combineCheckbox] = createToggle("Combine theater types", false);
   combineCheckbox.addEventListener("change", () => {
     combineOrigins = !!combineCheckbox.checked;
     update();
@@ -647,13 +578,20 @@ export function authorShareChart(author, formatted_data) {
 
   const chartHost = createEl("div", { props: { className: "chart-host" } });
 
+  const authorLegend = createEl("div", {
+    styles: { display: "grid", gap: "6px", marginTop: "4px", width: "fit-content" },
+  });
+
   // Layout
   wrapper.append(
-    labelsToggle,
-    combineToggle,
-    authorsBar,
-    authorLegend,
-    chartHost
+    ...[
+      labelsToggle,
+      combineToggle,
+      controlsContainer, // Will be ignored by filter(Boolean) if undefined
+      authorsBar,
+      authorLegend,
+      chartHost
+    ].filter(Boolean)
   );
 
   /* ---------- Render/update ---------- */
@@ -668,93 +606,35 @@ export function authorShareChart(author, formatted_data) {
 
     chartHost.innerHTML = "";
     const chartData = deriveStacked();
-    const { authors } = chartData;
+    const { segments, authors, maxStackCount, authorLabels } = chartData;
 
-    const isDark = checkDarkMode();
-    const patternBG = isDark ? "#1e1e1e" : "#ffffff";
+    const extraSpace = (maxStackCount || 0) * 0.1;
+    const title = `Author(s): ${authors.join("; ")} — Number of performance days${combineOrigins ? " (combined)" : ""}`;
 
-    const ceiling = chartData.maxStackCount || 10;
-
-    const combined = combineOrigins ? combineSegmentsByAuthor(chartData) : null;
-
-    // 1. Start from the *normal* chart for this mode
-    const base = renderCountMode(chartData);
-
-    let marks = [...base.marks];
-    let baseConfig = base.config;
+    let marks = [Plot.ruleY([0])];
 
     if (!combineOrigins) {
-      // Original behavior (origins stacked + texture overlay),
-      // using patternBG consistently.
-      if (chartData.authors.length > 1) {
-        const overlay = textureOverlayMarks(
-          chartData.segments,
-          chartData.authors,
-          patternBG
-        );
-  
-        marks.push(...overlay);
+      marks.push(Plot.rectY(segments, { x1: "x1", x2: "x2", y1: "daysStart", y2: "daysEnd", fill: "origin", opacity: 0.9, tip: sharedTip }));
+      if (authors.length > 1) {
+        marks.push(...textureOverlayMarks(segments, authors, theme.bg));
       }
     } else {
-      const { defs, fillOf } = makeCombinedFills(
-        chartData.authors,
-        patternBG
+      const { defs, fillOf } = makeCombinedFills(authors, theme.bg);
+      const combinedData = combineSegmentsByAuthor(chartData).map(s => ({ ...s, _fill: fillOf(s.author) }));
+      marks.push(
+        () => defs,
+        Plot.rectY(combinedData, { x1: "x1", x2: "x2", y1: "daysStart", y2: "daysEnd", fill: "_fill", opacity: 1, stroke: null, tip: sharedTip })
       );
-      const defsMark = () => defs;
-
-      const AUTHOR_BARS_INDEX = 0;
-
-      const baseWithoutAuthorBars = marks.filter((_, i) => i !== AUTHOR_BARS_INDEX);
-
-      const combinedBarMark = Plot.rectY(
-        combined.map((s) => ({
-          ...s,
-          _fill: fillOf(s.author),
-        })),
-        {
-          x1: "x1",
-          x2: "x2",
-          y1: "daysStart",
-          y2: "daysEnd",
-          fill: "_fill",
-          opacity: 1,
-          stroke: null,
-          tip: {
-            channels: {
-              Year: (d) => d.year,
-              Author: (d) => d.author,
-              "% of total": (d) => d.percent,
-              "Author days": (d) => d.count,
-            },
-            format: {
-              Year: (v) => `${v}`,
-              "% of total": (v) => `${v.toFixed(2)}%`,
-              "Author days": (v) => v,
-              x: false,
-              y: false,
-            },
-          },
-        }
-      );
-
-      marks = [defsMark, ...baseWithoutAuthorBars, combinedBarMark];
-
-      baseConfig = {
-        ...baseConfig,
-        title: `Author(s): ${chartData.authors.join(
-          "; "
-        )} — Number of performance days (combined)`,
-      };
     }
 
     if (showLabels) {
-      marks.push(...makeAuthorLabels(chartData.authorLabels, fontScale));
+      marks.push(...makeAuthorLabels(authorLabels, fontScale));
     }
 
     const plot = Plot.plot({
       ...sharedPlotConfig,
-      ...baseConfig,
-      // No graph background – let parent/container provide it
+      title,
+      y: { label: "Number of performance days", domain: [0, (maxStackCount || 10) + extraSpace], tickFormat: "d", grid: true, nice: true },
       style: {
         ...(sharedPlotConfig.style || {}),
         background: "transparent",
@@ -766,8 +646,7 @@ export function authorShareChart(author, formatted_data) {
 
     plot.style.fontSize = `${11 * fontScale}px`;
 
-    // Legend texture background is white
-    renderPatternLegend(authorLegend, authors, "#ffffff");
+    renderPatternLegend(authorLegend, authors, "transparent");
   }
 
   /* ---------- Events ---------- */

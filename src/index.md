@@ -712,15 +712,7 @@ import {
 } from "./components/author-share.js";
 
 if (authorShare) {
-  display(html`<h2>Author Performance Contribution Percentage</h2>`);
-  display(authorShareChart(author, formatted_data));
-  } else
-  display(html`<div></div>`)
-```
-
-```js
-
-if (authorShare) {
+  display(html`<h2>Author Performance Contribution Per Days</h2>`);
   const container = document.createElement("div");
   let currentAuthors = latestAuthorsToCompare;
 
@@ -734,13 +726,59 @@ if (authorShare) {
       msg.textContent = "Cannot add more authors to chart!";
       container.appendChild(msg);
     } else {
-      const btn = Inputs.button("Add author", {
-        reduce: () => {
-          addAuthorToCompare(author);
-          return null;
-        }
-      });
-      container.appendChild(btn);
+          const normalize = (str) => String(str || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+
+          let datalist = document.getElementById("author-share-datalist");
+          if (!datalist) {
+            datalist = document.createElement("datalist");
+            datalist.id = "author-share-datalist";
+            authorOptions.forEach(opt => {
+              if (opt && opt !== "No author") {
+                const option = document.createElement("option");
+                option.value = opt;
+                datalist.appendChild(option);
+              }
+            });
+            document.body.appendChild(datalist);
+          }
+
+          const textWidget = Inputs.text({ placeholder: "Type author name..." });
+          const textInput = textWidget.querySelector("input");
+          textInput.setAttribute("list", "author-share-datalist");
+
+          const handleAdd = () => {
+            const rawVal = textInput.value.trim();
+            if (!rawVal) return;
+            const normSearch = normalize(rawVal);
+            
+            let match = authorOptions.find(a => normalize(a) === normSearch) || 
+                        authorOptions.find(a => normalize(a).includes(normSearch));
+                        
+            if (match && match !== "No author") {
+              addAuthorToCompare(match);
+              textInput.value = ""; // Clear input after adding
+            } else {
+              alert("Author not found. Please try another name.");
+            }
+          };
+
+          textInput.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              handleAdd();
+            }
+          });
+
+          const btnWidget = Inputs.button("Add author", { reduce: handleAdd });
+
+          const formWrapper = document.createElement("div");
+          formWrapper.style.display = "flex";
+          formWrapper.style.gap = "8px";
+          formWrapper.style.alignItems = "center";
+
+          formWrapper.appendChild(textWidget);
+          formWrapper.appendChild(btnWidget);
+          container.appendChild(formWrapper);
     }
   };
 
@@ -751,8 +789,8 @@ if (authorShare) {
   };
   authorsCompareBus.addEventListener("authors:update", updateHandler);
   invalidation.then(() => authorsCompareBus.removeEventListener("authors:update", updateHandler));
-
-  display(container);
+  
+  display(authorShareChart(author, full_formatted_data, container));
 } else {
   display(html`<div></div>`)
 }
