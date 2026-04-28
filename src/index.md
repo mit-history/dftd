@@ -583,9 +583,11 @@ const authorOptions = [
     "No author",
     ...Array.from(
       new Set([
-        ...french.map((d) => d.author.split(" ; ")).flat().filter(Boolean),
+        ...french.map((d) => d.author?.split(" ; ")).flat().filter(Boolean),
         ...danish.map((d) => d.author?.split(",")).flat().filter(Boolean),
         ...dutch.map((d) => d.author).filter(Boolean),
+        ...saintDomingue.map((d) => d.author).filter(Boolean),
+        ...london.map((d) => d.author).filter(Boolean)
       ])
     ).sort()
 ]
@@ -1146,8 +1148,8 @@ display(performanceDays ? html `<p> Selected genres: ${genres.length === 0 ? "No
 ```js
 const genre_data =
   genres.length === 0
-    ? formatted_data.concat(formatted_stdmg)
-    : formatted_data.concat(formatted_stdmg).filter((d) => genres.includes(d.genre));
+    ? formatted_data
+    : formatted_data.filter((d) => genres.includes(d.genre));
 ```
 
 <div class="full-bleed days-grid">

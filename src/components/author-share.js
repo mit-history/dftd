@@ -123,6 +123,8 @@ const solidTexture = (id, stroke, _bg, step = 6, opaqueSolid = false) => `
 function buildAuthorOriginPatterns(
   authors,
   bgColor,
+  origins,
+  colorScale,
   strokeOverride,
   idPrefix = "",
   opaqueSolid = false
@@ -137,15 +139,15 @@ function buildAuthorOriginPatterns(
 
   const urlBy = new Map();
   const defs = [];
-  const origins = Object.keys(theaterColorMap);
 
   for (let i = 0; i < authors.length; i++) {
     const tpl = templates[i % templates.length];
     const perOrigin = new Map();
 
     for (const origin of origins) {
-      const id = `${idPrefix}tex-a${i}-${origin}`;
-      const stroke = strokeOverride ?? theaterColorMap[origin];
+      const safeOrigin = origin.replace(/[^a-zA-Z0-9]/g, '-');
+      const id = `${idPrefix}tex-a${i}-${safeOrigin}`;
+      const stroke = strokeOverride ?? colorScale(origin);
       defs.push(tpl(id, stroke, bgColor));
       perOrigin.set(origin, `url(#${id})`);
     }
@@ -186,7 +188,7 @@ function buildAuthorGrayPatterns(authors, bgColor, idPrefix = "combined-") {
 /* =============================================================================
    Legend
 ============================================================================= */
-function renderPatternLegend(legendEl, authors, bg = "transparent") {
+function renderPatternLegend(legendEl, authors, origins, colorScale, bg = "transparent") {
   legendEl.innerHTML = "";
   legendEl.style.display = !authors || authors.length < 2 ? "none" : "grid";
   if (!authors || authors.length < 2) return;
@@ -194,6 +196,8 @@ function renderPatternLegend(legendEl, authors, bg = "transparent") {
   const { defs } = buildAuthorOriginPatterns(
     authors,
     bg,
+    origins,
+    colorScale,
     undefined,
     "legend-",
     true
@@ -210,7 +214,6 @@ function renderPatternLegend(legendEl, authors, bg = "transparent") {
   });
   svg.style.display = "block";
   svg.appendChild(defs.cloneNode(true));
-const origins = Object.keys(theaterColorMap);
   authors.forEach((name, idx) => {
     const y = pad + idx * (swatchH + pad);
     const g = createSvg("g");
@@ -222,7 +225,8 @@ const origins = Object.keys(theaterColorMap);
       height: swatchH,
       rx: 2,
     });
-    rect.setAttribute("fill", `url(#legend-tex-a${idx}-${origins[0]})`);
+    const safeOrigin = origins[0] ? origins[0].replace(/[^a-zA-Z0-9]/g, '-') : '';
+    rect.setAttribute("fill", `url(#legend-tex-a${idx}-${safeOrigin})`);
     rect.setAttribute("stroke", theme.textMuted);
 
     const label = createSvg("text", {
@@ -293,7 +297,17 @@ export function authorShareChart(author, formatted_data, controlsContainer) {
 
   const totalDaysByYear = d3.rollup(
     formatted_data,
-    (rows) => new Set(rows.map((d) => d.date)).size,
+    (yearRows) => {
+      const byOrigin = d3.rollups(
+        yearRows,
+        (origRows) => new Set(origRows.map((d) => {
+          const dt = d.date instanceof Date ? d.date : new Date(d.date);
+          return isNaN(dt) ? String(d.date) : dt.toISOString().slice(0, 10);
+        })).size,
+        (d) => d.origin
+      );
+      return d3.sum(byOrigin, (d) => d[1]);
+    },
     (d) => +d.year
   );
 
@@ -310,7 +324,8 @@ export function authorShareChart(author, formatted_data, controlsContainer) {
     ratio > 1 ? 10 / (1 + 0.7 * (ratio - 1)) : 10 * (1 + 0.8 * (1 - ratio));
   const ticks = d3.ticks(d3.min(years), d3.max(years), 10).map(Math.round);
   const allYears = d3.range(d3.min(years), d3.max(years) + 1);
-  const origins = Object.keys(theaterColorMap);
+  const origins = Array.from(new Set(formatted_data.map(d => d.origin).filter(Boolean)));
+  const colorScale = d3.scaleOrdinal(origins, d3.schemeObservable10);
 
   const sharedPlotConfig = {
     width: 1000,
@@ -318,7 +333,7 @@ export function authorShareChart(author, formatted_data, controlsContainer) {
     x: { label: "Year", tickFormat: "d", ticks },
     color: {
       domain: origins,
-      range: origins.map(o => theaterColorMap[o] || "#999"),
+      range: origins.map(o => colorScale(o)),
       legend: true,
     },
     marginTop: 16,
@@ -333,6 +348,8 @@ export function authorShareChart(author, formatted_data, controlsContainer) {
     const { defs, urlBy } = buildAuthorOriginPatterns(
       authors,
       bg,
+      origins,
+      colorScale,
       undefined,
       "chart-",
       false
@@ -375,7 +392,10 @@ export function authorShareChart(author, formatted_data, controlsContainer) {
 
     const nested = d3.rollups(
       rows,
-      (v) => new Set(v.map((x) => x.date)).size,
+      (v) => new Set(v.map((x) => {
+        const dt = x.date instanceof Date ? x.date : new Date(x.date);
+        return isNaN(dt) ? String(x.date) : dt.toISOString().slice(0, 10);
+      })).size,
       (d) => d.author,
       (d) => d.year,
       (d) => d.origin
@@ -646,7 +666,7 @@ export function authorShareChart(author, formatted_data, controlsContainer) {
 
     plot.style.fontSize = `${11 * fontScale}px`;
 
-    renderPatternLegend(authorLegend, authors, "transparent");
+    renderPatternLegend(authorLegend, authors, origins, colorScale, "transparent");
   }
 
   /* ---------- Events ---------- */
