@@ -1,3 +1,8 @@
+<svelte:head>
+  <title>Transnational Stages</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet" />
+</svelte:head>
+
 <script>
   import { base } from '$app/paths';
   import mapSvg from './assets/interstage_world_map_empty.svg';
