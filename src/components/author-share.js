@@ -15,16 +15,16 @@ document.head.insertAdjacentHTML(
 );
 
 let theme = getTheme();
-const theaterColorMap = {
-  danish: "#3b82f6",
-  dutch: "#f59e0b",
-  french: "#ef4444",
-  "saint-domingue": "#6cc5b0",
-};
 
 /* =============================================================================
    Small Utilities (simplified)
 ============================================================================= */
+function normalizeText(str) {
+  return typeof str === "string"
+    ? str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase()
+    : "";
+}
+
 function createEl(tag, { styles, props, html } = {}) {
   const node = document.createElement(tag);
   if (styles) Object.assign(node.style, styles);
@@ -289,11 +289,7 @@ function makeAuthorLabels(labels, fontScale) {
 /* =============================================================================
    Main chart
 ============================================================================= */
-export function authorShareChart(author, formatted_data, controlsContainer) {
-  // --- DEBUG: Check for Saint-Domingue data ---
-  const sdData = formatted_data.filter(d => d.origin === "saint-domingue");
-  console.log(`Found ${sdData.length} records for Saint-Domingue!`, sdData);
-  // --------------------------------------------
+export function authorShareChart(author, formatted_data) {
 
   const totalDaysByYear = d3.rollup(
     formatted_data,
@@ -382,9 +378,11 @@ export function authorShareChart(author, formatted_data, controlsContainer) {
       : [author];
 
     const rows = formatted_data.flatMap((d) => {
-      const match = authors.find(
-        (a) => d.author === a || d.author?.includes(a)
-      );
+      const normAuthor = normalizeText(d.author);
+      const match = authors.find((a) => {
+        const normA = normalizeText(a);
+        return normAuthor === normA || normAuthor.includes(normA);
+      });
       return match
         ? [{ author: match, year: +d.year, origin: d.origin, date: d.date }]
         : [];
@@ -569,14 +567,6 @@ export function authorShareChart(author, formatted_data, controlsContainer) {
       container.append(pill);
     });
     authorsBar.append(container);
-
-    if (exceeded) {
-      const exc = createEl("span", {
-        styles: { color: "#ef4444", fontWeight: "bold", marginLeft: "8px" },
-        html: "(3 authors max!)"
-      });
-      authorsBar.append(exc);
-    }
   };
   renderAuthorsLabel(latestAuthorsToCompare);
 
@@ -596,6 +586,104 @@ export function authorShareChart(author, formatted_data, controlsContainer) {
     update();
   });
 
+  const allAuthors = [...new Set(formatted_data.map(d => d.author).filter(Boolean))].sort();
+  const normalizedMap = allAuthors.map(a => ({ original: a, normalized: normalizeText(a) }));
+
+  const searchContainer = createEl("div", { styles: { position: "relative", width: "100%", maxWidth: "400px", marginTop: "4px", marginBottom: "8px", fontFamily: "system-ui, sans-serif" } });
+  
+  const searchInput = createEl("input", {
+    props: { type: "text", placeholder: "Search and add author..." },
+    styles: { 
+      width: "100%", padding: "8px 12px", boxSizing: "border-box", 
+      borderRadius: "4px", border: `1px solid ${theme.textMuted}`, 
+      background: theme.bg, color: theme.text, fontSize: "14px"
+    }
+  });
+
+  const searchDropdown = createEl("div", {
+    styles: {
+      position: "absolute", top: "100%", left: 0, right: 0, 
+      background: theme.bg, border: `1px solid ${theme.textMuted}`, 
+      borderTop: "none", zIndex: 1000, maxHeight: "250px", 
+      overflowY: "auto", display: "none", borderRadius: "0 0 4px 4px",
+      boxShadow: "0 4px 12px rgba(0,0,0,0.15)"
+    }
+  });
+
+  searchInput.addEventListener("input", () => {
+    const query = normalizeText(searchInput.value);
+    searchDropdown.innerHTML = "";
+    
+    if (!query) {
+      searchDropdown.style.display = "none";
+      return;
+    }
+    
+    const matches = normalizedMap.filter(a => a.normalized.includes(query)).slice(0, 100);
+    
+    if (matches.length === 0) {
+      const noMatch = createEl("div", {
+        styles: { padding: "8px 12px", color: theme.textMuted, fontStyle: "italic", fontSize: "13px" },
+        html: "No authors found"
+      });
+      searchDropdown.append(noMatch);
+      searchDropdown.style.display = "block";
+      return;
+    }
+    
+    searchDropdown.style.display = "block";
+    matches.forEach(match => {
+      const item = createEl("div", {
+        styles: { padding: "8px 12px", cursor: "pointer", color: theme.text, fontSize: "13px", borderBottom: `1px solid ${theme.textMuted}40` },
+        html: match.original
+      });
+      item.addEventListener("mouseover", () => item.style.background = theme.textMuted + "40");
+      item.addEventListener("mouseout", () => item.style.background = "transparent");
+      item.addEventListener("mousedown", (e) => {
+        e.preventDefault();
+        addAuthorToCompare(match.original);
+        searchInput.value = "";
+        searchDropdown.style.display = "none";
+      });
+      searchDropdown.append(item);
+    });
+  });
+
+  searchInput.addEventListener("blur", () => {
+    searchDropdown.style.display = "none";
+  });
+
+  searchInput.addEventListener("focus", () => {
+    if (searchInput.value) searchDropdown.style.display = "block";
+  });
+
+  searchContainer.append(searchInput, searchDropdown);
+
+  const updateSearchState = (list) => {
+    if (list && list.length >= 3) {
+      searchInput.disabled = true;
+      searchInput.value = "Max 3 authors reached. Remove one to search.";
+      searchInput.style.opacity = "0.9";
+      searchInput.style.cursor = "not-allowed";
+      searchInput.style.color = "#ef4444";
+      searchInput.style.fontWeight = "bold";
+      searchInput.style.border = "1px solid #ef4444";
+      searchDropdown.style.display = "none";
+    } else {
+      searchInput.disabled = false;
+      searchInput.placeholder = "Search and add author...";
+      if (searchInput.value === "Max 3 authors reached. Remove one to search.") {
+        searchInput.value = "";
+      }
+      searchInput.style.opacity = "1";
+      searchInput.style.cursor = "text";
+      searchInput.style.color = theme.text;
+      searchInput.style.fontWeight = "normal";
+      searchInput.style.border = `1px solid ${theme.textMuted}`;
+    }
+  };
+  updateSearchState(latestAuthorsToCompare);
+
   const chartHost = createEl("div", { props: { className: "chart-host" } });
 
   const authorLegend = createEl("div", {
@@ -607,7 +695,7 @@ export function authorShareChart(author, formatted_data, controlsContainer) {
     ...[
       labelsToggle,
       combineToggle,
-      controlsContainer, // Will be ignored by filter(Boolean) if undefined
+      searchContainer,
       authorsBar,
       authorLegend,
       chartHost
@@ -616,13 +704,20 @@ export function authorShareChart(author, formatted_data, controlsContainer) {
 
   /* ---------- Render/update ---------- */
   function update() {
-    // Refresh global theme each time we render
     theme = getTheme();
 
-    // Update UI colors to current theme
     authorsBar.style.color = theme.textMuted;
     labelsToggle.style.color = theme.textMuted;
     combineToggle.style.color = theme.textMuted;
+
+    searchInput.style.background = theme.bg;
+    updateSearchState(latestAuthorsToCompare);
+    searchDropdown.style.background = theme.bg;
+    searchDropdown.style.border = `1px solid ${theme.textMuted}`;
+    Array.from(searchDropdown.children).forEach(child => {
+        child.style.color = theme.text;
+        child.style.borderBottom = `1px solid ${theme.textMuted}40`;
+    });
 
     chartHost.innerHTML = "";
     const chartData = deriveStacked();
@@ -677,6 +772,7 @@ export function authorShareChart(author, formatted_data, controlsContainer) {
 
   authorsCompareBus.addEventListener("authors:update", (e) => {
     renderAuthorsLabel(e.detail.authors, e.detail.exceeded);
+    updateSearchState(e.detail.authors);
     update();
   });
 
