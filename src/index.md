@@ -14,6 +14,34 @@ const druryLane = london.filter(d => d.place == "Drury Lane")
 // Load & normalize the Danish performances directly from the raw JSON
 const danish_raw = await FileAttachment("data/danish-performances.json").json();
 
+// Load Danish works to look up missing authors
+const danish_works = await FileAttachment("data/danish-works.json").json();
+const danishPerfAuthors = new Map();
+const danishPerfGenres = new Map();
+for (const work of danish_works) {
+  const authors = (work.contributors || [])
+    .filter(c => c.roles?.some(r => ["Playwright", "Librettist", "Author"].includes(r.title)))
+    .map(c => c.person?.name)
+    .filter(Boolean)
+    .join(" ; ");
+
+  const genres = (work.genres || [])
+    .map(g => g.name)
+    .filter(Boolean)
+    .join(" ; ");
+
+  if (work.productions) {
+    for (const prod of work.productions) {
+      if (prod.performances) {
+        for (const perf of prod.performances) {
+          if (authors) danishPerfAuthors.set(String(perf.id), authors);
+          if (genres) danishPerfGenres.set(String(perf.id), genres);
+        }
+      }
+    }
+  }
+}
+
 // helper: make any Strapi date format a usable (number OR "1748-12-16 AD")
 function toDate(value) {
   if (value instanceof Date) return value;
@@ -33,6 +61,14 @@ const danish = danish_raw.map((perf) => {
   // try to get a title, fall back to Strapi's formatted_title
   const works = perf.production?.works ?? [];
   const titleFromWorks = works.map((w) => w.title).filter(Boolean).join("; ");
+  let authorFromWorks = works.map((w) => w.author?.name || w.author).filter(Boolean).join(" ; ");
+  if (!authorFromWorks) {
+    authorFromWorks = danishPerfAuthors.get(String(perf.id));
+  }
+  let genreFromWorks = works.map((w) => w.genre?.name || w.genre).filter(Boolean).join(" ; ");
+  if (!genreFromWorks) {
+    genreFromWorks = danishPerfGenres.get(String(perf.id));
+  }
 
   return {
     id: typeof perf.id === "string" ? perf.id : String(perf.id),
@@ -43,9 +79,9 @@ const danish = danish_raw.map((perf) => {
       perf.formatted_title ||
       perf.production?.formatted_title ||
       null,
-    genre: null,                 //  current JSON doesn't carry genres here
+    genre: genreFromWorks || null,
     place: perf.place?.name ?? null,
-    author: null,
+    author: authorFromWorks || null,
     origin: "danish",
   };
 });
@@ -584,13 +620,14 @@ const authorOptions = [
     ...Array.from(
       new Set([
         ...french.map((d) => d.author?.split(" ; ")).flat().filter(Boolean),
-        ...danish.map((d) => d.author?.split(",")).flat().filter(Boolean),
+        ...danish.flatMap((d) => d.author?.split(/[,;]\s*/)).filter(Boolean),
+        ...danish.map((d) => d.author?.split(/[,;]\s*/)).flat().filter(Boolean),
         ...dutch.map((d) => d.author).filter(Boolean),
         ...saintDomingue.map((d) => d.author).filter(Boolean),
         ...london.map((d) => d.author).filter(Boolean)
       ])
     ).sort()
-]
+];
 
 const authorInput = Inputs.select( authorOptions, { label: "Filter by author", value: "No author" })
 const author = view(authorInput);

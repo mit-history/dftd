@@ -68,9 +68,9 @@ export const authorsCompareBus = new EventTarget();
 export let latestAuthorsToCompare = [];
 
 const initialAuthors = [
-  "Florent Carton dit Dancourt",
   "Voltaire",
-  "La Font (Joseph de)",
+  "Molière",
+  "William Shakespeare",
 ];
 
 export function emitAuthorsToCompare(authors) {
