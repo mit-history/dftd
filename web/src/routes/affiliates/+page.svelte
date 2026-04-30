@@ -102,39 +102,6 @@
   </div>
 </section>
 
-<section class="timeline-section">
-  <h2>Timeline of Projects</h2>
-  <p class="subtitle">Each line corresponds to the duration of a project</p>
-
-  <div class="timeline-container">
-    <div class="year-labels">
-      {#each Array.from({ length: (maxYear - minYear) / 25 + 1 }, (_, i) => minYear + i * 25) as year}
-        <div class="year" style="left: {(year - minYear) / yearRange * 100}%">{year}</div>
-      {/each}
-    </div>
-
-    <div class="lines" style="height: {projects.length * 50}px">
-      {#each projects as project, index}
-        <div class="label" style="top: {index * 50}px;">
-          <a href={project.link} target="_blank">{project.name} &#8599;</a>
-        </div>
-        {#each project.ranges as range}
-          <div
-            class="line tooltip"
-            style="
-              background-color: {project.color};
-              top: {index * 50 + 20}px;
-              left: {(range.start - minYear) / yearRange * 100}%;
-              width: {(range.end - range.start) / yearRange * 100}%;
-            "
-          >
-            <span class="tooltip-text">{project.name}: {range.start}–{range.end}</span>
-          </div>
-        {/each}
-      {/each}
-    </div>
-  </div>
-</section>
 
 <style>
   :global(body) {
