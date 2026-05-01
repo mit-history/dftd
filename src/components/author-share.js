@@ -289,7 +289,7 @@ function makeAuthorLabels(labels, fontScale) {
 /* =============================================================================
    Main chart
 ============================================================================= */
-export function authorShareChart(author, formatted_data, colorMap = {}) {
+export function authorShareChart(author, formatted_data, colorMap = {}, nameMap = {}) {
 
   const totalDaysByYear = d3.rollup(
     formatted_data,
@@ -333,6 +333,7 @@ export function authorShareChart(author, formatted_data, colorMap = {}) {
     color: {
       domain: origins,
       range: origins.map(o => colorScale(o)),
+      tickFormat: d => nameMap[d] || d,
       legend: true,
     },
     marginTop: 16,

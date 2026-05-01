@@ -23,6 +23,18 @@ const color_map = {
   // 'teatro del principe': '#8D664A',
 };
 
+const name_map = {
+  'french': 'Comédie-Française (Paris)',
+  'dutch': 'Schouwburg Theater (Amsterdam)',
+  'danish': 'Royal Danish Theater (Copenhagen)',
+  'saint-domingue': 'Saint-Domingue (All theaters)',
+  'covent garden': 'Covent Garden (London)',
+  'drury lane': 'Drury Lane (London)',
+  'new orleans': 'New Orleans (All theaters)',
+  'teatro de la cruz': 'Teatro de la Cruz (Madrid)',
+  'teatro del principe': 'Teatro del Principe (Madrid)'
+};
+
 // Load & normalize the Danish performances directly from the raw JSON
 const danish_raw = await FileAttachment("data/danish-performances.json").json();
 
@@ -203,6 +215,7 @@ function percentageYearsChart(data) {
     color: { 
       domain: Object.keys(color_map),
       range: Object.values(color_map),
+      tickFormat: d => name_map[d] || d,
       legend: true 
     },
     width: window.innerWidth,
@@ -253,12 +266,12 @@ function mapPlot(data) {
         stroke: d => color_map[d.origin],
         fill: d => color_map[d.origin],
         fillOpacity: 0.8,
-        channels: {origin: "origin"},
+        channels: {Location: d => name_map[d.origin] || d.origin},
         tip: {
           format: {
             x: false,
             y: false,
-            origin: true,
+            Location: true,
             count: true,
           }
         }
@@ -307,7 +320,11 @@ function genreLegend() {
         "danish-comedy", "danish-drama", "danish-ballet", "danish-other",
         "french-comedy", "french-drama", "french-ballet", "french-other"
       ],
-      range: ["#fca5a5", "#fb7185", "#ef4444", "#a3a3a3", "#93c5fd", "#60a5fa", "#3b82f6", "#6b7280"]
+      range: ["#fca5a5", "#fb7185", "#ef4444", "#a3a3a3", "#93c5fd", "#60a5fa", "#3b82f6", "#6b7280"],
+      tickFormat: d => {
+        const [orig, genre] = d.split('-');
+        return `${name_map[orig] || orig} - ${genre}`;
+      }
     },
     title: "Legend",
     columns: 2
@@ -553,7 +570,11 @@ const randomDates = () =>  {
 
 ```js
 const originOptions = ["danish", "dutch", "french", "saint-domingue", 'covent garden', 'drury lane'];
-const originsInput = Inputs.checkbox(originOptions, {label: "Origin", value: originOptions});
+const originsInput = Inputs.checkbox(originOptions, {
+  label: "Origin", 
+  value: originOptions,
+  format: d => name_map[d] || d
+});
 const originsSelect = Inputs.toggle({label: "Select All", value: true})
 const origins = view(originsInput);
 view(originsSelect);
@@ -720,7 +741,8 @@ function compareYearsChart(data) {
     color: { 
       domain: Object.keys(color_map),
       range: Object.values(color_map),
-      legend: true 
+      tickFormat: d => name_map[d] || d,
+      legend: true
     },
     width: window.innerWidth,
     marginBottom: 60,
@@ -854,7 +876,7 @@ if (authorShare) {
   invalidation.then(() => authorsCompareBus.removeEventListener("authors:update", updateHandler));
   
   display(container);
-  display(authorShareChart(author, full_formatted_data, color_map));
+  display(authorShareChart(author, full_formatted_data, color_map, name_map));
 } else {
   display(html`<div></div>`)
 }
@@ -906,7 +928,7 @@ const overall_threshold_val = do_overall_threshold_val?view(overall_threshold):[
 
 
 ```js
-display(bubble? html `<h2>French</h2>` : html`<div></div>`);
+display(bubble? html `<h2>Comédie-Française (Paris)</h2>` : html`<div></div>`);
 display(bubble&&!do_overall_threshold_val? html`<p>Threshold Range</p>`:html`<div></div>`);
 const french_threshold = rangeInput({
   min: 0,
@@ -946,7 +968,7 @@ display(
 
 ```js
 
-display(bubble? html `<h2>Dutch</h2>` : html`<div></div>`);
+display(bubble? html `<h2>Schouwburg Theater (Amsterdam)</h2>` : html`<div></div>`);
 display(bubble&&!do_overall_threshold_val? html`<p>Threshold Range</p>`:html`<div></div>`);
 const dutch_threshold = rangeInput({
   min: 0,
@@ -973,7 +995,7 @@ display(bubble? authorBubble(combined_data, 'dutch', 0, dutch_threshold_val, du_
 ```
 
 ```js
-display(bubble? html `<h2>Saint-Domingue</h2>` : html`<div></div>`)
+display(bubble? html `<h2>Saint-Domingue (All Theaters)</h2>` : html`<div></div>`)
 display(bubble&&!do_overall_threshold_val? html`<p>Threshold Range</p>`:html`<div></div>`);
 const stdmg_threshold = rangeInput({
   min: 0,
@@ -1001,7 +1023,7 @@ display(bubble? authorBubble(saintDomingue, 'saint-domingue', 0, stdmg_threshold
 ```
 
 ```js
-display(bubble? html `<h2>Covent Garden</h2>` : html`<div></div>`)
+display(bubble? html `<h2>Covent Garden (London)</h2>` : html`<div></div>`)
 display(bubble&&!do_overall_threshold_val? html`<p>Threshold Range</p>`:html`<div></div>`);
 const cv_threshold = rangeInput({
   min: 0,
@@ -1029,7 +1051,7 @@ display(bubble? authorBubble(coventGarden, 'covent garden', 0, cv_threshold_val,
 ```
 
 ```js
-display(bubble? html `<h2>Drury Lane</h2>` : html`<div></div>`)
+display(bubble? html `<h2>Drury Lane (London)</h2>` : html`<div></div>`)
 display(bubble&&!do_overall_threshold_val? html`<p>Threshold Range</p>`:html`<div></div>`);
 const dl_threshold = rangeInput({
   min: 0,
@@ -1299,7 +1321,7 @@ document.getElementById("heatmap-container").innerHTML = "";
 const containerWidth = window.innerWidth * 0.45;
 
 origins.length > 0 && performanceDays ? document.getElementById("line-chart-container").append(
-  createMultipleAnimatedLines(summarized_data, { width: containerWidth, height: 600, colorMap: color_map })
+  createMultipleAnimatedLines(summarized_data, { width: containerWidth, height: 600, colorMap: color_map, nameMap: name_map })
 ) : html`<i>No data.</i>`
 
 origins.length > 0 && performanceDays ? document.getElementById("heatmap-container").append(
@@ -1504,7 +1526,7 @@ function venuesValue() {
 
 function renderLegend(originsList) {
   const el = html`<div class="cal-legend">
-    ${originsList.map(o => html`<span class="cal-key"><span class="cal-dot" style="background:${COLOR.get(o) || '#999'}"></span>${o}</span>`)}
+    ${originsList.map(o => html`<span class="cal-key"><span class="cal-dot" style="background:${COLOR.get(o) || '#999'}"></span>${name_map[o] || o}</span>`)}
     <span class="cal-key"><span class="cal-dot" style="background:#dbeafe"></span>major event</span>
   </div>`;
   legendMount.replaceChildren(el);

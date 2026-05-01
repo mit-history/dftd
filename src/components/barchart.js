@@ -140,11 +140,11 @@ export function createAnimatedLineChart(
 
 
 // for all lines at once
-export function createMultipleAnimatedLines(groups, { width = 900, height = 500, duration = 100, colorMap = {} } = {}) {
+export function createMultipleAnimatedLines(groups, { width = 900, height = 500, duration = 100, colorMap = {}, nameMap = {} } = {}) {
   const baseFontSize = Math.max(12, width * 0.015);
   const baseRadius = Math.max(2, width * 0.01);
 
-  const margin = { top: 20, right: 160, bottom: 60, left: 60 };
+  const margin = { top: 20, right: 280, bottom: 60, left: 60 };
   const svg = d3.create("svg")
     .attr("viewBox", `0 0 ${width} ${height}`)
     .attr("preserveAspectRatio", "xMidYMid meet")
@@ -242,7 +242,7 @@ export function createMultipleAnimatedLines(groups, { width = 900, height = 500,
       .on("mouseover", (event, d) => {
         tooltip
           .style("opacity", 1)
-          .html(`${label}<br>Year: ${d.year}<br>Count: ${d.count}`)
+          .html(`${nameMap[label] || label}<br>Year: ${d.year}<br>Count: ${d.count}`)
           .style("left", event.pageX + 10 + "px")
           .style("top", event.pageY - 10 + "px");
       })
@@ -254,11 +254,11 @@ export function createMultipleAnimatedLines(groups, { width = 900, height = 500,
   });
 
 
-  const legend = svg.append("g").attr("transform", `translate(${width - 120}, 30)`);
+  const legend = svg.append("g").attr("transform", `translate(${width - 250}, 30)`);
   groups.forEach(({ label }, i) => {
     const g = legend.append("g").attr("transform", `translate(0, ${i * 20})`);
     g.append("rect").attr("width", 12).attr("height", 12).attr("fill", color(label));
-    g.append("text").attr("x", 18).attr("y", 10).text(label).style("font-size", `${baseFontSize}px`).style("fill", "#333");
+    g.append("text").attr("x", 18).attr("y", 10).text(nameMap[label] || label).style("font-size", `${baseFontSize}px`).style("fill", "#333");
   });
 
   return svg.node();
