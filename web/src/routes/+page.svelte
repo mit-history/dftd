@@ -87,6 +87,7 @@
     </div>
 
     <div class="hero-text">
+      <!-- TODO: Replace description -->
       <h1>Transnational Stages</h1>
       <h3 class="subtitle">Theatrical Circulation and Exchange in the Atlantic World, 1680–1850</h3>
       <p class="intro">
@@ -112,7 +113,9 @@
     background-color: #F6F3DE;
     min-height: 100vh;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
     padding: 80px 50px 20px;
     width: 100%;
     box-sizing: border-box;
@@ -124,7 +127,7 @@
     align-items: center;
     max-width: 1000px; /* Widened slightly to give the popup more breathing room */
     width: 100%;
-    transform: translateY(-30px);
+    gap: 2rem;
   }
 
   .image-wrapper {
@@ -136,9 +139,7 @@
   .map-container {
     position: relative;
     width: 100%;
-    max-width: 700px; /* map size */
-    margin-bottom: 1rem; /* height of text below map */
-    transform: translateY(10px);
+    max-width: 780px; /* scaled up slightly for 100% zoom */
     z-index: 1;
     border-radius: 4px;
     box-shadow: 0px 20px 50px -20px rgba(0, 0, 0, 0.3);
@@ -245,7 +246,7 @@
     line-height: 1.8;
     color: #222;
     margin: 0 auto;
-    transform: translateY(6px);
+    max-width: 850px;
   }
 
   /* Responsive Adjustments */

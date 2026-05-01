@@ -57,7 +57,6 @@
   <section class="hero">
     <div class="hero-overlay">
       <div class="hero-content">
-        <div class="accent-bar"></div>
         <h1>Explore the Data</h1>
         <p>
           Examine 18th-century performance data across Amsterdam, Copenhagen, and Paris.
@@ -99,7 +98,7 @@
 
 
   main.explore {
-    background: #f5f5f4; /* warm light gray (Stone-100 from Tailwind palette) */
+    background: #F6F3DE;
     min-height: 100vh;
   }
 
@@ -152,13 +151,6 @@
     color: white;
     padding: 0 1.5rem;
     position: relative;
-  }
-
-  .accent-bar {
-    width: 6px;
-    height: 40px;
-    background-color: #f7d300; /* NatGeo yellow */
-    margin: 0 auto 1.3rem auto;
   }
 
   .hero h1 {

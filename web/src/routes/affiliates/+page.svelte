@@ -13,7 +13,7 @@
       color: '#3b6f6b'
     },
     {
-      name: 'Comédie-Française (Paris)',
+      name: 'Comédie-Française Registers Project (Paris)',
       link: 'https://www.cfregisters.org/#!/',
       ranges: [
         { start: 1680, end: 1793 },
@@ -46,18 +46,29 @@
   const yearRange = maxYear - minYear;
 </script>
 
-<section class="affiliates-section">
-  <h1>Affiliated Projects</h1>
-  <hr />
+<main class="affiliates-page">
+  <!-- HERO SECTION -->
+  <section class="hero" style="background-image: url('{base}/images/affiliated_projects_banner.jpg')">
+    <div class="hero-overlay">
+      <div class="hero-content">
+        <h1>Affiliated Projects</h1>
+      </div>
+    </div>
+  </section>
 
+  <section class="affiliates-section">
   <div class="projects-grid">
 
     <div class="project-card">
       <a href="https://artex.au.dk/" target="_blank" class="project-title">
       <img src={base + '/images/copen_theat.jpg'} alt="Copenhagen Theater">
       Artistic Exchanges (Copenhagen)</a>
-      <p class="project-description">
-        Artistic Exchanges explores the transnational currents of Danish theatre. Follow the routes of travelling artists on the interactive mobility map, discover artists and their works, and delve into the repertoire of the Danish stage.
+
+      <p style="text-align: center;">
+        Ulla Kallenbach 
+        [<a href="mailto:ulla.kallenbach@uib.no" style="color: #335c67;">
+          ulla.kallenbach@uib.no
+        </a>]
       </p>
     </div>
 
@@ -65,17 +76,39 @@
       <a href="https://www.vondel.humanities.uva.nl/onstage/" target="_blank" class="project-title">
       <img src={base + '/images/amsterdam_theater.jpeg'} alt="Amsterdam Theater">
       Onstage (Amsterdam)</a>
-      <p class="project-description">
-        This is your address for questions about the repertoire, performances, popularity and revenues of the cultural program in Amsterdam’s public theatre during the period 1637 - 1772.
+      
+      <p style="text-align: center;">
+        Frans Blom
+        [<a href="mailto:f.r.e.blom@uva.nl" style="color: #335c67;">
+          f.r.e.blom@uva.nl
+        </a>]
       </p>
     </div>
 
     <div class="project-card">
       <a href="https://www.cfregisters.org/#!/" target="_blank" class="project-title">
-        <img src={base + '/images/2560px-Couronnement_de_Voltaire.jpg'} alt="Comédie-Française">
-        Comédie-Française (Paris)</a>
-      <p class="project-description">
-        Since its establishment in 1680, the Comédie-Française has produced and preserved daily registers documenting the company’s income and expenses, as well as the plays performed and their casting.
+      <img src={base + '/images/2560px-Couronnement_de_Voltaire.jpg'} alt="Comédie-Française">
+      Comédie-Française Registers Project (Paris)</a>
+
+      <p style="text-align: center;">
+        Sara Harvey
+        [<a href="mailto:saraharvey@uvic.ca" style="color: #335c67;">
+          saraharvey@uvic.ca
+        </a>]
+      </p>
+    </div>
+
+    <div class="project-card">
+      <a href="https://repcomit18.mesu.sorbonne-universite.fr/" target="_blank" class="project-title">
+      <!-- TODO: REPLACE IMAGE WITH JEFF'S -->
+      <img src={base + '/images/comedie_italienne.jpg'} alt="Répertoire de la Comédie-Italienne de Paris">
+      Répertoire de la Comédie-Italienne de Paris</a>
+
+      <p style="text-align: center;">
+        Emanuele DeLuca
+        [<a href="mailto:Emanuele.De-Luca@univ-cotedazur.fr" style="color: #335c67;">
+          Emanuele.De-Luca@univ-cotedazur.fr
+        </a>]
       </p>
     </div>
 
@@ -83,27 +116,122 @@
       <a href="https://www.theatronomics.com/" target="_blank" class="project-title">
       <img src={base + '/images/Theatronomics Map 2[21].jpg.jpeg'} alt="London Theater">
       Theatronomics (London)</a>
-      <p class="project-description">
-        Theatronomics offers an account of the eighteenth-century London stage. We tell the story of the commercial side of the entertainment industry to understand why some people made it…. and others did not.
+
+      <p style="text-align: center;">
+        David O’Shaughnessy
+        [<a href="mailto:david.oshaughnessy@universityofgalway.ie" style="color: #335c67;">
+          david.oshaughnessy@universityofgalway.ie
+        </a>]
       </p>
     </div>
 
+    <div class="project-card">
+      <!-- TODO: REPLACE IMAGE WITH JEFF'S -->
+      <a href="https://londonstagedatabase.uoregon.edu/" target="_blank" class="project-title">
+      <img src={base + '/images/london_stage_database.jpeg'} alt="London Stage Database">
+      London Stage Database</a>
+
+      <p style="text-align: center;">
+        Mattie Burkert
+        [<a href="mailto:mburkert@uoregon.edu" style="color: #335c67;">
+          mburkert@uoregon.edu
+        </a>]
+      </p>
+    </div>
 
     <div class="project-card">
       <a href="https://www.theatreinsaintdomingue.org/" target="_blank" class="project-title">
       <img src={base + '/images/pic for website.jpeg'} alt="Theatre in Saint-Domingue">
         Theatre in Saint-Domingue</a>
-      <p class="project-description">
-        This website and database seek to make known the rich and varied culture of public theatre as documented in the local newspapers between 1764 and 1791.
+
+        <p style="text-align: center;">
+        Julia Prest
+        [<a href="mailto:jp22@st-andrews.ac.uk" style="color: #335c67;">
+          jp22@st-andrews.ac.uk
+        </a>]
       </p>
     </div>
 
 
   </div>
-</section>
+  </section>
+</main>
 
 
 <style>
+  main.affiliates-page {
+    background: #F6F3DE;
+    min-height: 100vh;
+  }
+
+  /* === HERO FULL-BLEED === */
+  .hero {
+    position: relative;
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+    height: 55vh;
+    background-color: #d6d3d1;
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .hero::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 12px;
+    background: linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0) 0%,
+      #f5f5f4 100%
+    );
+    pointer-events: none;
+  }
+
+  .hero-overlay {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      rgba(0, 0, 0, 0.45),
+      rgba(0, 0, 0, 0.45)
+    );
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .hero-content {
+    max-width: 900px;
+    text-align: center;
+    color: white;
+    padding: 0 1.5rem;
+    position: relative;
+  }
+
+  .hero h1 {
+    font-size: 2.8rem;
+    font-weight: 700;
+    margin: 0 0 1rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  @media (max-width: 700px) {
+    .hero {
+      height: 50vh;
+    }
+    .hero h1 {
+      font-size: 2rem;
+    }
+  }
+
   :global(body) {
     margin: 0;
     padding: 0;
@@ -138,13 +266,16 @@
 
   .project-card img {
     width: 100%;
-    height: 180px;
+    height: 160px;
     object-fit: cover;
+    object-position: center;
     border-radius: 8px;
     margin-bottom: 1rem;
   }
 
   .project-title {
+    display: block;
+    text-align: center;
     font-size: 1.3rem;
     color: #3b6f6b;
     font-weight: bold;
@@ -155,11 +286,10 @@
     text-decoration: underline;
   }
 
-  .project-description {
-    margin-top: 0.8rem;
-    font-size: 1rem;
-    line-height: 1.6;
-    color: #000000;
+  .project-card p {
+    font-size: 0.85rem;
+    word-break: break-word;
+    overflow-wrap: break-word;
   }
 
   .timeline-section {

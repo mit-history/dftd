@@ -1,5 +1,5 @@
 <script>
-  import data_banner from '../assets/comparative_over_time_long.png';
+  import { base } from '$app/paths';
 
   const projects = [
     {
@@ -11,7 +11,7 @@
       name: 'Comédie-Française (Paris)',
       link: 'https://www.cfregisters.org/#!/',
       ranges: [
-        { start: 1680, end: 1793 }],
+        { start: 1748, end: 1793 }],
     },
     {
       name: 'Royal Danish Theater (Copenhagen)',
@@ -69,7 +69,7 @@
 
 <main class="timeline-page">
   <!-- HERO SECTION -->
-  <section class="hero" style="background-image: url({data_banner})">
+  <section class="hero" style="background-image: url('{base}/images/comparative_over_time_long.png')">
     <div class="hero-overlay">
       <div class="hero-content">
         <h1>Dataset Timelines</h1>
@@ -119,7 +119,7 @@
 
 <style>
   main.timeline-page {
-    background: #f5f5f4;
+    background: #F6F3DE;
     min-height: 100vh;
   }
 

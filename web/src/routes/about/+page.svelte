@@ -6,14 +6,21 @@
   import { base } from '$app/paths';
 </script>
 
-<h1>About</h1>
+<main class="about-page">
+  <!-- HERO SECTION -->
+  <section class="hero" style="background-image: url('{base}/images/random_french_theater.jpg')">
+    <div class="hero-overlay">
+      <div class="hero-content">
+        <h1>About</h1>
+      </div>
+    </div>
+  </section>
 
-<hr />
-<section class="about-section">
-  <div class="about-container">
+  <section class="about-section">
+    <div class="about-container">
 
-    <!-- Left: Text -->
-    <div class="about-text">
+      <!-- Text -->
+      <div class="about-text">
 
       <p>
         December 2025
@@ -35,107 +42,130 @@
         If you have questions about this work, or would like to join or contribute, please contact Jeff Ravel
         <a href="mailto:ravel@mit.edu" class="link">here</a>.
       </p>
-    </div>
 
-   <!-- Right: Image with caption -->
-  <div class="about-image">
-    <div class="image-wrapper">
-      <img src="{base}/images/random_french_theater.jpg" alt="random French Theatre Illustration" />
       <p class="caption">
-        P. A. Wille, Interior of the Hôtel de Bourgogne Playhouse in Paris, 1767. Courtesy of Wikimedia Commons.
+        <em>Background Image: P. A. Wille, Interior of the Hôtel de Bourgogne Playhouse in Paris, 1767. Courtesy of Wikimedia Commons.</em>
       </p>
     </div>
-  </div>
 
-</section>
+    </div>
+  </section>
+</main>
 
 
   <style>
-.image-wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-}
+  main.about-page {
+    background: #F6F3DE;
+    min-height: 100vh;
+  }
 
-.caption {
-  font-size: 0.9rem;
-  color: #555;
-  margin-top: 0.5rem;
-  max-width: 500px;
-}
+  /* === HERO FULL-BLEED === */
+  .hero {
+    position: relative;
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+    height: 45vh;
+    background-color: #d6d3d1;
+    background-size: cover;
+    background-position: center 30%;
+    background-repeat: no-repeat;
 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 
+  .hero::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 12px;
+    background: linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0) 0%,
+      #f5f5f4 100%
+    );
+    pointer-events: none;
+  }
 
-  h1 {
+  .hero-overlay {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      rgba(0, 0, 0, 0.45),
+      rgba(0, 0, 0, 0.45)
+    );
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .hero-content {
+    max-width: 900px;
+    text-align: center;
+    color: white;
+    padding: 0 1.5rem;
+    position: relative;
+  }
+
+  .hero h1 {
     font-family: 'Inter', sans-serif;
     font-size: 3rem;
     font-weight: 700;
-    margin-bottom: 0.5rem;
-    margin-top: 4rem;
-    text-align: center;
+    margin: 0 0 1rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
   }
 
+  @media (max-width: 700px) {
+    .hero {
+      height: 35vh;
+    }
+    .hero h1 {
+      font-size: 2.2rem;
+    }
+  }
+
+  :global(body) {
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+  }
 
   .about-section {
-    padding: 3rem 1rem;
-}
+    max-width: 800px;
+    margin: 3rem auto;
+    padding: 0 2rem;
+  }
 
-.about-container {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 2rem;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 1rem;
-}
-
-.about-text {
-  flex: 1;
-  font-size: 1rem;
-  line-height: 1.7;
-}
-
-.about-image {
-  flex: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.about-image img {
-  width: 100%;
-  max-width: 500px;
-  height: auto;
-  border-radius: 8px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-}
-a.link {
-  color: #393ed7;
-  text-decoration: underline;
-  font-weight: bold;
-}
-
-a.link:hover {
-  color: #a3c4e9;
-}
-
-
-/* Make it responsive */
-@media (max-width: 768px) {
   .about-container {
+    display: flex;
     flex-direction: column;
     align-items: center;
   }
 
-  .about-image {
-    margin-top: 2rem;
+  .about-text {
+    width: 100%;
+    font-size: 1.05rem;
+    line-height: 1.7;
   }
-}
 
+  .caption {
+    font-size: 0.9rem;
+    color: #666;
+    margin-top: 3rem;
+    text-align: center;
+  }
 
+  a.link {
+    color: #393ed7;
+    text-decoration: underline;
+    font-weight: bold;
+  }
 
-
-
+  a.link:hover {
+    color: #a3c4e9;
+  }
   </style>
