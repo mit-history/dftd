@@ -6,48 +6,57 @@
       name: 'Schouwburg Theater (Amsterdam)',
       link: 'https://www.vondel.humanities.uva.nl/onstage/',
       ranges: [{ start: 1748, end: 1798 }],
+      color: '#EFB119'
     },
     {
       name: 'Comédie-Française (Paris)',
       link: 'https://www.cfregisters.org/#!/',
       ranges: [
         { start: 1748, end: 1793 }],
+      color: '#FF725C'
     },
     {
       name: 'Royal Danish Theater (Copenhagen)',
       // link: '',
       ranges: [
         { start: 1748, end: 1798 }],
+      color: '#4269D0'
     },
     {
       name: 'Covent Garden (London)',
       // link: '',
       ranges: [{ start: 1766, end: 1800 }],
+      color: '#3BA951'
     },
     {
       name: 'Drury Lane (London)',
       // link: '',
       ranges: [{ start: 1766, end: 1800 }],
+      color: '#DF789A'
     },
     {
       name: 'Teatro de la Cruz (Madrid)',
       // link: '',
       ranges: [{ start: 1748, end: 1790 }],
+      color: '#4c00ff'
     },
     {
       name: 'Teatro de la Principe (Madrid)',
       // link: '',
       ranges: [{ start: 1748, end: 1790 }],
+      color: '#8D664A'
     },
     {
       name: 'Saint-Domingue (All theaters)',
       link: 'https://www.theatreinsaintdomingue.org/',
       ranges: [{ start: 1764, end: 1791 }],
+      color: '#6BC5B0'
     },
     {
       name: 'New Orleans (All theaters)',
       // link: '',
       ranges: [{ start: 1805, end: 1812 }],
+      color: '#A855F7'
     },
   ];
 

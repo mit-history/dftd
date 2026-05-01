@@ -11,6 +11,18 @@ const london = await FileAttachment('data/london/formatted_london.json').json()
 const coventGarden = london.filter(d => d.place == "Covent Garden");
 const druryLane = london.filter(d => d.place == "Drury Lane")
 
+const color_map = {
+  'french': '#FF725C',
+  'dutch': '#EFB119',
+  'danish': '#4269D0',
+  'saint-domingue': '#6BC5B0',
+  'new orleans': '#A855F7',
+  'covent garden': '#3BA951',
+  'drury lane': '#DF789A',
+  // 'teatro de la cruz': '#4c00ff',
+  // 'teatro del principe': '#8D664A',
+};
+
 // Load & normalize the Danish performances directly from the raw JSON
 const danish_raw = await FileAttachment("data/danish-performances.json").json();
 
@@ -188,7 +200,11 @@ function percentageYearsChart(data) {
     fx: { padding: 0, label: null },
     x: { axis: null, paddingOuter: 0.2 },
     y: { grid: true, label: "Percentage" },
-    color: { legend: true },
+    color: { 
+      domain: Object.keys(color_map),
+      range: Object.values(color_map),
+      legend: true 
+    },
     width: window.innerWidth,
     height: 500,
     marks: [
@@ -234,9 +250,9 @@ function mapPlot(data) {
         x: "longitude",
         y: "latitude",
         r: "count",
-        stroke: "red",
-        fill: "red",
-        fillOpacity: 0.2,
+        stroke: d => color_map[d.origin],
+        fill: d => color_map[d.origin],
+        fillOpacity: 0.8,
         channels: {origin: "origin"},
         tip: {
           format: {
@@ -701,7 +717,11 @@ function compareYearsChart(data) {
     fx: { label: null, padding: 0.1 },
     x: { axis: null, paddingOuter: 0.2 },
     y: { grid: true, label: "Performances", domain: [0, 366*2] },
-    color: { legend: true },
+    color: { 
+      domain: Object.keys(color_map),
+      range: Object.values(color_map),
+      legend: true 
+    },
     width: window.innerWidth,
     marginBottom: 60,
     marks: [
@@ -833,7 +853,8 @@ if (authorShare) {
   authorsCompareBus.addEventListener("authors:update", updateHandler);
   invalidation.then(() => authorsCompareBus.removeEventListener("authors:update", updateHandler));
   
-  display(authorShareChart(author, full_formatted_data, container));
+  display(container);
+  display(authorShareChart(author, full_formatted_data, color_map));
 } else {
   display(html`<div></div>`)
 }
@@ -1137,10 +1158,16 @@ const author_counts = author_filtered_data ? Object.entries(author_filtered_data
   return acc;
 }, {})).map(([origin, count]) => {
   const coordinates = {
-    danish: copenhagen,
-    dutch: amsterdam,
-    french: paris
-  }[origin];
+    "danish": copenhagen,
+    "dutch": amsterdam,
+    "french": paris,
+    "covent garden": {latitude: 51.5072, longitude: -0.14}, // London, slightly offset left
+    "drury lane": {latitude: 51.5072, longitude: -0.11},    // London, slightly offset right
+    "saint-domingue": {latitude: 18.9, longitude: -72.2},
+    "teatro de la cruz": {latitude: 40.4168, longitude: -3.7038},
+    "teatro del principe": {latitude: 40.4168, longitude: -3.7038},
+    "new orleans": {latitude: 29.9511, longitude: -90.0715}
+  }[origin] || {latitude: 0, longitude: 0};
   return { origin, count, ...coordinates };
 }) : undefined;
 ```
@@ -1233,26 +1260,26 @@ function summarize(dataset, label) {
 
 // use the already-filtered datasets
 const originToData = {
-  danish: danish_filtered_data,
-  french: french_filtered_data,
+  "danish": danish_filtered_data,
+  "french": french_filtered_data,
   // if you ever add dutch_filtered_data, put it here too
-  dutch: combined_data
+  "dutch": combined_data
     .filter(d => d.origin === "dutch")
     .filter(d => {
       const dt = asDate(d.date);
       return dt && dt >= start_date && dt <= end_date;
     }),
-  'saint-domingue': saintDomingue
+  "saint-domingue": saintDomingue
     .filter(d => {
       const dt = asDate(d.date);
       return dt && dt >= start_date && dt <= end_date;
     }),
-  'covent garden': coventGarden
+  "covent garden": coventGarden
     .filter(d => {
       const dt = asDate(d.date);
       return dt && dt >= start_date && dt <= end_date;
     }),
-  'drury lane': druryLane
+  "drury lane": druryLane
     .filter(d => {
       const dt = asDate(d.date);
       return dt && dt >= start_date && dt <= end_date;
@@ -1272,7 +1299,7 @@ document.getElementById("heatmap-container").innerHTML = "";
 const containerWidth = window.innerWidth * 0.45;
 
 origins.length > 0 && performanceDays ? document.getElementById("line-chart-container").append(
-  createMultipleAnimatedLines(summarized_data, { width: containerWidth, height: 600 })
+  createMultipleAnimatedLines(summarized_data, { width: containerWidth, height: 600, colorMap: color_map })
 ) : html`<i>No data.</i>`
 
 origins.length > 0 && performanceDays ? document.getElementById("heatmap-container").append(
@@ -1319,7 +1346,7 @@ const Danish = DanishRaw.map((perf, i) => {
     id: typeof perf.id === "string" ? perf.id : `Danish-${i}`,
     date: d, year: d ? d.getUTCFullYear() : null,
     title: titleFromWorks || perf.formatted_title || perf.production?.formatted_title || "Untitled",
-    origin: "Danish",
+    origin: "danish",
     theater: perf.place?.name ?? perf.theater ?? perf.venue ?? "Unknown venue",
     city: perf.place?.name ?? null
   };
@@ -1331,7 +1358,7 @@ const French = FrenchRaw.map((r,i) => {
     id: r.id ?? `French-${i}`,
     date: d, year: d ? d.getUTCFullYear() : (r.year ?? null),
     title: r.title ?? r.headline ?? r.playTitle ?? r.production?.formatted_title ?? "Untitled",
-    origin: "French",
+    origin: "french",
     theater: r.place?.name ?? r.place ?? r.theater ?? r.venue ?? "Unknown venue",
     city: r.city ?? r.place ?? null
   };
@@ -1343,7 +1370,7 @@ const Dutch = DutchRaw.map((r,i) => {
     id: r.id ?? r.ID ?? `Dutch-${i}`,
     date: d, year: d ? d.getUTCFullYear() : (r.year ?? r.Year ?? null),
     title: r.title ?? r.Title ?? r.play ?? r.Play ?? "Untitled",
-    origin: "Dutch",
+    origin: "dutch",
     theater: r.theater ?? r.Theater ?? r.venue ?? r.Venue ?? r.place ?? r.Place ?? "Unknown venue",
     city: r.city ?? r.City ?? null
   };
@@ -1356,7 +1383,7 @@ const nola = nolaRows.map((r,i) => {
     id: r["issue #"] ?? `nola-${i}`,
     date: d, year: d ? d.getUTCFullYear() : (r["year"] ?? null),
     title: (r["works mentioned"] ?? "Untitled").trim(),
-    origin: "New Orleans",
+    origin: "new orleans",
     theater: (r["performance location"] ?? r["loc of ad"] ?? "Unknown venue").trim(),
     city: "New Orleans"
   };
@@ -1381,11 +1408,15 @@ const allRows = [
 
 // Color map + legend colors (keys match origin values now)
 const COLOR = new Map([
-  ["Danish",       "#ef4444"],
-  ["French",       "#3b82f6"],
-  ["Dutch",        "#16a34a"],
-  ["New Orleans",  "#a855f7"],
-  ["Saint-Domingue", "#6cc5b0"]
+  ["danish",         color_map["danish"]],
+  ["french",         color_map["french"]],
+  ["dutch",          color_map["dutch"]],
+  ["new orleans",    color_map["new orleans"]],
+  ["saint-domingue", color_map["saint-domingue"]],
+  ["covent garden",  color_map["covent garden"]],
+  ["drury lane",     color_map["drury lane"]],
+  ["teatro de la cruz", color_map["teatro de la cruz"]],
+  ["teatro del principe", color_map["teatro del principe"]]
 ]);
 try { for (const [k,c] of COLOR) ORIGIN_COLOR.set(k, c); } catch {}
 
@@ -1458,13 +1489,9 @@ function buildVenuesInput(startDate, endDate, originsList) {
 }
 
 // Initial venues input, based on global filters
-const initialOriginsBase = origins.map(o =>
-  o === "danish" ? "Danish" :
-  o === "french" ? "French" :
-  o === "dutch"  ? "Dutch"  : o
-);
+const initialOriginsBase = origins;
 const initialOriginsList = includeNola.value
-  ? [...initialOriginsBase, "New Orleans"]
+  ? [...initialOriginsBase, "new orleans"]
   : initialOriginsBase;
 
 let venuesIn = buildVenuesInput(capDate(start_date), capDate(end_date), initialOriginsList);
@@ -1490,13 +1517,9 @@ function rerender() {
   const start = capDate(start_date);
   const end   = capDate(end_date);
 
-  const baseOrigins = origins.map(o =>
-    o === "danish" ? "Danish" :
-    o === "french" ? "French" :
-    o === "dutch"  ? "Dutch"  : o
-  );
+  const baseOrigins = origins;
   const originsList = includeNola.value
-    ? [...baseOrigins, "New Orleans"]
+    ? [...baseOrigins, "new orleans"]
     : baseOrigins;
 
   const anchor = capDate(anchorIn.value || start);

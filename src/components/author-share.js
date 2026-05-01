@@ -289,7 +289,7 @@ function makeAuthorLabels(labels, fontScale) {
 /* =============================================================================
    Main chart
 ============================================================================= */
-export function authorShareChart(author, formatted_data) {
+export function authorShareChart(author, formatted_data, colorMap = {}) {
 
   const totalDaysByYear = d3.rollup(
     formatted_data,
@@ -321,7 +321,10 @@ export function authorShareChart(author, formatted_data) {
   const ticks = d3.ticks(d3.min(years), d3.max(years), 10).map(Math.round);
   const allYears = d3.range(d3.min(years), d3.max(years) + 1);
   const origins = Array.from(new Set(formatted_data.map(d => d.origin).filter(Boolean)));
-  const colorScale = d3.scaleOrdinal(origins, d3.schemeObservable10);
+  
+  const colorScale = d3.scaleOrdinal()
+    .domain(origins)
+    .range(origins.map((o, i) => colorMap[o] || d3.schemeObservable10[i % 10]));
 
   const sharedPlotConfig = {
     width: 1000,

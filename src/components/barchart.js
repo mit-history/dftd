@@ -88,8 +88,17 @@ export function createAnimatedLineChart(
     .attr("fill", "none")
     .attr("stroke", "#000")
     .attr("stroke-width", 3)
-    .attr("stroke-dasharray", "0,1000")
     .attr("d", line);
+
+  const totalLength = path.node().getTotalLength();
+
+  path
+    .attr("stroke-dasharray", `${totalLength},${totalLength}`)
+    .attr("stroke-dashoffset", totalLength)
+    .transition()
+    .duration(duration * formattedData.length)
+    .ease(d3.easeLinear)
+    .attr("stroke-dashoffset", 0);
 
   const tooltip = d3
     .select("body")
@@ -120,14 +129,6 @@ export function createAnimatedLineChart(
     })
     .on("mouseout", () => tooltip.style("opacity", 0));
 
-  path
-    .attr("stroke-dasharray", path.node().getTotalLength())
-    .attr("stroke-dashoffset", path.node().getTotalLength())
-    .transition()
-    .duration(duration * formattedData.length)
-    .ease(d3.easeLinear)
-    .attr("stroke-dashoffset", 0);
-
   circles
     .transition()
     .delay((d, i) => i * duration)
@@ -139,7 +140,7 @@ export function createAnimatedLineChart(
 
 
 // for all lines at once
-export function createMultipleAnimatedLines(groups, { width = 900, height = 500, duration = 100 } = {}) {
+export function createMultipleAnimatedLines(groups, { width = 900, height = 500, duration = 100, colorMap = {} } = {}) {
   const baseFontSize = Math.max(12, width * 0.015);
   const baseRadius = Math.max(2, width * 0.01);
 
@@ -176,7 +177,10 @@ export function createMultipleAnimatedLines(groups, { width = 900, height = 500,
   .attr("font-size", `${baseFontSize}px`)
   .text("Max: 366 days");
 
-  const color = d3.scaleOrdinal().domain(groups.map(g => g.label)).range(["red", "blue", "green", "purple", "orange", "cyan"]);
+  const defaultColors = ["red", "blue", "green", "purple", "orange", "cyan"];
+  const color = d3.scaleOrdinal()
+    .domain(groups.map(g => g.label))
+    .range(groups.map((g, i) => colorMap[g.label] || defaultColors[i % defaultColors.length]));
 
   const line = d3.line()
     .x(d => x(d.year))
