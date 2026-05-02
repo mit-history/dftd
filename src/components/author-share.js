@@ -15,16 +15,16 @@ document.head.insertAdjacentHTML(
 );
 
 let theme = getTheme();
-const theaterColorMap = {
-  danish: "#3b82f6",
-  dutch: "#f59e0b",
-  french: "#ef4444",
-  "saint-domingue": "#6cc5b0",
-};
 
 /* =============================================================================
    Small Utilities (simplified)
 ============================================================================= */
+function normalizeText(str) {
+  return typeof str === "string"
+    ? str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase()
+    : "";
+}
+
 function createEl(tag, { styles, props, html } = {}) {
   const node = document.createElement(tag);
   if (styles) Object.assign(node.style, styles);
@@ -39,7 +39,7 @@ function createSvg(tag, attrs = {}) {
 }
 
 function checkDarkMode() {
-  return (
+  return (  
     window.matchMedia &&
     window.matchMedia("(prefers-color-scheme: dark)").matches
   );
@@ -68,9 +68,9 @@ export const authorsCompareBus = new EventTarget();
 export let latestAuthorsToCompare = [];
 
 const initialAuthors = [
-  "Florent Carton dit Dancourt",
   "Voltaire",
-  "La Font (Joseph de)",
+  "Molière",
+  "William Shakespeare",
 ];
 
 export function emitAuthorsToCompare(authors) {
@@ -123,6 +123,8 @@ const solidTexture = (id, stroke, _bg, step = 6, opaqueSolid = false) => `
 function buildAuthorOriginPatterns(
   authors,
   bgColor,
+  origins,
+  colorScale,
   strokeOverride,
   idPrefix = "",
   opaqueSolid = false
@@ -137,15 +139,15 @@ function buildAuthorOriginPatterns(
 
   const urlBy = new Map();
   const defs = [];
-  const origins = Object.keys(theaterColorMap);
 
   for (let i = 0; i < authors.length; i++) {
     const tpl = templates[i % templates.length];
     const perOrigin = new Map();
 
     for (const origin of origins) {
-      const id = `${idPrefix}tex-a${i}-${origin}`;
-      const stroke = strokeOverride ?? theaterColorMap[origin];
+      const safeOrigin = origin.replace(/[^a-zA-Z0-9]/g, '-');
+      const id = `${idPrefix}tex-a${i}-${safeOrigin}`;
+      const stroke = strokeOverride ?? colorScale(origin);
       defs.push(tpl(id, stroke, bgColor));
       perOrigin.set(origin, `url(#${id})`);
     }
@@ -186,7 +188,7 @@ function buildAuthorGrayPatterns(authors, bgColor, idPrefix = "combined-") {
 /* =============================================================================
    Legend
 ============================================================================= */
-function renderPatternLegend(legendEl, authors, bg = "#ffffff") {
+function renderPatternLegend(legendEl, authors, origins, colorScale, bg = "transparent") {
   legendEl.innerHTML = "";
   legendEl.style.display = !authors || authors.length < 2 ? "none" : "grid";
   if (!authors || authors.length < 2) return;
@@ -194,6 +196,8 @@ function renderPatternLegend(legendEl, authors, bg = "#ffffff") {
   const { defs } = buildAuthorOriginPatterns(
     authors,
     bg,
+    origins,
+    colorScale,
     undefined,
     "legend-",
     true
@@ -210,8 +214,6 @@ function renderPatternLegend(legendEl, authors, bg = "#ffffff") {
   });
   svg.style.display = "block";
   svg.appendChild(defs.cloneNode(true));
-
-  const origins = Object.keys(theaterColorMap);
   authors.forEach((name, idx) => {
     const y = pad + idx * (swatchH + pad);
     const g = createSvg("g");
@@ -223,8 +225,9 @@ function renderPatternLegend(legendEl, authors, bg = "#ffffff") {
       height: swatchH,
       rx: 2,
     });
-    rect.setAttribute("fill", `url(#legend-tex-a${idx}-${origins[0]})`);
-    rect.setAttribute("stroke", "#333");
+    const safeOrigin = origins[0] ? origins[0].replace(/[^a-zA-Z0-9]/g, '-') : '';
+    rect.setAttribute("fill", `url(#legend-tex-a${idx}-${safeOrigin})`);
+    rect.setAttribute("stroke", theme.textMuted);
 
     const label = createSvg("text", {
       x: swatchW + 8,
@@ -286,15 +289,21 @@ function makeAuthorLabels(labels, fontScale) {
 /* =============================================================================
    Main chart
 ============================================================================= */
-export function authorShareChart(author, formatted_data) {
-  // --- DEBUG: Check for Saint-Domingue data ---
-  const sdData = formatted_data.filter(d => d.origin === "saint-domingue");
-  console.log(`Found ${sdData.length} records for Saint-Domingue!`, sdData);
-  // --------------------------------------------
+export function authorShareChart(author, formatted_data, colorMap = {}, nameMap = {}) {
 
   const totalDaysByYear = d3.rollup(
     formatted_data,
-    (rows) => new Set(rows.map((d) => d.date)).size,
+    (yearRows) => {
+      const byOrigin = d3.rollups(
+        yearRows,
+        (origRows) => new Set(origRows.map((d) => {
+          const dt = d.date instanceof Date ? d.date : new Date(d.date);
+          return isNaN(dt) ? String(d.date) : dt.toISOString().slice(0, 10);
+        })).size,
+        (d) => d.origin
+      );
+      return d3.sum(byOrigin, (d) => d[1]);
+    },
     (d) => +d.year
   );
 
@@ -311,7 +320,11 @@ export function authorShareChart(author, formatted_data) {
     ratio > 1 ? 10 / (1 + 0.7 * (ratio - 1)) : 10 * (1 + 0.8 * (1 - ratio));
   const ticks = d3.ticks(d3.min(years), d3.max(years), 10).map(Math.round);
   const allYears = d3.range(d3.min(years), d3.max(years) + 1);
-  const origins = Object.keys(theaterColorMap);
+  const origins = Array.from(new Set(formatted_data.map(d => d.origin).filter(Boolean)));
+  
+  const colorScale = d3.scaleOrdinal()
+    .domain(origins)
+    .range(origins.map((o, i) => colorMap[o] || d3.schemeObservable10[i % 10]));
 
   const sharedPlotConfig = {
     width: 1000,
@@ -319,7 +332,8 @@ export function authorShareChart(author, formatted_data) {
     x: { label: "Year", tickFormat: "d", ticks },
     color: {
       domain: origins,
-      range: origins.map((k) => theaterColorMap[k]),
+      range: origins.map(o => colorScale(o)),
+      tickFormat: d => nameMap[d] || d,
       legend: true,
     },
     marginTop: 16,
@@ -329,6 +343,38 @@ export function authorShareChart(author, formatted_data) {
   const mq = window.matchMedia("(prefers-color-scheme: dark)");
   mq.addEventListener("change", () => update());
 
+  /* ---------- Mark builders ---------- */
+  function textureOverlayMarks(segments, authors, bg) {
+    const { defs, urlBy } = buildAuthorOriginPatterns(
+      authors,
+      bg,
+      origins,
+      colorScale,
+      undefined,
+      "chart-",
+      false
+    );
+
+    const data = segments.map((s) => ({
+      ...s,
+      _tex: urlBy.get(s.author)?.get(s.origin) || "none",
+    }));
+
+    return [
+      () => defs,
+      Plot.rectY(data, {
+        x1: "x1",
+        x2: "x2",
+        y1: "daysStart",
+        y2: "daysEnd",
+        fill: "_tex",
+        stroke: null,
+        opacity: 1,
+        pointerEvents: "none",
+      }),
+    ];
+  }
+
   /* ---------- Data builders ---------- */
   function deriveStacked() {
     const authors = latestAuthorsToCompare.length
@@ -336,9 +382,11 @@ export function authorShareChart(author, formatted_data) {
       : [author];
 
     const rows = formatted_data.flatMap((d) => {
-      const match = authors.find(
-        (a) => d.author === a || d.author?.includes(a)
-      );
+      const normAuthor = normalizeText(d.author);
+      const match = authors.find((a) => {
+        const normA = normalizeText(a);
+        return normAuthor === normA || normAuthor.includes(normA);
+      });
       return match
         ? [{ author: match, year: +d.year, origin: d.origin, date: d.date }]
         : [];
@@ -346,7 +394,10 @@ export function authorShareChart(author, formatted_data) {
 
     const nested = d3.rollups(
       rows,
-      (v) => new Set(v.map((x) => x.date)).size,
+      (v) => new Set(v.map((x) => {
+        const dt = x.date instanceof Date ? x.date : new Date(x.date);
+        return isNaN(dt) ? String(x.date) : dt.toISOString().slice(0, 10);
+      })).size,
       (d) => d.author,
       (d) => d.year,
       (d) => d.origin
@@ -390,7 +441,7 @@ export function authorShareChart(author, formatted_data) {
         const xMid = (x1 + x2) / 2;
 
         for (let i = 0; i < origins.length; i++) {
-          const c = origCounts[i] || 0;
+          const c = origCounts[i] || 0; 
           const p = total ? (c / total) * 100 : 0;
           
           if (!c) continue;
@@ -460,89 +511,10 @@ export function authorShareChart(author, formatted_data) {
     );
   }
 
-  /* ---------- Mark builders ---------- */
-  function renderCountMode(chartData) {
-    const { segments, authors, maxStackCount } = chartData;
-    const extraSpace = (maxStackCount ?? 0) * 0.1;
-
-    const marks = [];
-
-    // Author share bars (always shown)
-    marks.push(
-      Plot.rectY(segments, {
-        x1: "x1",
-        x2: "x2",
-        y1: "daysStart",
-        y2: "daysEnd",
-        fill: "origin",
-        opacity: 0.9,
-        tip: {
-          channels: {
-            Year: (d) => d.year,
-            Author: (d) => d.author,
-            "% of total": (d) => d.percent,
-            "Author days": (d) => d.count,
-          },
-          format: {
-            Year: (v) => `${v}`,
-            "% of total": (v) => `${v.toFixed(2)}%`,
-            "Author days": (v) => v,
-            x: false,
-            y: false,
-          },
-        },
-      }),
-      Plot.ruleY([0])
-    );
-
-    return {
-      config: {
-        y: {
-          label: "Number of performance days",
-          domain: [0, (maxStackCount || 10) + extraSpace],
-          tickFormat: "d",
-          grid: true,
-          nice: true,
-        },
-        title: `Author(s): ${authors.join("; ")} — Number of performance days`,
-      },
-      marks,
-    };
-  }
-
-  function textureOverlayMarks(
-    segments,
-    authors,
-    bg = theme.textureBG
-  ) {
-    const { defs, urlBy } = buildAuthorOriginPatterns(
-      authors,
-      bg,
-      undefined,
-      /* idPrefix */ "chart-",
-      /* opaqueSolid */ false
-    );
-
-    const data = segments
-      .map((s) => ({
-        ...s,
-        _tex: urlBy.get(s.author)?.get(s.origin) || "none",
-      }));
-
-    return [
-      () => defs,
-      Plot.rectY(data, {
-        x1: "x1",
-        x2: "x2",
-        y1: "daysStart",
-        y2: "daysEnd",
-        fill: "_tex",
-        stroke: null,
-        opacity: 1,
-        pointerEvents: "none",
-      }),
-    ];
-  }
+  const sharedTip = {
+    channels: { Year: "year", Author: "author", "% of total": "percent", "Author days": "count" },
+    format: { Year: (v) => `${v}`, "% of total": (v) => `${v.toFixed(2)}%`, "Author days": true, x: false, y: false },
+  };
 
   function makeCombinedFills(authors, bg = theme.textureBG) {
     const { defs, urlByAuthor } = buildAuthorGrayPatterns(
@@ -599,162 +571,189 @@ export function authorShareChart(author, formatted_data) {
       container.append(pill);
     });
     authorsBar.append(container);
-
-    if (exceeded) {
-      const exc = createEl("span", {
-        styles: { color: "#ef4444", fontWeight: "bold", marginLeft: "8px" },
-        html: "(3 authors max!)"
-      });
-      authorsBar.append(exc);
-    }
   };
   renderAuthorsLabel(latestAuthorsToCompare);
 
-  // Legend (no outer box)
-  const authorLegend = createEl("div", {
-    styles: { display: "grid", gap: "6px", marginTop: "4px", width: "fit-content" },
-  });
+  const createToggle = (text, checked) => {
+    const lbl = createEl("label", {
+      styles: { display: "inline-flex", alignItems: "center", gap: "8px", fontSize: "12px", color: theme.textMuted, paddingLeft: "2px" },
+      html: `<input type="checkbox" style="transform: translateY(1px);"${checked ? " checked" : ""}> ${text}`,
+    });
+    return [lbl, lbl.querySelector("input")];
+  };
 
-  const labelsToggle = createEl("label", {
-    styles: {
-      display: "inline-flex",
-      alignItems: "center",
-      gap: "8px",
-      fontSize: "12px",
-      color: theme.textMuted,
-      paddingLeft: "2px",
-    },
-    html: `<input type="checkbox" style="transform: translateY(1px);" checked> Show author labels`,
-  });
-  const labelsCheckbox = labelsToggle.querySelector("input");
+  const [labelsToggle, labelsCheckbox] = createToggle("Show author labels", true);
 
-  const combineToggle = createEl("label", {
-    styles: {
-      display: "inline-flex",
-      alignItems: "center",
-      gap: "8px",
-      fontSize: "12px",
-      color: theme.textMuted,
-      paddingLeft: "2px",
-    },
-    html: `<input type="checkbox" style="transform: translateY(1px);"> Combine theater types`,
-  });
-  const combineCheckbox = combineToggle.querySelector("input");
+  const [combineToggle, combineCheckbox] = createToggle("Combine theater types", false);
   combineCheckbox.addEventListener("change", () => {
     combineOrigins = !!combineCheckbox.checked;
     update();
   });
 
+  const allAuthors = [...new Set(formatted_data.map(d => d.author).filter(Boolean))].sort();
+  const normalizedMap = allAuthors.map(a => ({ original: a, normalized: normalizeText(a) }));
+
+  const searchContainer = createEl("div", { styles: { position: "relative", width: "100%", maxWidth: "400px", marginTop: "4px", marginBottom: "8px", fontFamily: "system-ui, sans-serif" } });
+  
+  const searchInput = createEl("input", {
+    props: { type: "text", placeholder: "Search and add author..." },
+    styles: { 
+      width: "100%", padding: "8px 12px", boxSizing: "border-box", 
+      borderRadius: "4px", border: `1px solid ${theme.textMuted}`, 
+      background: theme.bg, color: theme.text, fontSize: "14px"
+    }
+  });
+
+  const searchDropdown = createEl("div", {
+    styles: {
+      position: "absolute", top: "100%", left: 0, right: 0, 
+      background: theme.bg, border: `1px solid ${theme.textMuted}`, 
+      borderTop: "none", zIndex: 1000, maxHeight: "250px", 
+      overflowY: "auto", display: "none", borderRadius: "0 0 4px 4px",
+      boxShadow: "0 4px 12px rgba(0,0,0,0.15)"
+    }
+  });
+
+  searchInput.addEventListener("input", () => {
+    const query = normalizeText(searchInput.value);
+    searchDropdown.innerHTML = "";
+    
+    if (!query) {
+      searchDropdown.style.display = "none";
+      return;
+    }
+    
+    const matches = normalizedMap.filter(a => a.normalized.includes(query)).slice(0, 100);
+    
+    if (matches.length === 0) {
+      const noMatch = createEl("div", {
+        styles: { padding: "8px 12px", color: theme.textMuted, fontStyle: "italic", fontSize: "13px" },
+        html: "No authors found"
+      });
+      searchDropdown.append(noMatch);
+      searchDropdown.style.display = "block";
+      return;
+    }
+    
+    searchDropdown.style.display = "block";
+    matches.forEach(match => {
+      const item = createEl("div", {
+        styles: { padding: "8px 12px", cursor: "pointer", color: theme.text, fontSize: "13px", borderBottom: `1px solid ${theme.textMuted}40` },
+        html: match.original
+      });
+      item.addEventListener("mouseover", () => item.style.background = theme.textMuted + "40");
+      item.addEventListener("mouseout", () => item.style.background = "transparent");
+      item.addEventListener("mousedown", (e) => {
+        e.preventDefault();
+        addAuthorToCompare(match.original);
+        searchInput.value = "";
+        searchDropdown.style.display = "none";
+      });
+      searchDropdown.append(item);
+    });
+  });
+
+  searchInput.addEventListener("blur", () => {
+    searchDropdown.style.display = "none";
+  });
+
+  searchInput.addEventListener("focus", () => {
+    if (searchInput.value) searchDropdown.style.display = "block";
+  });
+
+  searchContainer.append(searchInput, searchDropdown);
+
+  const updateSearchState = (list) => {
+    if (list && list.length >= 3) {
+      searchInput.disabled = true;
+      searchInput.value = "Max 3 authors reached. Remove one to search.";
+      searchInput.style.opacity = "0.9";
+      searchInput.style.cursor = "not-allowed";
+      searchInput.style.color = "#ef4444";
+      searchInput.style.fontWeight = "bold";
+      searchInput.style.border = "1px solid #ef4444";
+      searchDropdown.style.display = "none";
+    } else {
+      searchInput.disabled = false;
+      searchInput.placeholder = "Search and add author...";
+      if (searchInput.value === "Max 3 authors reached. Remove one to search.") {
+        searchInput.value = "";
+      }
+      searchInput.style.opacity = "1";
+      searchInput.style.cursor = "text";
+      searchInput.style.color = theme.text;
+      searchInput.style.fontWeight = "normal";
+      searchInput.style.border = `1px solid ${theme.textMuted}`;
+    }
+  };
+  updateSearchState(latestAuthorsToCompare);
+
   const chartHost = createEl("div", { props: { className: "chart-host" } });
+
+  const authorLegend = createEl("div", {
+    styles: { display: "grid", gap: "6px", marginTop: "4px", width: "fit-content" },
+  });
 
   // Layout
   wrapper.append(
-    labelsToggle,
-    combineToggle,
-    authorsBar,
-    authorLegend,
-    chartHost
+    ...[
+      labelsToggle,
+      combineToggle,
+      searchContainer,
+      authorsBar,
+      authorLegend,
+      chartHost
+    ].filter(Boolean)
   );
 
   /* ---------- Render/update ---------- */
   function update() {
-    // Refresh global theme each time we render
     theme = getTheme();
 
-    // Update UI colors to current theme
     authorsBar.style.color = theme.textMuted;
     labelsToggle.style.color = theme.textMuted;
     combineToggle.style.color = theme.textMuted;
 
+    searchInput.style.background = theme.bg;
+    updateSearchState(latestAuthorsToCompare);
+    searchDropdown.style.background = theme.bg;
+    searchDropdown.style.border = `1px solid ${theme.textMuted}`;
+    Array.from(searchDropdown.children).forEach(child => {
+        child.style.color = theme.text;
+        child.style.borderBottom = `1px solid ${theme.textMuted}40`;
+    });
+
     chartHost.innerHTML = "";
     const chartData = deriveStacked();
-    const { authors } = chartData;
+    const { segments, authors, maxStackCount, authorLabels } = chartData;
 
-    const isDark = checkDarkMode();
-    const patternBG = isDark ? "#1e1e1e" : "#ffffff";
+    const extraSpace = (maxStackCount || 0) * 0.1;
+    const title = `Author(s): ${authors.join("; ")} — Number of performance days${combineOrigins ? " (combined)" : ""}`;
 
-    const ceiling = chartData.maxStackCount || 10;
-
-    const combined = combineOrigins ? combineSegmentsByAuthor(chartData) : null;
-
-    // 1. Start from the *normal* chart for this mode
-    const base = renderCountMode(chartData);
-
-    let marks = [...base.marks];
-    let baseConfig = base.config;
+    let marks = [Plot.ruleY([0])];
 
     if (!combineOrigins) {
-      // Original behavior (origins stacked + texture overlay),
-      // using patternBG consistently.
-      if (chartData.authors.length > 1) {
-        const overlay = textureOverlayMarks(
-          chartData.segments,
-          chartData.authors,
-          patternBG
-        );
-  
-        marks.push(...overlay);
+      marks.push(Plot.rectY(segments, { x1: "x1", x2: "x2", y1: "daysStart", y2: "daysEnd", fill: "origin", opacity: 0.9, tip: sharedTip }));
+      if (authors.length > 1) {
+        marks.push(...textureOverlayMarks(segments, authors, theme.bg));
       }
     } else {
-      const { defs, fillOf } = makeCombinedFills(
-        chartData.authors,
-        patternBG
+      const { defs, fillOf } = makeCombinedFills(authors, theme.bg);
+      const combinedData = combineSegmentsByAuthor(chartData).map(s => ({ ...s, _fill: fillOf(s.author) }));
+      marks.push(
+        () => defs,
+        Plot.rectY(combinedData, { x1: "x1", x2: "x2", y1: "daysStart", y2: "daysEnd", fill: "_fill", opacity: 1, stroke: null, tip: sharedTip })
       );
-      const defsMark = () => defs;
-
-      const AUTHOR_BARS_INDEX = 0;
-
-      const baseWithoutAuthorBars = marks.filter((_, i) => i !== AUTHOR_BARS_INDEX);
-
-      const combinedBarMark = Plot.rectY(
-        combined.map((s) => ({
-          ...s,
-          _fill: fillOf(s.author),
-        })),
-        {
-          x1: "x1",
-          x2: "x2",
-          y1: "daysStart",
-          y2: "daysEnd",
-          fill: "_fill",
-          opacity: 1,
-          stroke: null,
-          tip: {
-            channels: {
-              Year: (d) => d.year,
-              Author: (d) => d.author,
-              "% of total": (d) => d.percent,
-              "Author days": (d) => d.count,
-            },
-            format: {
-              Year: (v) => `${v}`,
-              "% of total": (v) => `${v.toFixed(2)}%`,
-              "Author days": (v) => v,
-              x: false,
-              y: false,
-            },
-          },
-        }
-      );
-
-      marks = [defsMark, ...baseWithoutAuthorBars, combinedBarMark];
-
-      baseConfig = {
-        ...baseConfig,
-        title: `Author(s): ${chartData.authors.join(
-          "; "
-        )} — Number of performance days (combined)`,
-      };
     }
 
     if (showLabels) {
-      marks.push(...makeAuthorLabels(chartData.authorLabels, fontScale));
+      marks.push(...makeAuthorLabels(authorLabels, fontScale));
     }
 
     const plot = Plot.plot({
       ...sharedPlotConfig,
-      ...baseConfig,
-      // No graph background – let parent/container provide it
+      title,
+      y: { label: "Number of performance days", domain: [0, (maxStackCount || 10) + extraSpace], tickFormat: "d", grid: true, nice: true },
       style: {
         ...(sharedPlotConfig.style || {}),
         background: "transparent",
@@ -766,8 +765,7 @@ export function authorShareChart(author, formatted_data) {
 
     plot.style.fontSize = `${11 * fontScale}px`;
 
-    // Legend texture background is white
-    renderPatternLegend(authorLegend, authors, "#ffffff");
+    renderPatternLegend(authorLegend, authors, origins, colorScale, "transparent");
   }
 
   /* ---------- Events ---------- */
@@ -778,6 +776,7 @@ export function authorShareChart(author, formatted_data) {
 
   authorsCompareBus.addEventListener("authors:update", (e) => {
     renderAuthorsLabel(e.detail.authors, e.detail.exceeded);
+    updateSearchState(e.detail.authors);
     update();
   });
 

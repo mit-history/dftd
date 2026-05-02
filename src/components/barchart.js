@@ -88,8 +88,17 @@ export function createAnimatedLineChart(
     .attr("fill", "none")
     .attr("stroke", "#000")
     .attr("stroke-width", 3)
-    .attr("stroke-dasharray", "0,1000")
     .attr("d", line);
+
+  const totalLength = path.node().getTotalLength();
+
+  path
+    .attr("stroke-dasharray", `${totalLength},${totalLength}`)
+    .attr("stroke-dashoffset", totalLength)
+    .transition()
+    .duration(duration * formattedData.length)
+    .ease(d3.easeLinear)
+    .attr("stroke-dashoffset", 0);
 
   const tooltip = d3
     .select("body")
@@ -120,14 +129,6 @@ export function createAnimatedLineChart(
     })
     .on("mouseout", () => tooltip.style("opacity", 0));
 
-  path
-    .attr("stroke-dasharray", path.node().getTotalLength())
-    .attr("stroke-dashoffset", path.node().getTotalLength())
-    .transition()
-    .duration(duration * formattedData.length)
-    .ease(d3.easeLinear)
-    .attr("stroke-dashoffset", 0);
-
   circles
     .transition()
     .delay((d, i) => i * duration)
@@ -139,11 +140,11 @@ export function createAnimatedLineChart(
 
 
 // for all lines at once
-export function createMultipleAnimatedLines(groups, { width = 900, height = 500, duration = 100 } = {}) {
+export function createMultipleAnimatedLines(groups, { width = 900, height = 500, duration = 100, colorMap = {}, nameMap = {} } = {}) {
   const baseFontSize = Math.max(12, width * 0.015);
   const baseRadius = Math.max(2, width * 0.01);
 
-  const margin = { top: 20, right: 160, bottom: 60, left: 60 };
+  const margin = { top: 20, right: 280, bottom: 60, left: 60 };
   const svg = d3.create("svg")
     .attr("viewBox", `0 0 ${width} ${height}`)
     .attr("preserveAspectRatio", "xMidYMid meet")
@@ -176,7 +177,10 @@ export function createMultipleAnimatedLines(groups, { width = 900, height = 500,
   .attr("font-size", `${baseFontSize}px`)
   .text("Max: 366 days");
 
-  const color = d3.scaleOrdinal().domain(groups.map(g => g.label)).range(["red", "blue", "green", "purple", "orange", "cyan"]);
+  const defaultColors = ["red", "blue", "green", "purple", "orange", "cyan"];
+  const color = d3.scaleOrdinal()
+    .domain(groups.map(g => g.label))
+    .range(groups.map((g, i) => colorMap[g.label] || defaultColors[i % defaultColors.length]));
 
   const line = d3.line()
     .x(d => x(d.year))
@@ -238,7 +242,7 @@ export function createMultipleAnimatedLines(groups, { width = 900, height = 500,
       .on("mouseover", (event, d) => {
         tooltip
           .style("opacity", 1)
-          .html(`${label}<br>Year: ${d.year}<br>Count: ${d.count}`)
+          .html(`${nameMap[label] || label}<br>Year: ${d.year}<br>Count: ${d.count}`)
           .style("left", event.pageX + 10 + "px")
           .style("top", event.pageY - 10 + "px");
       })
@@ -250,11 +254,11 @@ export function createMultipleAnimatedLines(groups, { width = 900, height = 500,
   });
 
 
-  const legend = svg.append("g").attr("transform", `translate(${width - 120}, 30)`);
+  const legend = svg.append("g").attr("transform", `translate(${width - 250}, 30)`);
   groups.forEach(({ label }, i) => {
     const g = legend.append("g").attr("transform", `translate(0, ${i * 20})`);
     g.append("rect").attr("width", 12).attr("height", 12).attr("fill", color(label));
-    g.append("text").attr("x", 18).attr("y", 10).text(label).style("font-size", `${baseFontSize}px`).style("fill", "#333");
+    g.append("text").attr("x", 18).attr("y", 10).text(nameMap[label] || label).style("font-size", `${baseFontSize}px`).style("fill", "#333");
   });
 
   return svg.node();
