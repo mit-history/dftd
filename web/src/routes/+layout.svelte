@@ -57,10 +57,10 @@
 
       <ul class:visible={$isHome} class:open={isOpen} >
         <li><a href={base + '/'}>Home</a></li>
-        <li><a href={base + '/About'}>About</a></li>
-        <li><a href={base + '/Affiliates'}>Affiliated Projects</a></li>
+        <li><a href={base + '/about'}>About</a></li>
         <li><a href={base + '/data'}>Explore the Data</a></li>
-        <li><a href={base + '/Team'}>People</a></li>
+        <li><a href={base + '/timeline'}>Dataset Timelines</a></li>
+        <li><a href={base + '/affiliates'}>Affiliated Projects</a></li>
       </ul>
     </div>
   </header>
