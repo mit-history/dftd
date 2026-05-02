@@ -1,9 +1,11 @@
 <script>
   import { base } from "$app/paths";
+  const  calSvg = "../assets/calendar.svg"
 
   const visualizations = [
     {
       id: "over-time",
+      icon:"bar-chart.svg",
       category: "Annual Performance Comparison",
       title: "Annual Performance Counts",
       description:
@@ -23,6 +25,7 @@
     // },
     {
       id: "heat-map",
+      icon: "fire.svg",
       category: "Annual Performance Comparison",
       title: "Heat Map Showing Performance Patterns",
       description: ""
@@ -30,6 +33,7 @@
     },
     {
       id: "days",
+      icon:"line-chart.svg",
       category: "Annual Performance Comparison",
       title: "Animated Line Chart Showing Annual Performance Totals",
       description:
@@ -37,6 +41,7 @@
     },
     {
       id: "calendar",
+      icon:"calendar.svg",
       category: "Performance Calendar",
       title: "Global Theatre Calendar",
       description:
@@ -44,6 +49,7 @@
     },
     {
       id: "authorShare",
+      icon:"bar-chart.svg",
       category: "Authors",
       title: "Author Presence in Repertories - Bar Graph",
       description:
@@ -51,6 +57,7 @@
     },
     {
       id: "bubble",
+      icon:"bubble.svg",
       category: "Authors",
       title: "Author Presence in Repertories - Bubble Graph",
       description:
@@ -58,12 +65,24 @@
     }
   ];
 
-  const categories = [
-    "Authors",
-    "Genres",
-    "Annual Performance Comparison",
-    "Performance Calendar"
-  ]
+  const categories = $state([
+    {
+      name: 'Authors',
+      collapsed: true
+    },
+    {
+      name: 'Genres',
+      collapsed: true
+    },
+    {
+      name: 'Annual Performance Comparison',
+      collapsed: true
+    },
+    {
+      name: 'Performance Calendar',
+      collapsed: true
+    }
+  ])
 </script>
 
 <svelte:head>
@@ -112,11 +131,14 @@
 
     <section class="categories-list">
       {#each categories as cat}
-      <div class="category-card">
-        <h2>{cat}</h2>
-        {#each visualizations.filter(d => d.category === cat) as viz}
+      <div class="category-card {cat.collapsed? 'collapsed':''}">
+        <button
+          onclick={() => cat.collapsed = !cat.collapsed}
+        >{cat.name}</button>
+        {#each visualizations.filter(d => d.category === cat.name) as viz}
           <div class="visualization-link">
             <a href={base + "/data/" + viz.id}>
+              <img class="viz-icon" src={base + '/images/' + viz.icon} alt="Icon"/>
               <h3>{viz.title}
               <span class="arrow">→</span></h3>
             </a>
@@ -131,9 +153,12 @@
 
 <style>
 
+  .viz-icon{
+    max-width: 2rem;
+  }
   .categories-list{
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: 50% 50%;
     margin-top: 1rem;
     gap: 1.8rem;
     text-align: left;
@@ -152,10 +177,19 @@
     color: inherit;
   }
 
-  .category-card h2 {
+  .category-card button {
     margin: 0 0 0.5rem;
-    font-size: 1.25rem;
+    /* font-size: 1.25rem; */
     font-weight: 600;
+    font-size: 1.5em; /* h2 typical size */
+    color: #2a2a2a; /* Standard text color */
+    background: none;
+    border: none;
+    padding: 0;
+    text-align: start;
+    /* margin: 0; */
+    cursor: pointer;
+    font-family: inherit; /* Inherit font from body */
   }
 
   .category-card div:first-of-type{
@@ -168,8 +202,12 @@
 
   .category-card h3 {
     color: #555;
-    font-size: 0.97rem;
+    /* font-size: 0.97rem; */
     line-height: 1.5;
+  }
+
+  .collapsed .visualization-link{
+    display: none;
   }
 
   .visualization-link{
@@ -197,6 +235,9 @@
 
   .visualization-link a{
     text-decoration: none;
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
   }
 
 
