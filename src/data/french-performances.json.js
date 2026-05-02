@@ -36,7 +36,7 @@ export async function load() {
     });
 
     // console.log("✅ Formatted Plays (First 5 Records):", formattedPlays.slice(0, 5));
-    return filteredPlays;
+    return formattedPlays;
   } catch (error) {
     console.error("❌ Error loading plays:", error);
     return [];

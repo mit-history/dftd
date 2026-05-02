@@ -15,8 +15,14 @@ const french_dates = new Set(french.filter(d=> d.year === 1775).map(d=> d.date))
 const dutch = await FileAttachment("data/dutch-performances.csv").csv({typed: true});
 const saintDomingue = await FileAttachment("data/saint_domingue/formatted_saint_domingue.json").json();
 const london = await FileAttachment('data/london/formatted_london.json').json()
-const coventGarden = london.filter(d => d.place == "Covent Garden");
-const druryLane = london.filter(d => d.place == "Drury Lane")
+const coventGarden = london.filter(d => d.place == "Covent Garden").map(d =>{
+  d.origin = 'covent garden';
+  return d;
+});
+const druryLane = london.filter(d => d.place == "Drury Lane").map(d =>{
+  d.origin = 'drury lane';
+  return d;
+});
 
 const color_map = {
   'french': '#FF725C',
@@ -206,7 +212,9 @@ const combined_data = [
   ...danish,
   ...french.map(d => ({ ...d, origin: "french" })),
   ...dutch.map(d => ({ ...d, origin: "dutch" })),
-  // ...saintDomingue.map(d => ({ ...d, origin: "saint-domingue" }))
+  ...saintDomingue.map(d => ({ ...d, origin: "saint-domingue" })),
+  ...coventGarden,
+  ...druryLane
 ];
 
 ```
@@ -699,25 +707,25 @@ const formatted_data = combined_data.filter(d => {
   const dt = asDate(d.date);
   return dt && dt > start_date && dt <= end_date && origins.includes(d.origin);
 });
-const formatted_stdmg = saintDomingue.filter(d => {
-  const dt = asDate(d.date);
-  return dt && dt > start_date && dt <= end_date && origins.includes(d.origin);
-});
-const formatted_london = london.filter(d => {
-  const dt = asDate(d.date);
-  return dt && dt > start_date && dt <= end_date && origins.includes(d.origin);
-});
-console.log('covent garden', coventGarden);
-const formatted_cv = coventGarden.filter(d => {
-  const dt = asDate(d.date);
-  return dt && dt > start_date && dt <= end_date && origins.includes('covent garden');
-});
-console.log('formatted covent garden', formatted_cv);
+// const formatted_stdmg = saintDomingue.filter(d => {
+//   const dt = asDate(d.date);
+//   return dt && dt > start_date && dt <= end_date && origins.includes(d.origin);
+// });
+// const formatted_london = london.filter(d => {
+//   const dt = asDate(d.date);
+//   return dt && dt > start_date && dt <= end_date && origins.includes(d.origin);
+// });
+// console.log('covent garden', coventGarden);
+// const formatted_cv = coventGarden.filter(d => {
+//   const dt = asDate(d.date);
+//   return dt && dt > start_date && dt <= end_date && origins.includes('covent garden');
+// });
+// console.log('formatted covent garden', formatted_cv);
 
-const formatted_dl = druryLane.filter(d => {
-  const dt = asDate(d.date);
-  return dt && dt > start_date && dt <= end_date && origins.includes('drury lane');
-})
+// const formatted_dl = druryLane.filter(d => {
+//   const dt = asDate(d.date);
+//   return dt && dt > start_date && dt <= end_date && origins.includes('drury lane');
+// })
 
 
 const yearsInView = Array.from(
@@ -745,7 +753,7 @@ function compareYearsChart(data) {
     title: `Compare performances per year, ${start_date.getFullYear()}–${end_date.getFullYear()}`,
     fx: { label: null, padding: 0.1 },
     x: { axis: null, paddingOuter: 0.2 },
-    y: { grid: true, label: "Performances", domain: [0, 366*2] },
+    y: { grid: true, label: "Performances", domain: [0, 366] },
     color: {
       domain: Object.keys(color_map),
       range: Object.values(color_map),
@@ -773,39 +781,39 @@ function compareYearsChart(data) {
 
 ```js
 // console.log('cv experiments')
-const new_cv = []
-let dates = new Set()
+// const new_cv = []
+// let dates = new Set()
 
-for (const event of formatted_cv){
-  if (!dates.has(event.date)){
-    new_cv.push(event);
-    dates.add(event.date)
-  }
-}
+// for (const event of formatted_cv){
+//   if (!dates.has(event.date)){
+//     new_cv.push(event);
+//     dates.add(event.date)
+//   }
+// }
 
-const new_stdmg = []
-dates = new Set()
-for (const event of formatted_stdmg){
-  if (!dates.has(event.date)){
-    new_stdmg.push(event);
-    dates.add(event.date)
-  }
-}
+// const new_stdmg = []
+// dates = new Set()
+// for (const event of formatted_stdmg){
+//   if (!dates.has(event.date)){
+//     new_stdmg.push(event);
+//     dates.add(event.date)
+//   }
+// }
 // console.log('stdmg experiments')
 // console.log(new_stdmg)
 
-const new_dl = []
-dates = new Set()
-for (const event of formatted_dl){
-  if (!dates.has(event.date)){
-    new_dl.push(event);
-    dates.add(event.date)
-  }
-}
+// const new_dl = []
+// dates = new Set()
+// for (const event of formatted_dl){
+//   if (!dates.has(event.date)){
+//     new_dl.push(event);
+//     dates.add(event.date)
+//   }
+// }
 
 const new_formatted_data = []
-for (const origin of ['dutch', 'french', 'danish']){
-  dates = new Set()
+for (const origin of originOptions){
+  const dates = new Set()
   for (const event of formatted_data.filter(d=>d.origin === origin)){
     if (!dates.has(event.date)){
       new_formatted_data.push(event);
@@ -815,13 +823,13 @@ for (const origin of ['dutch', 'french', 'danish']){
 }
 // console.log(new_cv.length)
 // console.log(formatted_cv.length)
-const full_formatted_data = new_formatted_data.concat(new_stdmg).concat(new_cv.map(d => {d.origin = 'covent garden'; return d})).concat(new_dl.map(d => {d.origin = 'drury lane'; return d}));
+// const full_formatted_data = new_formatted_data.concat(new_stdmg).concat(new_cv.map(d => {d.origin = 'covent garden'; return d})).concat(new_dl.map(d => {d.origin = 'drury lane'; return d}));
 if (overTime) {
   display(html`<h2>Comparative Performances Over Time</h2>`);
   display(
-    full_formatted_data.length > 0
+    new_formatted_data.length > 0
       ? html`<div class="full-bleed" id="french-graph-container">
-          ${compareYearsChart(full_formatted_data)}
+          ${compareYearsChart(new_formatted_data)}
         </div>`
       : html`<i>No data.</i>`
   );
@@ -927,7 +935,7 @@ if (authorShare) {
   invalidation.then(() => authorsCompareBus.removeEventListener("authors:update", updateHandler));
 
   display(container);
-  display(authorShareChart(author, full_formatted_data, color_map, name_map));
+  display(authorShareChart(author, new_formatted_data, color_map, name_map));
 } else {
   display(html`<div></div>`)
 }
@@ -1401,6 +1409,10 @@ import { injectCalendarStyles, buildEvents, renderCalendar, ORIGIN_COLOR } from 
 const FrenchRaw = await FileAttachment("data/french-performances.json").json();
 const DutchRaw  = await FileAttachment("data/dutch-performances.csv").csv({typed: true});
 const DanishRaw = await FileAttachment("data/danish-performances.json").json();
+const SaintDomingueRaw = await FileAttachment("data/saint_domingue/formatted_saint_domingue.json").json();
+const LondonRaw = await FileAttachment('data/london/formatted_london.json').json();
+const CoventGardenRaw = LondonRaw.filter(d=>d.place='Covent Garden').map(d=>({...d, origin: 'covent garden'}));
+const DruryLaneRaw = LondonRaw.filter(d=>d.place='Drury Lane').map(d=>({...d, origin: 'drury lane'}));
 const nolaCsv   = await FileAttachment("data/new_orleans/new_o_frequent_performances.csv").csv({typed: false});
 
 // ==============================
@@ -1449,6 +1461,42 @@ const Dutch = DutchRaw.map((r,i) => {
   };
 }).filter(d => d.date);
 
+const SaintDomingue = SaintDomingueRaw.map((r,i) => {
+  const d = asDate(r.date ?? r.Date ?? r.performance_date ?? r.start_date);
+  return {
+    id: r.id ?? r.ID ?? `Saint-Domingue-${i}`,
+    date: d, year: d ? d.getUTCFullYear() : (r.year ?? r.Year ?? null),
+    title: r.title ?? r.Title ?? r.play ?? r.Play ?? "Untitled",
+    origin: "saint-domingue",
+    theater: r.theater ?? r.Theater ?? r.venue ?? r.Venue ?? r.place ?? r.Place ?? "Unknown venue",
+    city: r.city ?? r.City ?? null
+  };
+}).filter(d => d.date);
+
+const CoventGarden = CoventGardenRaw.map((r,i) => {
+  const d = asDate(r.date ?? r.Date ?? r.performance_date ?? r.start_date);
+  return {
+    id: r.id ?? r.ID ?? `Covent-Garden-${i}`,
+    date: d, year: d ? d.getUTCFullYear() : (r.year ?? r.Year ?? null),
+    title: r.title ?? r.Title ?? r.play ?? r.Play ?? "Untitled",
+    origin: "covent garden",
+    theater: r.theater ?? r.Theater ?? r.venue ?? r.Venue ?? r.place ?? r.Place ?? "Unknown venue",
+    city: r.city ?? r.City ?? null
+  };
+}).filter(d => d.date);
+
+const DruryLane = DruryLaneRaw.map((r,i) => {
+  const d = asDate(r.date ?? r.Date ?? r.performance_date ?? r.start_date);
+  return {
+    id: r.id ?? r.ID ?? `Drury-Lane-${i}`,
+    date: d, year: d ? d.getUTCFullYear() : (r.year ?? r.Year ?? null),
+    title: r.title ?? r.Title ?? r.play ?? r.Play ?? "Untitled",
+    origin: "drury lane",
+    theater: r.theater ?? r.Theater ?? r.venue ?? r.Venue ?? r.place ?? r.Place ?? "Unknown venue",
+    city: r.city ?? r.City ?? null
+  };
+}).filter(d => d.date);
+
 const nolaRows = nolaCsv.map(obj => { const out = {}; for (const k of Object.keys(obj)) out[normKey(k)] = obj[k]; return out; });
 const nola = nolaRows.map((r,i) => {
   const d = asDate(r["date of performance"] ?? r["date"]);
@@ -1476,6 +1524,9 @@ const allRows = [
   ...Danish.filter(d => d.date <= CAP_NON_NOLA),
   ...French.filter(d => d.date <= CAP_NON_NOLA),
   ...Dutch.filter(d => d.date <= CAP_NON_NOLA),
+  ...SaintDomingue.filter(d => d.date <= CAP_NON_NOLA),
+  ...CoventGarden.filter(d => d.date <= CAP_NON_NOLA),
+  ...DruryLane.filter(d => d.date <= CAP_NON_NOLA),
   ...nola.filter(d => d.date <= CAP)          // NOLA up to 1812
 ];
 
