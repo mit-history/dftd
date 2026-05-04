@@ -65,7 +65,7 @@
       Artistic Exchanges (Copenhagen)</a>
 
       <p style="text-align: center;">
-        Ulla Kallenbach 
+        Project Contact: Ulla Kallenbach 
         [<a href="mailto:ulla.kallenbach@uib.no" style="color: #335c67;">
           ulla.kallenbach@uib.no
         </a>]
@@ -78,7 +78,7 @@
       Onstage (Amsterdam)</a>
       
       <p style="text-align: center;">
-        Frans Blom
+        Project Contact: Frans Blom
         [<a href="mailto:f.r.e.blom@uva.nl" style="color: #335c67;">
           f.r.e.blom@uva.nl
         </a>]
@@ -91,7 +91,7 @@
       Comédie-Française Registers Project (Paris)</a>
 
       <p style="text-align: center;">
-        Sara Harvey
+        Project Contact: Sara Harvey
         [<a href="mailto:saraharvey@uvic.ca" style="color: #335c67;">
           saraharvey@uvic.ca
         </a>]
@@ -100,12 +100,11 @@
 
     <div class="project-card">
       <a href="https://repcomit18.mesu.sorbonne-universite.fr/" target="_blank" class="project-title">
-      <!-- TODO: REPLACE IMAGE WITH JEFF'S -->
       <img src={base + '/images/comedie_italienne.jpg'} alt="Répertoire de la Comédie-Italienne de Paris">
       Répertoire de la Comédie-Italienne de Paris</a>
 
       <p style="text-align: center;">
-        Emanuele DeLuca
+        Project Contact: Emanuele DeLuca
         [<a href="mailto:Emanuele.De-Luca@univ-cotedazur.fr" style="color: #335c67;">
           Emanuele.De-Luca@univ-cotedazur.fr
         </a>]
@@ -118,7 +117,7 @@
       Theatronomics (London)</a>
 
       <p style="text-align: center;">
-        David O’Shaughnessy
+        Project Contact: David O’Shaughnessy
         [<a href="mailto:david.oshaughnessy@universityofgalway.ie" style="color: #335c67;">
           david.oshaughnessy@universityofgalway.ie
         </a>]
@@ -126,13 +125,12 @@
     </div>
 
     <div class="project-card">
-      <!-- TODO: REPLACE IMAGE WITH JEFF'S -->
       <a href="https://londonstagedatabase.uoregon.edu/" target="_blank" class="project-title">
       <img src={base + '/images/london_stage_database.jpeg'} alt="London Stage Database">
       London Stage Database</a>
 
       <p style="text-align: center;">
-        Mattie Burkert
+        Project Contact: Mattie Burkert
         [<a href="mailto:mburkert@uoregon.edu" style="color: #335c67;">
           mburkert@uoregon.edu
         </a>]
@@ -145,7 +143,7 @@
         Theatre in Saint-Domingue</a>
 
         <p style="text-align: center;">
-        Julia Prest
+        Project Contact: Julia Prest
         [<a href="mailto:jp22@st-andrews.ac.uk" style="color: #335c67;">
           jp22@st-andrews.ac.uk
         </a>]
