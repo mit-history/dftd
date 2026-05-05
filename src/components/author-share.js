@@ -661,6 +661,25 @@ export function authorShareChart(author, formatted_data, colorMap = {}, nameMap 
     if (searchInput.value) searchDropdown.style.display = "block";
   });
 
+  searchInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      const query = normalizeText(searchInput.value);
+      if (!query) return;
+
+      const match = normalizedMap.find(a => a.normalized === query) ||
+                    normalizedMap.find(a => a.normalized.includes(query));
+
+      if (match) {
+        addAuthorToCompare(match.original);
+        searchInput.value = "";
+        searchDropdown.style.display = "none";
+      } else {
+        alert("Author not found. Please try another name.");
+      }
+    }
+  });
+
   searchContainer.append(searchInput, searchDropdown);
 
   const updateSearchState = (list) => {
