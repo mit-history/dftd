@@ -133,7 +133,9 @@
       <div class="category-card {cat.collapsed? 'collapsed':''}">
         <button
           onclick={() => cat.collapsed = !cat.collapsed}
-        >{cat.name}</button>
+        >{cat.name}
+        <img class="menu-icon" src={base + '/images/' + (cat.collapsed? 'open-menu.svg': 'close-menu.svg')} alt='icon'/>
+        </button>
         {#each visualizations.filter(d => d.category === cat.name) as viz}
           <div class="visualization-link">
             <a href={base + "/data/" + viz.id}>
@@ -152,7 +154,7 @@
 
 <style>
 
-  .viz-icon{
+  .viz-icon, .menu-icon{
     max-width: 2rem;
   }
   .categories-list{
@@ -174,6 +176,7 @@
     box-shadow: 0 8px 22px rgba(0, 0, 0, 0.04);
     transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s;
     color: inherit;
+    height: fit-content;
   }
 
   .category-card button {

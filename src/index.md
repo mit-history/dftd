@@ -23,6 +23,10 @@ const druryLane = london.filter(d => d.place == "Drury Lane").map(d =>{
   d.origin = 'drury lane';
   return d;
 });
+const newOrleans = await FileAttachment("data/new_orleans/new_o_frequent_performances.csv").csv({typed: false});
+console.log(coventGarden)
+console.log(druryLane)
+
 
 const color_map = {
   'french': '#FF725C',
@@ -214,8 +218,19 @@ const combined_data = [
   ...dutch.map(d => ({ ...d, origin: "dutch" })),
   ...saintDomingue.map(d => ({ ...d, origin: "saint-domingue" })),
   ...coventGarden,
-  ...druryLane
+  ...druryLane,
+  ...newOrleans.map(d=>({
+    date: new Date(d['date of performance']),
+    title: d['works mentioned'],
+    genre: d.genre,
+    place: d['Performance Location'],
+    author: d.author,
+    year: Number(d.year),
+    origin: 'new orleans'
+  }))
 ];
+// console.log('combined data')
+// console.log(combined_data.filter(d=>d.origin=='new orleans'))
 
 ```
 
@@ -563,31 +578,53 @@ const heatMap = viz.includes("Heat Map");
 <div class="card" style="margin-bottom: 1rem;">
 
 
-<details open>
+<details closed>
 
 <summary>Filters</summary>
 
 ```js
-const start_date_input = Inputs.date({label: "Start", value: "1748-01-01"})
-const end_date_input = Inputs.date({label: "End", value: "1798-12-31"})
-const start_date = view(start_date_input);
-const end_date = view(end_date_input);
+import { rangeInput } from "./components/range_input.js";
+```
 
-const randomDates = () =>  {
-  const start = new Date("1748-01-01");
-  const end = new Date("1798-12-31"); // was 1778-12-31 before
-  const new_start = new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
-  const new_end = new Date(new_start.getTime() + Math.random() * (end.getTime() - new_start.getTime()));
-  start_date_input.value = new_start;
-  end_date_input.value = new_end;
-  start_date_input.dispatchEvent(new Event("input"));
-  end_date_input.dispatchEvent(new Event("input"));
-}
+```js
+// if(heatMap || calendar){
+  const start_date_input = Inputs.date({label: "Start", value: "1748-01-01"})
+  const end_date_input = Inputs.date({label: "End", value: "1798-12-31"})
+  const start_date = view(start_date_input);
+  const end_date = view(end_date_input);
+
+  const randomDates = () =>  {
+    const start = new Date("1748-01-01");
+    const end = new Date("1798-12-31"); // was 1778-12-31 before
+    const new_start = new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
+    const new_end = new Date(new_start.getTime() + Math.random() * (end.getTime() - new_start.getTime()));
+    start_date_input.value = new_start;
+    end_date_input.value = new_end;
+    start_date_input.dispatchEvent(new Event("input"));
+    end_date_input.dispatchEvent(new Event("input"));
+  }
+// }else{
+// const date_range = rangeInput({
+//   min: 1748,
+//   max: 1793,
+//   step: 1,
+//   value: [1748, 1793],
+//   enableTextInput: true
+// });
+// const date_range_val = true ? view(date_range) : null;
+// }
+
 
 ```
 
 ```js
-const originOptions = ["danish", "dutch", "french", "saint-domingue", 'covent garden', 'drury lane'];
+
+// if (date_range_val !== null){
+//   const start_date = new Date(date_range_val[0])
+//   const end_date = new Date(date_range_val[1])
+// }
+
+const originOptions = ["danish", "dutch", "french", "saint-domingue", 'covent garden', 'drury lane', 'new orleans'];
 const originsInput = Inputs.checkbox(originOptions, {
   label: "Origin",
   value: originOptions,
@@ -665,8 +702,8 @@ genreInput.oninput = (event) => {
   }
 }
 
-const genres = view(genreInput);
-if(genreOptions.length > 0) view(genreSelect);
+const genres = genreOptions// view(genreInput);
+// if(genreOptions.length > 0) view(genreSelect);
 ```
 
 ```js
@@ -685,7 +722,7 @@ const authorOptions = [
 ];
 
 const authorInput = Inputs.select( authorOptions, { label: "Filter by author", value: "No author" })
-const author = view(authorInput);
+const author = authorShare? view(authorInput): 'No author';
 
 const randomAuthor = () => {
   authorInput.value = authorOptions[Math.floor(Math.random() * authorOptions.length)];
@@ -710,6 +747,8 @@ const formatted_data = combined_data.filter(d => {
   const dt = asDate(d.date);
   return dt && dt > start_date && dt <= end_date && origins.includes(d.origin);
 });
+// console.log('og formatted data')
+// console.log(formatted_data.filter(d=>d.origin=='new orleans'))
 // const formatted_stdmg = saintDomingue.filter(d => {
 //   const dt = asDate(d.date);
 //   return dt && dt > start_date && dt <= end_date && origins.includes(d.origin);
@@ -824,6 +863,8 @@ for (const origin of originOptions){
     }
   }
 }
+// console.log('formatted data')
+// console.log(new_formatted_data.filter(d=>d.origin=='new orleans'))
 // console.log(new_cv.length)
 // console.log(formatted_cv.length)
 // const full_formatted_data = new_formatted_data.concat(new_stdmg).concat(new_cv.map(d => {d.origin = 'covent garden'; return d})).concat(new_dl.map(d => {d.origin = 'drury lane'; return d}));
@@ -854,11 +895,6 @@ import {
   latestAuthorsToCompare
 } from "./components/author-share.js";
 
-if (authorShare) {
-  // display(html`<h2>Author Performance Contribution Percentage</h2>`);
-  display(authorShareChart(author, formatted_data));
-  } else
-  display(html`<div></div>`)
 ```
 
 ```js
@@ -954,7 +990,6 @@ if (authorShare) {
 
 ```js
 import { BubbleChart, authorBubble } from "./components/bubble_chart.js";
-import { rangeInput } from "./components/range_input.js";
 ```
 
 ```js
@@ -1057,6 +1092,8 @@ const du = rangeInput({
   enableTextInput: true
 });
 const du_val = bubble?view(du):[0,0];
+
+console.log(`du_val: ${du_val[0]}\ndu: ${du}`)
 
 ```
 
@@ -1388,10 +1425,11 @@ const summarized_data = origins.map(origin =>
 document.getElementById("line-chart-container").innerHTML = "";
 document.getElementById("heatmap-container").innerHTML = "";
 
-const containerWidth = window.innerWidth * 0.45;
+const containerWidth = window.innerWidth;
+const containerHeight = window.innerHeight;
 
 origins.length > 0 && performanceDays ? document.getElementById("line-chart-container").append(
-  createMultipleAnimatedLines(summarized_data, { width: containerWidth, height: 600 })
+  createMultipleAnimatedLines(summarized_data, { width: containerWidth, height: containerHeight })
 ) : html`<i>No data.</i>`
 
 
@@ -1403,7 +1441,7 @@ origins.length > 0 && performanceDays ? document.getElementById("line-chart-cont
 ```js
 // display(heatMap ? html `<h2>Heatmap of Days with Performances</h2>` : html`<div></div>`)
 
-display(origins.length > 0 && heatMap ? createHeatmap(genre_data, { width: containerWidth, height: 600 }) : html`<i>No data.</i>`)
+display(origins.length > 0 && heatMap ? createHeatmap(genre_data, { width: containerWidth, height: containerHeight }) : html`<i>No data.</i>`)
 
 ```
 
@@ -1427,9 +1465,10 @@ const DutchRaw  = await FileAttachment("data/dutch-performances.csv").csv({typed
 const DanishRaw = await FileAttachment("data/danish-performances.json").json();
 const SaintDomingueRaw = await FileAttachment("data/saint_domingue/formatted_saint_domingue.json").json();
 const LondonRaw = await FileAttachment('data/london/formatted_london.json').json();
-const CoventGardenRaw = LondonRaw.filter(d=>d.place='Covent Garden').map(d=>({...d, origin: 'covent garden'}));
-const DruryLaneRaw = LondonRaw.filter(d=>d.place='Drury Lane').map(d=>({...d, origin: 'drury lane'}));
+const CoventGardenRaw = LondonRaw.filter(d=>d.place=='Covent Garden').map(d=>({...d, origin: 'covent garden'}));
+const DruryLaneRaw = LondonRaw.filter(d=>d.place=='Drury Lane').map(d=>({...d, origin: 'drury lane'}));
 const nolaCsv   = await FileAttachment("data/new_orleans/new_o_frequent_performances.csv").csv({typed: false});
+
 
 // ==============================
 // 2) Helpers
