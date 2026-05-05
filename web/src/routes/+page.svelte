@@ -87,15 +87,14 @@
     </div>
 
     <div class="hero-text">
-      <!-- TODO: Replace description -->
       <h1>Transnational Stages</h1>
-      <h3 class="subtitle">Theatrical Circulation and Exchange in the Atlantic World, 1680–1850</h3>
+      <h3 class="subtitle">Theatrical Circulation and Exchange in the Eighteenth-Century Atlantic World</h3>
       <p class="intro">
-        From the seventeenth to the twentieth centuries in the Atlantic World plays and performers often crossed
-        land boundaries and oceans, creating new meanings and audience expectations as they did so.
-        <strong>Transnational Stages</strong> offers users the opportunity to study national datasets via
-        comparative visualization tools, thereby creating new insights into international theatrical trends
-        in the Early Modern and Modern periods.
+        In the eighteenth-century Atlantic World, plays and performers often crossed land boundaries and oceans,
+        creating new meanings and audience expectations as they did so.
+        <strong>Transnational Stages</strong> offers users the opportunity <a href="{base}/data" data-sveltekit-reload class="link">to study national datasets via comparative visualization tools</a>,
+        thereby creating new insights into international theatrical trends in the Early Modern and Modern periods.
+        Our project relies on the foundational work of our <a href="{base}/affiliates" class="link">affiliated project</a> partners. Learn more about our work <a href="{base}/about" class="link">here</a>.
       </p>
     </div>
   </section>

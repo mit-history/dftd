@@ -43,7 +43,7 @@
         The three collaborators have reached out to colleagues who have compiled datasets on theater performance in several venues in Europe and the Americas.
         Our goal to date has been to create visualizations that allow users to compare data on authors, genres, and performance frequency across the national boundaries in which theater history is traditionally studied.
         Our work began in Fall 2024 and has featured project planning meetings at MIT and the University of Bergen. In between these meetings, project partners have generously shared their datasets,
-        allowing us to assemble them in our repository and link them to series of experimental visualizations, which you will find <a href="{base}/" class="https://transnationalstages.net/data">here</a>.
+        allowing us to assemble them in our repository and link them to series of experimental visualizations, which you will find <a href="{base}/data" class="link">here</a>.
       </p>
 
       <p>
@@ -53,12 +53,12 @@
       <p>
         In Spring 2026, we are able to offer tools to visualize comparisons between theater venues in several European capitals and two venues in the Americas.
         The majority of this data derives from the second half of the eighteenth century; for a better sense of the current chronological scope of the project,
-        see this <a href="{base}/" class="https://transnationalstages.net/timeline">timeline</a>. The tools we have created allow one to study the frequency of author performance within and across these different venues.
+        see this <a href="{base}/timeline" class="link">timeline</a>. The tools we have created allow one to study the frequency of author performance within and across these different venues.
         They permit users to better understand the performance rates of different genres in various national settings.
         Finally, they allow researchers to get a sense of the frequency with which troupes on these stages performed across half a century.
         In all instances, we have created tools which we hope will allow researchers and others curious about the theater history and cultural history of the
         period to formulate questions that transcend national borders in this cosmopolitan age. The datasets we make available here do not contain the full amount
-        of information compiled by our project partners on their <a href="{base}/" class="https://transnationalstages.net/affiliates">various web sites</a>. The heterogeneity of the historical record has forced us to focus on the most
+        of information compiled by our project partners on their <a href="{base}/affiliates" class="link">various web sites</a>. The heterogeneity of the historical record has forced us to focus on the most
         basic comparative categories. We urge our users, once they have explored our tools, to continue their investigations by digging deeper into the data our
         project partners have made available, and of course to explore other online and physical archives relevant to this history.
       </p>
@@ -88,10 +88,6 @@
         Lastly, we intend to continue to refine our visualization tools to unlock more comparisons and sustain increasingly refined scholarly inquiry into the rich
         theatrical traditions of the Age of Enlightenment. We welcome your comments and suggestions about our work and invite to you to join us if you are interested.
         Please contact <a href="mailto:ravel@mit.edu" class="link">Jeff Ravel</a>, Professor Emeritus of History at MIT, to get involved.
-      </p>
-
-      <p class="caption">
-        <em>Background Image: P. A. Wille, Interior of the Hôtel de Bourgogne Playhouse in Paris, 1767. Courtesy of Wikimedia Commons.</em>
       </p>
     </div>
 
