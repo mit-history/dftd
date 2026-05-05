@@ -23,28 +23,71 @@
       <div class="about-text">
 
       <p>
-        December 2025
+        <u><strong>May 2026</strong></u>
       </p>
 
       <p>
-        <strong>Transnational Stages</strong> is a digital humanities project that builds on the foundation of several extant theater history projects. Our aim is to create a way for theater historians, performance studies scholars, and others interested in theater in the Atlantic world between 1680 and 1850 to compare performance practices in different theatrical venues, and to trace the mobility of authors, performers, and repertory across national boundaries.
+        <strong>Transnational Stages</strong> is a digital humanities project that builds on the foundation of several extant theater history projects.
+        Our aim is to create a way for theater historians, performance studies scholars, and others interested in theater in the eighteenth-century
+        Atlantic world to compare performance practices in different theatrical venues, and to trace the mobility of authors, performers, and
+        repertory across national boundaries.
       </p>
 
       <p>
-        In the 2024-2025 academic year, funded by MIT and the University of Bergen, we compared the datasets created by these different national projects and assembled the current website. Its main feature is a set of visualizations that allows one to compare the frequency of performance and the types of genres found in the repertory of theaters in Amsterdam, Copenhagen, and Paris from 1748–1798.
+        <u>History</u>
       </p>
 
       <p>
-        In the 2025-2026 academic year, we have already added to these visualizations and modified our web site design. By the end of the year, we hope to add data to our visualizations from theaters in London, Paris, Saint-Domingue (later Haiti), and New Orleans.
+        The project began as a collaboration between Professor Ulla Kallenbach at the University of Bergen and Professors Jeff Ravel and Anne McCants at MIT.
+        It was funded initially by an MIT Seed Funds grant, with supplemental support from the University of Bergen.
+        The three collaborators have reached out to colleagues who have compiled datasets on theater performance in several venues in Europe and the Americas.
+        Our goal to date has been to create visualizations that allow users to compare data on authors, genres, and performance frequency across the national boundaries in which theater history is traditionally studied.
+        Our work began in Fall 2024 and has featured project planning meetings at MIT and the University of Bergen. In between these meetings, project partners have generously shared their datasets,
+        allowing us to assemble them in our repository and link them to series of experimental visualizations, which you will find <a href="{base}/data" class="link">here</a>.
       </p>
 
-      <p class="contact">
-        If you have questions about this work, or would like to join or contribute, please contact Jeff Ravel
-        <a href="mailto:ravel@mit.edu" class="link">here</a>.
+      <p>
+        <u>Current State</u>
       </p>
 
-      <p class="caption">
-        <em>Background Image: P. A. Wille, Interior of the Hôtel de Bourgogne Playhouse in Paris, 1767. Courtesy of Wikimedia Commons.</em>
+      <p>
+        In Spring 2026, we are able to offer tools to visualize comparisons between theater venues in several European capitals and two venues in the Americas.
+        The majority of this data derives from the second half of the eighteenth century; for a better sense of the current chronological scope of the project,
+        see this <a href="{base}/timeline" class="link">timeline</a>. The tools we have created allow one to study the frequency of author performance within and across these different venues.
+        They permit users to better understand the performance rates of different genres in various national settings.
+        Finally, they allow researchers to get a sense of the frequency with which troupes on these stages performed across half a century.
+        In all instances, we have created tools which we hope will allow researchers and others curious about the theater history and cultural history of the
+        period to formulate questions that transcend national borders in this cosmopolitan age. The datasets we make available here do not contain the full amount
+        of information compiled by our project partners on their <a href="{base}/affiliates" class="link">various web sites</a>. The heterogeneity of the historical record has forced us to focus on the most
+        basic comparative categories. We urge our users, once they have explored our tools, to continue their investigations by digging deeper into the data our
+        project partners have made available, and of course to explore other online and physical archives relevant to this history.
+      </p>
+
+      <p>
+        <u>Future Directions</u>
+      </p>
+
+      <p>
+        Going forward, we plan to expand our project in several different ways. First, we hope to offer data from the first half of the eighteenth
+        century in most of our venues. For various reasons we confined ourselves to making visible data from the second half of the century, but
+        the data for the preceding period is, in most instances, readily available and will be added to our repertory as time and resources permit.
+      </p>
+
+      <p>
+        Secondly, we would also like to add data from other eighteenth-century performance venues, both in Europe and the Americas. The historical record
+        is substantively different in these two regions. In Europe, archival material has often been preserved that records many aspects of performance,
+        receipts and expenditures, allowing for a more holistic view of the theatrical enterprise. In the Americas, the main source for performance history
+        is usually local periodicals which contain announcements of plays about to be staged. This data is less reliable, in that we are unable to verify that
+        the performance actually occurred, and more limited in that it does not contain information about the financial aspects of performance. Nevertheless,
+        we are actively seeking to partner with colleagues who are compiling theater datasets in the period and would like to join the project. We acknowledge
+        that we will never be able to provide an overview of all theatrical activity on both sides of the Atlantic in this period, but we are eager to create
+        as a comprehensive a resource as the historical record and our resources will permit.
+      </p>
+
+      <p>
+        Lastly, we intend to continue to refine our visualization tools to unlock more comparisons and sustain increasingly refined scholarly inquiry into the rich
+        theatrical traditions of the Age of Enlightenment. We welcome your comments and suggestions about our work and invite to you to join us if you are interested.
+        Please contact <a href="mailto:ravel@mit.edu" class="link">Jeff Ravel</a>, Professor Emeritus of History at MIT, to get involved.
       </p>
     </div>
 

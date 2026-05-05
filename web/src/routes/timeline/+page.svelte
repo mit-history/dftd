@@ -17,7 +17,7 @@
     },
     {
       name: 'Royal Danish Theater (Copenhagen)',
-      // link: '',
+      link: 'https://artex.au.dk/',
       ranges: [
         { start: 1748, end: 1798 }],
       color: '#4269D0'
@@ -82,18 +82,16 @@
     <div class="hero-overlay">
       <div class="hero-content">
         <h1>Dataset Timelines</h1>
-        <p>
-          Transnational Stages is a work-in-progress. 
-          We ultimately plan to include datasets of the following duration for each theater accessible in our visualizations.
-          The actual data currently accessible may be drawn from a shorter time span.
-        </p>
       </div>
     </div>
   </section>
 
   <section class="timeline-section">
-    <h2>Timeline of Projects</h2>
-    <p class="subtitle">Each line corresponds to the duration of a project</p>
+    <p class="intro-text">
+      The timelines below indicate the current chronology of the data available in our visualizations for each theatrical venue listed, as of Spring 2026.
+      In the future we plan to add data from the late seventeenth century to the mid-eighteenth century, to provide a fuller picture of theatrical activity in
+      these locations during the 1700s.
+    </p>
 
     <div class="timeline-container">
       <div class="year-labels">
@@ -214,6 +212,11 @@
     max-width: 1000px;
     margin: 4rem auto;
     padding: 0 2rem;
+  }
+
+  .intro-text {
+    font-size: 1.15rem;
+    line-height: 1.6;
   }
 
   .timeline-container {
