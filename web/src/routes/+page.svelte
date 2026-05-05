@@ -92,7 +92,7 @@
       <p class="intro">
         In the eighteenth-century Atlantic World, plays and performers often crossed land boundaries and oceans,
         creating new meanings and audience expectations as they did so.
-        <strong>Transnational Stages</strong> offers users the opportunity <a href="{base}/data" data-sveltekit-reload class="link">to study national datasets via comparative visualization tools</a>,
+        <strong>Transnational Stages</strong> offers users the opportunity <a href="{base}/data" class="link">to study national datasets via comparative visualization tools</a>,
         thereby creating new insights into international theatrical trends in the Early Modern and Modern periods.
         Our project relies on the foundational work of our <a href="{base}/affiliates" class="link">affiliated project</a> partners. Learn more about our work <a href="{base}/about" class="link">here</a>.
       </p>
