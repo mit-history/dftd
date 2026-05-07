@@ -722,7 +722,7 @@ const authorOptions = [
 ];
 
 const authorInput = Inputs.select( authorOptions, { label: "Filter by author", value: "No author" })
-const author = authorShare? view(authorInput): 'No author';
+const author = 'No author';
 
 const randomAuthor = () => {
   authorInput.value = authorOptions[Math.floor(Math.random() * authorOptions.length)];
