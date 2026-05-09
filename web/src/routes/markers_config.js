@@ -78,8 +78,8 @@ export const markers = [
     id: 'saint-domingue',
     name: 'saint-domingue',
     src: saintDomingueMarkerSvg,
-    top: '86.5%',
-    left: '26.2%',
+    top: '86.9%',
+    left: '25.8%',
     width: '134.3px',
     clipPath: generateClipPath('134.3px')
   },
@@ -98,8 +98,8 @@ export const markers = [
     id: 'london',
     name: 'London',
     src: londonMarkerSvg,
-    top: '30.8%',
-    left: '73%',
+    top: '32%',
+    left: '73.4%',
     width: '76.9px',
     clipPath: generateClipPath('76.9px', true)
   },
