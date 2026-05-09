@@ -30,10 +30,11 @@ const color_map = {
   'danish': '#4269D0',
   'saint-domingue': '#6BC5B0',
   'new orleans': '#A855F7',
-  'covent garden': '#3BA951',
+  'covent garden': '#4DA011',
   'drury lane': '#DF789A',
-  // 'teatro de la cruz': '#4c00ff',
-  // 'teatro del principe': '#8D664A',
+  // 'teatro de la cruz': '#97BBF5',
+  // 'teatro del principe': '#9C6B4E',
+  // 'incoming data': '#B2C400',
 };
 
 const name_map = {
