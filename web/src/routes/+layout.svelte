@@ -56,12 +56,12 @@
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
   transition: background-color 0.3s ease, box-shadow 0.3s ease;
   overflow-x: visible;
+  box-sizing: border-box;
 }
 
 .top-bar-container {
   display: flex;
-  /* justify-content: center; */
-  justify-content: space-between;
+  justify-content: center;
   position: relative;
   align-items: center;
   width: 100%;
@@ -90,7 +90,7 @@ ul {
   display: flex;
   flex-wrap: wrap;
   gap: 1.5rem;
-  margin: 0 auto;
+  margin: 0;
   padding: 0;
   align-items: center;
   justify-content: center;

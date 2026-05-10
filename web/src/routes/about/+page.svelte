@@ -64,6 +64,22 @@
       </p>
 
       <p>
+        Notes on specific datasets:
+      </p>
+
+      <ul>
+        <li>
+          <u>London</u>: Our data for the Covent Garden and Drury Lane theaters have been generously provided by the teams responsible for the London Stage Database and the Theatronomics  projects.  We are grateful to both teams, and to their project leads, Professors Mattie Burkert and David O'Shaughnessy, for sharing their work.
+        </li>
+        <li>
+          <u>Madrid</u>: Our data for the Teatro de la Cruz and the Teatro del Principe are derived from a digital transcription of the print work <i>Cartelera teatral madrilena del siglo XVIII: 1708-1808</i>, eds. René Andioc and Mireille Coulon (Toulouse: Presses universitaires du Mirail, 1996).  We thank Professor Coulon for permission to use the data she and her deceased collaborator compiled.
+        </li>
+        <li>
+          <u>New Orleans</u>: Our New Orleans data was generously provided by Professor Jeffery Leichman of Louisiana State University (LSU). He led a team of LSU students who extracted information regarding performances given in four New Orleans theaters in the early nineteenth century from the daily periodical <i>Le Moniteur de Louisane</i>."
+        </li>
+      </ul>
+
+      <p>
         <u>Future Directions</u>
       </p>
 
