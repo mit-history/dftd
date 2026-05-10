@@ -1330,8 +1330,8 @@ const DutchRaw  = await FileAttachment("data/dutch-performances.csv").csv({typed
 const DanishRaw = await FileAttachment("data/danish-performances.json").json();
 const SaintDomingueRaw = await FileAttachment("data/saint_domingue/formatted_saint_domingue.json").json();
 const LondonRaw = await FileAttachment('data/london/formatted_london.json').json();
-const CoventGardenRaw = LondonRaw.filter(d=>d.place='Covent Garden').map(d=>({...d, origin: 'covent garden'}));
-const DruryLaneRaw = LondonRaw.filter(d=>d.place='Drury Lane').map(d=>({...d, origin: 'drury lane'}));
+const CoventGardenRaw = LondonRaw.filter(d=>d.place=='Covent Garden').map(d=>({...d, origin: 'covent garden'}));
+const DruryLaneRaw = LondonRaw.filter(d=>d.place=='Drury Lane').map(d=>({...d, origin: 'drury lane'}));
 const nolaCsv   = await FileAttachment("data/new_orleans/new_o_frequent_performances.csv").csv({typed: false});
 
 // ==============================
@@ -1349,7 +1349,7 @@ const Danish = DanishRaw.map((perf, i) => {
   return {
     id: typeof perf.id === "string" ? perf.id : `Danish-${i}`,
     date: d, year: d ? d.getUTCFullYear() : null,
-    title: titleFromWorks || perf.formatted_title || perf.production?.formatted_title || "Untitled",
+    title: titleFromWorks || perf.formatted_title.slice(0, perf.formatted_title.indexOf(' by The Royal Danish')) || perf.production?.formatted_title.slice(0, perf.formatted_title.indexOf(' by The Royal Danish')) || "Untitled",
     origin: "danish",
     theater: perf.place?.name ?? perf.theater ?? perf.venue ?? "Unknown venue",
     city: perf.place?.name ?? null
