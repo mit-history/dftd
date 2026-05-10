@@ -34,10 +34,11 @@ const color_map = {
   'danish': '#4269D0',
   'saint-domingue': '#6BC5B0',
   'new orleans': '#A855F7',
-  'covent garden': '#3BA951',
+  'covent garden': '#4DA011',
   'drury lane': '#DF789A',
-  // 'teatro de la cruz': '#4c00ff',
-  // 'teatro del principe': '#8D664A',
+  // 'teatro de la cruz': '#97BBF5',
+  // 'teatro del principe': '#9C6B4E',
+  // 'incoming data': '#B2C400',
 };
 
 const name_map = {
@@ -900,88 +901,7 @@ import {
 ```js
 
 if (authorShare) {
-  const container = document.createElement("div");
-  let currentAuthors = latestAuthorsToCompare;
-
-  const renderControls = () => {
-    container.innerHTML = "";
-    if (currentAuthors.length >= 3) {
-      const msg = document.createElement("div");
-      msg.style.color = "#ef4444";
-      msg.style.fontWeight = "bold";
-      msg.style.marginBottom = "8px";
-      msg.textContent = "Cannot add more authors to chart!";
-      container.appendChild(msg);
-    } else {
-          const normalize = (str) => String(str || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-
-          let datalist = document.getElementById("author-share-datalist");
-          if (datalist) datalist.remove();
-
-          datalist = document.createElement("datalist");
-          datalist.id = "author-share-datalist";
-          authorOptions.forEach(opt => {
-            if (opt && opt !== "No author") {
-              const option = document.createElement("option");
-              option.value = opt;
-              datalist.appendChild(option);
-            }
-          });
-          document.body.appendChild(datalist);
-
-          const textWidget = Inputs.text({ placeholder: "Type author name..." });
-          const textInput = textWidget.querySelector("input");
-          textInput.setAttribute("list", "author-share-datalist");
-
-          const handleAdd = () => {
-            const rawVal = textInput.value.trim();
-            if (!rawVal) return;
-            const normSearch = normalize(rawVal);
-            const searchWords = normSearch.split(/\s+/);
-
-            let match = authorOptions.find(a => normalize(a) === normSearch) ||
-                        authorOptions.find(a => {
-                          const normA = normalize(a);
-                          return searchWords.every(word => normA.includes(word));
-                        });
-
-            if (match && match !== "No author") {
-              addAuthorToCompare(match);
-              textInput.value = ""; // Clear input after adding
-            } else {
-              alert("Author not found. Please try another name.");
-            }
-          };
-
-          textInput.addEventListener("keydown", (e) => {
-            if (e.key === "Enter") {
-              e.preventDefault();
-              handleAdd();
-            }
-          });
-
-          const btnWidget = Inputs.button("Add author", { reduce: handleAdd });
-
-          const formWrapper = document.createElement("div");
-          formWrapper.style.display = "flex";
-          formWrapper.style.gap = "8px";
-          formWrapper.style.alignItems = "center";
-
-          formWrapper.appendChild(textWidget);
-          formWrapper.appendChild(btnWidget);
-          container.appendChild(formWrapper);
-    }
-  };
-
-  renderControls();
-  const updateHandler = (e) => {
-    currentAuthors = e.detail.authors;
-    renderControls();
-  };
-  authorsCompareBus.addEventListener("authors:update", updateHandler);
-  invalidation.then(() => authorsCompareBus.removeEventListener("authors:update", updateHandler));
-
-  display(container);
+  display(html`<h2>Author Performance Contribution Per Days</h2>`);
   display(authorShareChart(author, new_formatted_data, color_map, name_map));
 } else {
   display(html`<div></div>`)
@@ -1485,7 +1405,7 @@ const Danish = DanishRaw.map((perf, i) => {
   return {
     id: typeof perf.id === "string" ? perf.id : `Danish-${i}`,
     date: d, year: d ? d.getUTCFullYear() : null,
-    title: titleFromWorks || perf.formatted_title || perf.production?.formatted_title || "Untitled",
+    title: titleFromWorks || perf.formatted_title.slice(0, perf.formatted_title.indexOf(' by The Royal Danish')) || perf.production?.formatted_title.slice(0, perf.formatted_title.indexOf(' by The Royal Danish')) || "Untitled",
     origin: "danish",
     theater: perf.place?.name ?? perf.theater ?? perf.venue ?? "Unknown venue",
     city: perf.place?.name ?? null

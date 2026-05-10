@@ -26,7 +26,7 @@
       name: 'Covent Garden (London)',
       // link: '',
       ranges: [{ start: 1766, end: 1800 }],
-      color: '#3BA951'
+      color: '#4DA011'
     },
     {
       name: 'Drury Lane (London)',
@@ -38,13 +38,13 @@
       name: 'Teatro de la Cruz (Madrid)',
       // link: '',
       ranges: [{ start: 1748, end: 1790 }],
-      color: '#4c00ff'
+      color: '#97BBF5'
     },
     {
       name: 'Teatro de la Principe (Madrid)',
       // link: '',
       ranges: [{ start: 1748, end: 1790 }],
-      color: '#8D664A'
+      color: '#9C6B4E'
     },
     {
       name: 'Saint-Domingue (All theaters)',
@@ -73,7 +73,6 @@
 
 <svelte:head>
   <title>Data Timeline</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet" />
 </svelte:head>
 
 <main class="timeline-page">
@@ -133,8 +132,7 @@
   /* === HERO FULL-BLEED === */
   .hero {
     position: relative;
-    width: 100vw;
-    margin-left: calc(50% - 50vw);
+    width: 100%;
     height: 55vh;
     background-color: #d6d3d1;
     background-size: cover;
