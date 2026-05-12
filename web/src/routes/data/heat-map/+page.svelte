@@ -3,8 +3,8 @@
 </svelte:head>
 
 <script>
-//   const baseNotebookUrl = "https://transnationalstages.net/data";
-  const baseNotebookUrl = "http://127.0.0.1:3000/";
+  const baseNotebookUrl = "https://transnationalstages.net/data";
+  // const baseNotebookUrl = "http://127.0.0.1:3000/";
 
   const notebookUrl = `${baseNotebookUrl}?viz=heat-map`;
 </script>
