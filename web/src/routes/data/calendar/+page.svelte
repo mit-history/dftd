@@ -22,20 +22,8 @@
   </section> -->
 
   <section class="viz-info">
-  <div class="chip">Calendar View</div>
-  <h1>Global Theatre Calendar (1748–1798 + New Orleans)</h1>
-
-  <p>
-    Explore how performance frequency fluctuated across Paris, Copenhagen, Amsterdam,
-    and New Orleans. Switch between Month, Week, and Day views, and compare activity
-    with major world events.
-  </p>
-
-  <ul class="keypoints">
-    <li>Filter by theatre to study venue-specific seasons.</li>
-    <li>Use overlays to reveal links between performances and historical events.</li>
-    <li>Navigate through time using the arrow controls.</li>
-  </ul>
+  <div class="chip">Performance Calendar</div>
+  <h1>Global Theatre Calendar</h1>
 </section>
 
 

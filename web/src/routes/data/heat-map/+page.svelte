@@ -1,45 +1,52 @@
 <svelte:head>
-  <title>Author Shares • Explore the Data</title>
+  <title>Performances Over Time • Explore the Data</title>
 </svelte:head>
 
 <script>
-  const baseNotebookUrl = "https://transnationalstages.net/data";
-  const notebookUrl = `${baseNotebookUrl}?viz=authorShare`;
+//   const baseNotebookUrl = "https://transnationalstages.net/data";
+  const baseNotebookUrl = "http://127.0.0.1:3000/";
+
+  const notebookUrl = `${baseNotebookUrl}?viz=heat-map`;
 </script>
 
 
-
 <main class="viz-page">
-  <!-- <h1 class="title">Author Shares</h1> -->
+  <!-- Title -->
+  <!-- <h1 class="title">Performances Over Time</h1> -->
 
+  <!-- Dummy timeline -->
   <!-- <section class="timeline">
     <div class="timeline-bar">
-      <span class="timeline-label">
-        Percentage of each city’s repertoire accounted for by a selected author.
-      </span>
+      <span class="timeline-label">Timeline (placeholder – 1748 → 1798)</span>
     </div>
   </section> -->
-<section class="viz-info">
-  <div class="chip">Authors</div>
-  <h1>Author Presence in Repertories - Bar Graph</h1>
+
+  <!-- Text below visualization
+  <section class="below-text">
+    <p>
+      This view focuses on how performance counts change over time in each city’s repertoire.
+      Use the filters in the visualization to narrow the date range, toggle cities, and explore
+      periods of growth, decline, or disruption. This is especially useful for spotting shifts
+      around major historical events or theatre reforms.
+    </p>
+  </section> -->
+
+  <section class="viz-info">
+  <div class="chip">Annual Performance Comparison</div>
+  <h1>Heat Map Showing Performance Patterns</h1>
 </section>
 
+
+  <!-- Interactive visualization -->
   <section class="viz-frame">
     <iframe
       src={notebookUrl}
-      title="Author Shares Visualization"
+      title="Heatmap Visualization"
       loading="lazy"
     ></iframe>
   </section>
 
-  <!-- <section class="below-text">
-    <p>
-      This visualization shows how a particular playwright’s works contribute to each city’s
-      repertoire over time. By normalizing each author's performances as a percentage of that
-      city's total output, you can compare influence across Amsterdam, Copenhagen, and Paris even
-      when their overall volumes differ dramatically.
-    </p>
-  </section> -->
+
 </main>
 
 <style>
