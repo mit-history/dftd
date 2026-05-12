@@ -134,7 +134,7 @@
         <button
           onclick={() => cat.collapsed = !cat.collapsed}
         >{cat.name}
-        <img class="menu-icon" src={base + '/images/' + (cat.collapsed? 'open-menu.svg': 'close-menu.svg')} alt='icon'/>
+        <img class="menu-icon" src={base + '/images/' + (cat.collapsed? 'dropdown-icon.svg': 'dropup-icon.svg')} alt='icon'/>
         </button>
         {#each visualizations.filter(d => d.category === cat.name) as viz}
           <div class="visualization-link">
@@ -192,6 +192,9 @@
     /* margin: 0; */
     cursor: pointer;
     font-family: inherit; /* Inherit font from body */
+    display: inline-flex;
+    flex-direction: row;
+    align-items: center;
   }
 
   .category-card div:first-of-type{

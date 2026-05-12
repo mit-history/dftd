@@ -7,11 +7,6 @@ toc: false
 const french = await FileAttachment("data/french-performances.json").json();
 console.log('lengths')
 const french_dates = new Set(french.filter(d=> d.year === 1775).map(d=> d.date))
-// console.log(french_dates)
-// console.log(french_dates.size)
-// console.log(french.filter(d=> d.year === 1775).length)
-// console.log(french)
-// console.log(french.length)
 const dutch = await FileAttachment("data/dutch-performances.csv").csv({typed: true});
 const saintDomingue = await FileAttachment("data/saint_domingue/formatted_saint_domingue.json").json();
 const london = await FileAttachment('data/london/formatted_london.json').json()
@@ -532,8 +527,8 @@ const vizLabelById = {
 const opt = [
   "Over Time",
   "Heat Map",
-  "Diverging Genres",
-  "By Author",
+  // "Diverging Genres",
+  // "By Author",
   "Days with Performances",
   "Author Share",
   "Author Bubble",
@@ -565,8 +560,8 @@ if (vizParam && vizLabelById[vizParam]) {
 
 ```js
 const overTime = viz.includes("Over Time");
-const divergingGenres = viz.includes("Diverging Genres");
-const byAuthor = viz.includes("By Author");
+// const divergingGenres = viz.includes("Diverging Genres");
+// const byAuthor = viz.includes("By Author");
 const performanceDays = viz.includes("Days with Performances");
 const authorShare = viz.includes("Author Share");
 const bubble = viz.includes("Author Bubble");
@@ -588,11 +583,53 @@ import { rangeInput } from "./components/range_input.js";
 ```
 
 ```js
-// if(heatMap || calendar){
+// Calendar-specific controls only
+const modeIn       = Inputs.radio(["Month","Week","Day"], { label: "Calendar view", value: "Month" });
+const overlayIn    = Inputs.toggle({ label: "Overlay major events", value: true });
+const anchorIn     = Inputs.date({ label: "Date displayed", value: start_date });
+const includeNola  = Inputs.toggle({ label: "Include New Orleans (NOLA)", value: true });
+
+const nav = html`<div style="display:flex; gap:.5rem; align-items:center; margin:.25rem 0;">
+  <button id="prev">◀ Prev</button><button id="next">Next ▶</button>
+</div>`;
+
+// Dedicated mount nodes so we *replace* contents instead of appending
+const venuesMount = html`<div id="venues-mount"></div>`;
+const legendMount = html`<div id="legend-mount"></div>`;
+
+// Only render the controls card if calendar viz is active
+if (calendar) {
+  display(html`<div style="padding:.6rem; margin:.6rem 0;">
+    <div style="display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:.6rem;">
+      <div>${anchorIn}</div><div>${nav}</div>
+      <div>${modeIn}</div><div>${overlayIn}</div>
+      <div style="grid-column:1/-1">${includeNola}</div>
+      <div style="grid-column:1/-1">${venuesMount}</div>
+      <div style="grid-column:1/-1">${legendMount}</div>
+    </div>
+  </div>`);
+}else{
+  display(html`<span></span>`);
+}
+```
+
+```js
   const start_date_input = Inputs.date({label: "Start", value: "1748-01-01"})
   const end_date_input = Inputs.date({label: "End", value: "1798-12-31"})
-  const start_date = view(start_date_input);
-  const end_date = view(end_date_input);
+  const date_range = rangeInput({
+    min: 1748,
+    max: 1793,
+    step: 1,
+    value: [1748, 1793],
+    enableTextInput: true
+  });
+  const date_range_val = !(calendar || heatMap)? view(date_range): [1748, 1793];
+```
+```js
+
+  const start_date = heatMap? view(start_date_input): calendar? new Date("1748-01-01"): new Date(`${date_range_val[0]}-01-01`);
+  const end_date = heatMap? view(end_date_input): calendar? new Date("1798-12-31"): new Date(`${date_range_val[1]}-12-31`);
+
 
   const randomDates = () =>  {
     const start = new Date("1748-01-01");
@@ -604,26 +641,11 @@ import { rangeInput } from "./components/range_input.js";
     start_date_input.dispatchEvent(new Event("input"));
     end_date_input.dispatchEvent(new Event("input"));
   }
-// }else{
-// const date_range = rangeInput({
-//   min: 1748,
-//   max: 1793,
-//   step: 1,
-//   value: [1748, 1793],
-//   enableTextInput: true
-// });
-// const date_range_val = true ? view(date_range) : null;
-// }
 
 
 ```
 
 ```js
-
-// if (date_range_val !== null){
-//   const start_date = new Date(date_range_val[0])
-//   const end_date = new Date(date_range_val[1])
-// }
 
 const originOptions = ["danish", "dutch", "french", "saint-domingue", 'covent garden', 'drury lane', 'new orleans'];
 const originsInput = Inputs.checkbox(originOptions, {
@@ -632,8 +654,9 @@ const originsInput = Inputs.checkbox(originOptions, {
   format: d => name_map[d] || d
 });
 const originsSelect = Inputs.toggle({label: "Select All", value: true})
-const origins = view(originsInput);
-view(originsSelect);
+const origins = !calendar? view(originsInput): originOptions;
+if (!calendar)
+  view(originsSelect);
 
 originsSelect.oninput = (event) => {
   if (!event.bubbles) return;
@@ -732,11 +755,24 @@ const randomAuthor = () => {
 ```
 
 ```js
-view(Inputs.button("Randomize", {value: null, reduce: () => {
-  randomDates();
-  randomOrigins();
-  randomAuthor();
-}}));
+const percent_absolute = Inputs.radio(["percentage", "absolute"], {label: "Mode", value: "percentage"});
+const percent_absolute_val = bubble?view(percent_absolute):0;
+```
+
+```js
+const do_overall_threshold = Inputs.toggle({label: "Overall Threshold", value: true});
+const do_overall_threshold_val = bubble?view(do_overall_threshold):false;
+
+```
+```js
+const overall_threshold = rangeInput({
+  min: 0,
+  max: percent_absolute_val=="percentage"?100:Math.max(...Object.values(maxes)),
+  step: 1,
+  value: [0, percent_absolute_val=="percentage"?100:Math.max(...Object.values(maxes))],
+  enableTextInput: true
+});
+const overall_threshold_val = do_overall_threshold_val?view(overall_threshold):[0,0];
 ```
 
 </details>
@@ -748,27 +784,7 @@ const formatted_data = combined_data.filter(d => {
   const dt = asDate(d.date);
   return dt && dt > start_date && dt <= end_date && origins.includes(d.origin);
 });
-// console.log('og formatted data')
-// console.log(formatted_data.filter(d=>d.origin=='new orleans'))
-// const formatted_stdmg = saintDomingue.filter(d => {
-//   const dt = asDate(d.date);
-//   return dt && dt > start_date && dt <= end_date && origins.includes(d.origin);
-// });
-// const formatted_london = london.filter(d => {
-//   const dt = asDate(d.date);
-//   return dt && dt > start_date && dt <= end_date && origins.includes(d.origin);
-// });
-// console.log('covent garden', coventGarden);
-// const formatted_cv = coventGarden.filter(d => {
-//   const dt = asDate(d.date);
-//   return dt && dt > start_date && dt <= end_date && origins.includes('covent garden');
-// });
-// console.log('formatted covent garden', formatted_cv);
 
-// const formatted_dl = druryLane.filter(d => {
-//   const dt = asDate(d.date);
-//   return dt && dt > start_date && dt <= end_date && origins.includes('drury lane');
-// })
 
 
 const yearsInView = Array.from(
@@ -854,35 +870,35 @@ function compareYearsChart(data) {
 //   }
 // }
 
-const new_formatted_data = []
+const unique_formatted_data = []
 for (const origin of originOptions){
   const dates = new Set()
   for (const event of formatted_data.filter(d=>d.origin === origin)){
     if (!dates.has(event.date)){
-      new_formatted_data.push(event);
+      unique_formatted_data.push(event);
       dates.add(event.date)
     }
   }
 }
 // console.log('formatted data')
-// console.log(new_formatted_data.filter(d=>d.origin=='new orleans'))
+// console.log(unique_formatted_data.filter(d=>d.origin=='new orleans'))
 // console.log(new_cv.length)
 // console.log(formatted_cv.length)
-// const full_formatted_data = new_formatted_data.concat(new_stdmg).concat(new_cv.map(d => {d.origin = 'covent garden'; return d})).concat(new_dl.map(d => {d.origin = 'drury lane'; return d}));
+// const full_formatted_data = unique_formatted_data.concat(new_stdmg).concat(new_cv.map(d => {d.origin = 'covent garden'; return d})).concat(new_dl.map(d => {d.origin = 'drury lane'; return d}));
 if (overTime) {
   // display(html`<h2>Comparative Performances Over Time</h2>`);
   display(
-    new_formatted_data.length > 0
+    unique_formatted_data.length > 0
       ? html`<div class="full-bleed" id="french-graph-container">
-          ${compareYearsChart(new_formatted_data)}
+          ${compareYearsChart(unique_formatted_data)}
         </div>`
       : html`<i>No data.</i>`
   );
 }
 
-if (divergingGenres) {
+// if (divergingGenres) {
   // display(html`<h2>Comparative Performance Genres Over Time</h2>`);
-}
+// }
 
 ```
 
@@ -902,7 +918,7 @@ import {
 
 if (authorShare) {
   display(html`<h2>Author Performance Contribution Per Days</h2>`);
-  display(authorShareChart(author, new_formatted_data, color_map, name_map));
+  display(authorShareChart(author, unique_formatted_data, color_map, name_map));
 } else {
   display(html`<div></div>`)
 }
@@ -927,7 +943,9 @@ console.log('maxes', maxes)
 // display(bubble ? html `<h2>Authors Performed By Location</h2>` : html`<div></div>`);
 ```
 
-```js
+
+
+<!-- ```js
 display(bubble? html `<div></h2>` : html`<div></div>`);
 const percent_absolute = Inputs.radio(["percentage", "absolute"], {label: "Mode", value: "percentage"});
 const percent_absolute_val = bubble?view(percent_absolute):0;
@@ -949,7 +967,7 @@ const overall_threshold = rangeInput({
   enableTextInput: true
 });
 const overall_threshold_val = do_overall_threshold_val?view(overall_threshold):[0,0];
-```
+``` -->
 
 
 ```js
@@ -963,15 +981,6 @@ const french_threshold = rangeInput({
   enableTextInput: true
 });
 const french_threshold_val = bubble? (do_overall_threshold_val?overall_threshold_val:view(french_threshold)):[0,0];
-display(bubble? html`<p>Year Range</p>`:html`<div></div>`);
-const f = rangeInput({
-  min: 1748,
-  max: 1793,
-  step: 1,
-  value: [1748, 1793],
-  enableTextInput: true
-});
-const f_val = bubble ? view(f) : [0,0];
 
 ```
 
@@ -983,8 +992,8 @@ display(
         "french",
         0,
        french_threshold_val,
-        f_val[0],
-         f_val[1],
+        date_range_val[0],
+         date_range_val[1],
          percent_absolute_val
        )
      : html`<div></div>`
@@ -1003,22 +1012,12 @@ const dutch_threshold = rangeInput({
   enableTextInput: true
 });
 const dutch_threshold_val = bubble? (do_overall_threshold_val?overall_threshold_val:view(dutch_threshold)):[0,0];
-display(bubble? html`<p>Year Range</p>`:html`<div></div>`);
-const du = rangeInput({
-  min: 1748,
-  max: 1798,
-  step: 1,
-  value: [1748, 1798],
-  enableTextInput: true
-});
-const du_val = bubble?view(du):[0,0];
 
-console.log(`du_val: ${du_val[0]}\ndu: ${du}`)
 
 ```
 
 ```js
-display(bubble? authorBubble(combined_data, 'dutch', 0, dutch_threshold_val, du_val[0], du_val[1], percent_absolute_val): html`<div></div>`);
+display(bubble? authorBubble(combined_data, 'dutch', 0, dutch_threshold_val, date_range_val[0], date_range_val[1], percent_absolute_val): html`<div></div>`);
 ```
 
 ```js
@@ -1033,20 +1032,12 @@ const stdmg_threshold = rangeInput({
 });
 const stdmg_threshold_val = bubble? (do_overall_threshold_val?overall_threshold_val:view(stdmg_threshold)):[0,0];
 display(bubble? html`<p>Year Range</p>`:html`<div></div>`);
-const sd = rangeInput({
-  min: 1764,
-  max: 1791,
-  step: 1,
-  value: [1764, 1791],
-  enableTextInput: true
-});
-const sd_val = bubble?view(sd):[0,0];
 
 
 ```
 
 ```js
-display(bubble? authorBubble(saintDomingue, 'saint-domingue', 0, stdmg_threshold_val, sd_val[0], sd_val[1], percent_absolute_val): html`<div></div>`);
+display(bubble? authorBubble(saintDomingue, 'saint-domingue', 0, stdmg_threshold_val, date_range_val[0], date_range_val[1], percent_absolute_val): html`<div></div>`);
 ```
 
 ```js
@@ -1060,21 +1051,13 @@ const cv_threshold = rangeInput({
   enableTextInput: true
 });
 const cv_threshold_val = bubble? (do_overall_threshold_val?overall_threshold_val:view(cv_threshold)):[0,0];
-display(bubble? html`<p>Year Range</p>`:html`<div></div>`);
-const cv = rangeInput({
-  min: 1766,
-  max: 1800,
-  step: 1,
-  value: [1766, 1800],
-  enableTextInput: true
-});
-const cv_val = bubble?view(cv):[0,0];
+
 
 
 ```
 
 ```js
-display(bubble? authorBubble(coventGarden, 'covent garden', 0, cv_threshold_val, cv_val[0], cv_val[1], percent_absolute_val): html`<div></div>`);
+display(bubble? authorBubble(coventGarden, 'covent garden', 0, cv_threshold_val, date_range_val[0], date_range_val[1], percent_absolute_val): html`<div></div>`);
 ```
 
 ```js
@@ -1088,21 +1071,12 @@ const dl_threshold = rangeInput({
   enableTextInput: true
 });
 const dl_threshold_val = bubble? (do_overall_threshold_val?overall_threshold_val:view(dl_threshold)):[0,0];
-display(bubble? html`<p>Year Range</p>`:html`<div></div>`);
-const dl = rangeInput({
-  min: 1766,
-  max: 1800,
-  step: 1,
-  value: [1766, 1800],
-  enableTextInput: true
-});
-const dl_val = bubble?view(dl):[0,0];
 
 
 ```
 
 ```js
-display(bubble? authorBubble(druryLane, 'drury lane', 0, dl_threshold_val, dl_val[0], dl_val[1], percent_absolute_val): html`<div></div>`);
+display(bubble? authorBubble(druryLane, 'drury lane', 0, dl_threshold_val, date_range_val[0], date_range_val[1], percent_absolute_val): html`<div></div>`);
 ```
 
 
@@ -1172,16 +1146,16 @@ const french_summary = processPerformanceGenres(french_filtered_data, french_com
 ```
 
 ```js
-display(divergingGenres ? genreLegend() : html`<div></div>`);
+// display(divergingGenres ? genreLegend() : html`<div></div>`);
 ```
 
 ```js
-display(divergingGenres
-  ? ((danish_filtered_data.length > 0 && french_filtered_data.length > 0)
-      ? html`<div class="full-bleed">${divergentPlot()}</div>`
-      : html`<i>No data.</i>`)
-  : html`<div></div>`
-)
+// display(divergingGenres
+//   ? ((danish_filtered_data.length > 0 && french_filtered_data.length > 0)
+//       ? html`<div class="full-bleed">${divergentPlot()}</div>`
+//       : html`<i>No data.</i>`)
+//   : html`<div></div>`
+// )
 
 ```
 
@@ -1222,38 +1196,38 @@ const author_counts = author_filtered_data ? Object.entries(author_filtered_data
 ```
 
 ```js
-display(byAuthor ? html `<h2>Performances by Author</h2>` : html`<div></div>`)
+// display(byAuthor ? html `<h2>Performances by Author</h2>` : html`<div></div>`)
 ```
 
 ```js
-display(byAuthor ? html `<h3>Percentage by Author</h3>` : html`<div></div>`)
+// display(byAuthor ? html `<h3>Percentage by Author</h3>` : html`<div></div>`)
 ```
 
 ```js
-display(byAuthor
-  ? (author_data.length > 0
-      ? html`<div class="full-bleed">
-          ${percentageYearsChart(author_data)}
-        </div>`
-      : html`<i>No data.</i>`)
-  : html`<div></div>`
-)
+// display(byAuthor
+//   ? (author_data.length > 0
+//       ? html`<div class="full-bleed">
+//           ${percentageYearsChart(author_data)}
+//         </div>`
+//       : html`<i>No data.</i>`)
+//   : html`<div></div>`
+// )
 
 ```
 
 ```js
-display(byAuthor ? html `<h3>Percentage by Location</h3>` : html`<div></div>`)
+// display(byAuthor ? html `<h3>Percentage by Location</h3>` : html`<div></div>`)
 ```
 
 ```js
-display(byAuthor
-  ? (author_counts
-      ? html`<div class="full-bleed">
-          ${mapPlot(author_counts)}
-        </div>`
-      : html`<i>No data.</i>`)
-  : html`<div></div>`
-)
+// display(byAuthor
+//   ? (author_counts
+//       ? html`<div class="full-bleed">
+//           ${mapPlot(author_counts)}
+//         </div>`
+//       : html`<i>No data.</i>`)
+//   : html`<div></div>`
+// )
 
 ```
 
@@ -1361,7 +1335,7 @@ origins.length > 0 && performanceDays ? document.getElementById("line-chart-cont
 ```js
 // display(heatMap ? html `<h2>Heatmap of Days with Performances</h2>` : html`<div></div>`)
 
-display(origins.length > 0 && heatMap ? createHeatmap(genre_data, { width: containerWidth, height: containerHeight }) : html`<i>No data.</i>`)
+display(origins.length > 0 && heatMap ? createHeatmap(genre_data, { width: containerWidth, height: containerHeight }) : heatMap? html`<i>No data.</i>`: html`<span></span>`)
 
 ```
 
@@ -1536,32 +1510,32 @@ if (calendar) {
 //    👉 uses global start_date / end_date / origins
 // ==============================
 
-// Calendar-specific controls only
-const modeIn       = Inputs.radio(["Month","Week","Day"], { label: "Calendar view", value: "Month" });
-const overlayIn    = Inputs.toggle({ label: "Overlay major events", value: true });
-const anchorIn     = Inputs.date({ label: "Date displayed", value: start_date });
-const includeNola  = Inputs.toggle({ label: "Include New Orleans (NOLA)", value: true });
+// // Calendar-specific controls only
+// const modeIn       = Inputs.radio(["Month","Week","Day"], { label: "Calendar view", value: "Month" });
+// const overlayIn    = Inputs.toggle({ label: "Overlay major events", value: true });
+// const anchorIn     = Inputs.date({ label: "Date displayed", value: start_date });
+// const includeNola  = Inputs.toggle({ label: "Include New Orleans (NOLA)", value: true });
 
-const nav = html`<div style="display:flex; gap:.5rem; align-items:center; margin:.25rem 0;">
-  <button id="prev">◀ Prev</button><button id="next">Next ▶</button>
-</div>`;
+// const nav = html`<div style="display:flex; gap:.5rem; align-items:center; margin:.25rem 0;">
+//   <button id="prev">◀ Prev</button><button id="next">Next ▶</button>
+// </div>`;
 
-// Dedicated mount nodes so we *replace* contents instead of appending
-const venuesMount = html`<div id="venues-mount"></div>`;
-const legendMount = html`<div id="legend-mount"></div>`;
+// // Dedicated mount nodes so we *replace* contents instead of appending
+// const venuesMount = html`<div id="venues-mount"></div>`;
+// const legendMount = html`<div id="legend-mount"></div>`;
 
-// Only render the controls card if calendar viz is active
-if (calendar) {
-  display(html`<div class="card" style="padding:.6rem; margin:.6rem 0;">
-    <div style="display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:.6rem;">
-      <div>${anchorIn}</div><div>${nav}</div>
-      <div>${modeIn}</div><div>${overlayIn}</div>
-      <div style="grid-column:1/-1">${includeNola}</div>
-      <div style="grid-column:1/-1">${venuesMount}</div>
-      <div style="grid-column:1/-1">${legendMount}</div>
-    </div>
-  </div>`);
-}
+// // Only render the controls card if calendar viz is active
+// if (calendar) {
+//   display(html`<div class="card" style="padding:.6rem; margin:.6rem 0;">
+//     <div style="display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:.6rem;">
+//       <div>${anchorIn}</div><div>${nav}</div>
+//       <div>${modeIn}</div><div>${overlayIn}</div>
+//       <div style="grid-column:1/-1">${includeNola}</div>
+//       <div style="grid-column:1/-1">${venuesMount}</div>
+//       <div style="grid-column:1/-1">${legendMount}</div>
+//     </div>
+//   </div>`);
+// }
 
 // ==============================
 // 6) Imperative render with global filters
