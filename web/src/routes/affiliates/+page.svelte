@@ -167,7 +167,7 @@
     position: relative;
     width: 100vw;
     margin-left: calc(50% - 50vw);
-    height: 55vh;
+    height: 45vh;
     background-color: #d6d3d1;
     background-size: cover;
     background-position: center center;

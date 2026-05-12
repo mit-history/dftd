@@ -8,7 +8,7 @@
 
 <main class="about-page">
   <!-- HERO SECTION -->
-  <section class="hero" style="background-image: url('{base}/images/random_french_theater.jpg')">
+  <section class="hero" style="background-image: url('{base}/images/about_header.png')">
     <div class="hero-overlay">
       <div class="hero-content">
         <h1>About</h1>
@@ -104,6 +104,16 @@
         Lastly, we intend to continue to refine our visualization tools to unlock more comparisons and sustain increasingly refined scholarly inquiry into the rich
         theatrical traditions of the Age of Enlightenment. We welcome your comments and suggestions about our work and invite to you to join us if you are interested.
         Please contact <a href="mailto:ravel@mit.edu" class="link">Jeff Ravel</a>, Professor Emeritus of History at MIT, to get involved.
+      </p>
+
+      <p>
+        <u>Our Team</u>
+      </p>
+
+      <p>
+        The Transnational Stages web site and data visualizations have been created by the following MIT and Wellesley College students:
+        Rhea Bhattacharjee, Akosua Essah, Tristan Hoang, Nony Otu Ugwu, and Elaine Yang.  We are grateful for technical support from Rebecca Black and Jamie
+        Folson at <a href="https://www.performantsoftware.com/" class="link">Performant Software Solutions</a>.
       </p>
     </div>
 

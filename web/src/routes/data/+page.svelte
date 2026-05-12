@@ -58,11 +58,6 @@
     <div class="hero-overlay">
       <div class="hero-content">
         <h1>Explore the Data</h1>
-        <p>
-          Examine 18th-century performance data across Amsterdam, Copenhagen, and Paris.
-          Discover trends across genres, authors, and seasons, and explore interactive
-          visualizations from our digital theatre dataset.
-        </p>
       </div>
     </div>
   </section>
@@ -107,8 +102,8 @@
     position: relative;
     width: 100vw;
     margin-left: calc(50% - 50vw);
-    height: 55vh;
-    background-image: url('/images/temp_EXP.jpg'); /* Place image in web/static/images/ */
+    height: 45vh;
+    background-image: url('/images/explore_data_header.png'); /* Place image in web/static/images/ */
     background-size: cover;
     background-position: center center;
     background-repeat: no-repeat;
@@ -170,7 +165,7 @@
 
   @media (max-width: 700px) {
     .hero {
-      height: 50vh;
+      height: 35vh;
     }
     .hero h1 {
       font-size: 2rem;

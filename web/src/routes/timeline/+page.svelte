@@ -133,7 +133,7 @@
   .hero {
     position: relative;
     width: 100%;
-    height: 55vh;
+    height: 45vh;
     background-color: #d6d3d1;
     background-size: cover;
     background-position: center center;
