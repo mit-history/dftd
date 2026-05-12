@@ -113,7 +113,7 @@
       <p>
         The Transnational Stages web site and data visualizations have been created by the following MIT and Wellesley College students:
         Rhea Bhattacharjee, Akosua Essah, Tristan Hoang, Nony Otu Ugwu, and Elaine Yang.  We are grateful for technical support from Rebecca Black and Jamie
-        Folson at <a href="https://www.performantsoftware.com/" class="link">Performant Software Solutions</a>.
+        Folsom at <a href="https://www.performantsoftware.com/" class="link">Performant Software Solutions</a>.
       </p>
     </div>
 

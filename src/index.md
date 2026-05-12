@@ -1323,7 +1323,12 @@ const containerWidth = window.innerWidth;
 const containerHeight = window.innerHeight;
 
 origins.length > 0 && performanceDays ? document.getElementById("line-chart-container").append(
-  createMultipleAnimatedLines(summarized_data, { width: containerWidth, height: containerHeight })
+  createMultipleAnimatedLines(summarized_data, { 
+    width: containerWidth, 
+    height: containerHeight,
+    colorMap: color_map,
+    nameMap: name_map
+  })
 ) : html`<i>No data.</i>`
 
 
