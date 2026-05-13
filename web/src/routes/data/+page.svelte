@@ -24,6 +24,13 @@
     //     "See how frequently different playwrights appear in each dataset, and compare author influence across cities."
     // },
     {
+      id: "nola-genre-bubble",
+      icon: "bubble.svg",
+      category: "Genres",
+      title: "New Orleans Genre Bubble Chart",
+      description: ""
+    },
+    {
       id: "heat-map",
       icon: "fire.svg",
       category: "Annual Performance Comparison",
@@ -147,7 +154,6 @@
 </main>
 
 <style>
-
   .viz-icon, .menu-icon{
     max-width: 2rem;
   }
@@ -238,13 +244,6 @@
     flex-direction: row;
     gap: 1rem;
   }
-
-
-
-
-
-
-
 
   main.explore {
     background: #F6F3DE;

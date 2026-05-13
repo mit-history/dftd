@@ -519,7 +519,8 @@ const vizLabelById = {
   "author-bubble": "Author Bubble",
   "authorBubble": "Author Bubble",
 
-  "calendar": "Calendar"
+  "calendar": "Calendar",
+  "nola-genre-bubble": "NOLA Genre Bubble"
 };
 
 
@@ -611,6 +612,16 @@ if (calendar) {
 }else{
   display(html`<span></span>`);
 }
+
+const nolaMainGenres = ["drame", "tragedy", "comedy", "vaudeville", "opera", "other"];
+
+const nolaGenreInput = Inputs.checkbox(nolaMainGenres, {
+  label: "Filter NOLA Genres",
+  value: nolaMainGenres,
+  format: d => d.charAt(0).toUpperCase() + d.slice(1)
+});
+
+const nolaSelectedGenres = nolaBubble ? view(nolaGenreInput) : nolaMainGenres;
 ```
 
 ```js
@@ -623,12 +634,12 @@ if (calendar) {
     value: [1748, 1793],
     enableTextInput: true
   });
-  const date_range_val = !(calendar || heatMap)? view(date_range): [1748, 1793];
+  const date_range_val = !(calendar || heatMap || nolaBubble)? view(date_range): [1748, 1793];
 ```
 ```js
 
-  const start_date = heatMap? view(start_date_input): calendar? new Date("1748-01-01"): new Date(`${date_range_val[0]}-01-01`);
-  const end_date = heatMap? view(end_date_input): calendar? new Date("1798-12-31"): new Date(`${date_range_val[1]}-12-31`);
+  const start_date = heatMap? view(start_date_input): (calendar || nolaBubble)? new Date("1748-01-01"): new Date(`${date_range_val[0]}-01-01`);
+  const end_date = heatMap? view(end_date_input): (calendar || nolaBubble)? new Date("1798-12-31"): new Date(`${date_range_val[1]}-12-31`);
 
 
   const randomDates = () =>  {
@@ -654,8 +665,8 @@ const originsInput = Inputs.checkbox(originOptions, {
   format: d => name_map[d] || d
 });
 const originsSelect = Inputs.toggle({label: "Select All", value: true})
-const origins = !calendar? view(originsInput): originOptions;
-if (!calendar)
+const origins = !(calendar || nolaBubble)? view(originsInput): originOptions;
+if (!(calendar || nolaBubble))
   view(originsSelect);
 
 originsSelect.oninput = (event) => {
@@ -1684,8 +1695,6 @@ if (calendar) {
 display(nolaBubble ? html`<h2>New Orleans Genre Bubble Chart</h2>` : html`<div></div>`);
 
 if (nolaBubble) {
-  const MAIN_GENRES = ["drame", "tragedy", "comedy", "vaudeville", "opera", "other"];
-
   function stripAccents(value) {
     return String(value || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "");
   }
@@ -1764,7 +1773,7 @@ if (nolaBubble) {
     const hierarchyData = expanded
       ? {
           name: "genres",
-          children: MAIN_GENRES.map(main => {
+          children: nolaSelectedGenres.map(main => {
             const rows = expandedData.filter(d => d.original_parent_genres.includes(main));
             const children = d3.rollups(
               rows.filter(d => d.original_genre && String(d.original_genre).trim() !== ""),
@@ -1778,7 +1787,11 @@ if (nolaBubble) {
         }
       : {
           name: "genres",
-          children: d3.rollups(expandedData, v => v.length, d => d.main_genre)
+          children: d3.rollups(
+            expandedData.filter(d => nolaSelectedGenres.includes(d.main_genre)), 
+            v => v.length, 
+            d => d.main_genre
+          )
             .map(([name, value]) => ({ name, value }))
             .sort((a, b) => d3.descending(a.value, b.value))
         };
@@ -1793,7 +1806,7 @@ if (nolaBubble) {
     const packed = pack(root);
     const leaves = packed.leaves();
 
-    const color = d3.scaleOrdinal().domain(MAIN_GENRES).range(d3.schemeTableau10);
+    const color = d3.scaleOrdinal().domain(nolaMainGenres).range(d3.schemeTableau10);
 
     const svg = d3.create("svg")
       .attr("viewBox", [0, 0, width, height])
@@ -1852,7 +1865,7 @@ if (nolaBubble) {
 
     // --- Summary table ---
     const summaryTable = expanded
-      ? MAIN_GENRES.flatMap(main => {
+      ? nolaSelectedGenres.flatMap(main => {
           const rows = expandedData.filter(d => d.original_parent_genres.includes(main));
           return d3.rollups(
             rows.filter(d => d.original_genre && String(d.original_genre).trim() !== ""),
@@ -1862,16 +1875,21 @@ if (nolaBubble) {
             .map(([subgenre, works]) => ({ main_genre: formatLabel(main), subgenre: formatLabel(subgenre), works }))
             .sort((a, b) => d3.descending(a.works, b.works));
         })
-      : d3.rollups(expandedData, v => v.length, d => d.main_genre)
+      : d3.rollups(
+          expandedData.filter(d => nolaSelectedGenres.includes(d.main_genre)), 
+          v => v.length, 
+          d => d.main_genre
+        )
           .map(([main_genre, works]) => ({ main_genre: formatLabel(main_genre), works }))
           .sort((a, b) => d3.descending(a.works, b.works));
 
     tableMount.replaceChildren(Inputs.table(summaryTable));
 
     // --- Inspect works selector ---
-    const genreSelect = Inputs.select(MAIN_GENRES, {
+    const selectOptions = nolaSelectedGenres.length > 0 ? nolaSelectedGenres : ["None selected"];
+    const genreSelect = Inputs.select(selectOptions, {
       label: "Inspect works in main category:",
-      value: "comedy",
+      value: selectOptions.includes("comedy") ? "comedy" : selectOptions[0],
       format: d => formatLabel(d)
     });
 
