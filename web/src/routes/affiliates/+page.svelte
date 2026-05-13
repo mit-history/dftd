@@ -59,7 +59,7 @@
   <section class="affiliates-section">
   <div class="projects-grid">
 
-    <div class="project-card">
+    <div class="project-card" style="border-color: #4269D0;">
       <a href="https://artex.au.dk/" target="_blank" class="project-title">
       <img src={base + '/images/copen_theat.jpg'} alt="Copenhagen Theater">
       Artistic Exchanges (Copenhagen)</a>
@@ -72,7 +72,7 @@
       </p>
     </div>
 
-    <div class="project-card">
+    <div class="project-card" style="border-color: #EFB119;">
       <a href="https://www.vondel.humanities.uva.nl/onstage/" target="_blank" class="project-title">
       <img src={base + '/images/amsterdam_theater.jpeg'} alt="Amsterdam Theater">
       Onstage (Amsterdam)</a>
@@ -85,7 +85,7 @@
       </p>
     </div>
 
-    <div class="project-card">
+    <div class="project-card" style="border-color: #FF725C;">
       <a href="https://www.cfregisters.org/#!/" target="_blank" class="project-title">
       <img src={base + '/images/2560px-Couronnement_de_Voltaire.jpg'} alt="Comédie-Française">
       Comédie-Française Registers Project (Paris)</a>
@@ -98,7 +98,7 @@
       </p>
     </div>
 
-    <div class="project-card">
+    <div class="project-card" style="border-color: #e07a5f;">
       <a href="https://repcomit18.mesu.sorbonne-universite.fr/" target="_blank" class="project-title">
       <img src={base + '/images/comedie_italienne.jpg'} alt="Répertoire de la Comédie-Italienne de Paris">
       Répertoire de la Comédie-Italienne de Paris</a>
@@ -111,7 +111,7 @@
       </p>
     </div>
 
-    <div class="project-card">
+    <div class="project-card" style="border-color: #DF789A;">
       <a href="https://www.theatronomics.com/" target="_blank" class="project-title">
       <img src={base + '/images/Theatronomics Map 2[21].jpg.jpeg'} alt="London Theater">
       Theatronomics (London)</a>
@@ -124,7 +124,7 @@
       </p>
     </div>
 
-    <div class="project-card">
+    <div class="project-card" style="border-color: #4DA011;">
       <a href="https://londonstagedatabase.uoregon.edu/" target="_blank" class="project-title">
       <img src={base + '/images/london_stage_database.jpeg'} alt="London Stage Database">
       London Stage Database</a>
@@ -137,7 +137,7 @@
       </p>
     </div>
 
-    <div class="project-card">
+    <div class="project-card" style="border-color: #6BC5B0;">
       <a href="https://www.theatreinsaintdomingue.org/" target="_blank" class="project-title">
       <img src={base + '/images/pic for website.jpeg'} alt="Theatre in Saint-Domingue">
         Theatre in Saint-Domingue</a>
@@ -255,6 +255,8 @@
     padding: 1rem;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border-style: solid;
+    border-width: 3px;
   }
 
   .project-card:hover {

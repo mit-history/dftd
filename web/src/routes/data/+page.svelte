@@ -99,7 +99,6 @@
       </div>
     </div>
   </section>
-
   <!-- CONTENT BELOW HERO -->
   <section class="content">
 
@@ -154,7 +153,7 @@
   }
   .categories-list{
     display: grid;
-    grid-template-columns: 50% 50%;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 400px), 1fr)); /* make it 2 boxes per row on 1024px */
     margin-top: 1rem;
     gap: 1.8rem;
     text-align: left;

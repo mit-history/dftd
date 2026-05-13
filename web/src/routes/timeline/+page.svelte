@@ -66,8 +66,10 @@
   const earliestYear = Math.min(...allStarts);
   const latestYear = Math.max(...allEnds);
 
-  const minYear = Math.floor(earliestYear / 5) * 5;
-  const maxYear = Math.ceil(latestYear / 5) * 5;
+  const minYear = 1740;
+  // const minYear = Math.floor(earliestYear / 5) * 5;
+  const maxYear = 1815;
+  // const maxYear = Math.ceil(latestYear / 5) * 5 + 5;
   const yearRange = maxYear - minYear;
 </script>
 
@@ -94,7 +96,7 @@
 
     <div class="timeline-container">
       <div class="year-labels">
-        {#each Array.from({ length: Math.floor((maxYear - minYear) / 25) + 1 }, (_, i) => minYear + i * 25) as year}
+        {#each Array.from({ length: Math.floor((maxYear - minYear) / 15) + 1 }, (_, i) => minYear + i * 15) as year}
           <div class="year" style="left: {(year - minYear) / yearRange * 100}%">{year}</div>
         {/each}
       </div>

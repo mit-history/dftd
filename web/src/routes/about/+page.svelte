@@ -136,7 +136,7 @@
     height: 45vh;
     background-color: #d6d3d1;
     background-size: cover;
-    background-position: center 30%;
+    background-position: center 45%;
     background-repeat: no-repeat;
 
     display: flex;
