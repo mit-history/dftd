@@ -98,7 +98,7 @@
       </p>
     </div>
 
-    <div class="project-card" style="border-color: #e07a5f;">
+    <div class="project-card" style="border-color: #FFFFFF;">
       <a href="https://repcomit18.mesu.sorbonne-universite.fr/" target="_blank" class="project-title">
       <img src={base + '/images/comedie_italienne.jpg'} alt="Répertoire de la Comédie-Italienne de Paris">
       Répertoire de la Comédie-Italienne de Paris</a>

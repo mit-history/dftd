@@ -39,11 +39,11 @@
 
       <p>
         The project began as a collaboration between Professor Ulla Kallenbach at the University of Bergen and Professors Jeff Ravel and Anne McCants at MIT.
-        It was funded initially by an MIT Seed Funds grant, with supplemental support from the University of Bergen.
+        It was funded initially by a Seed Funds grant provided by <a href="https://misti.mit.edu/" class="link">MISTI</a>, MIT's Global Experiences Program, with supplemental support from the University of Bergen.
         The three collaborators have reached out to colleagues who have compiled datasets on theater performance in several venues in Europe and the Americas.
         Our goal to date has been to create visualizations that allow users to compare data on authors, genres, and performance frequency across the national boundaries in which theater history is traditionally studied.
         Our work began in Fall 2024 and has featured project planning meetings at MIT and the University of Bergen. In between these meetings, project partners have generously shared their datasets,
-        allowing us to assemble them in our repository and link them to series of experimental visualizations, which you will find <a href="{base}/data" class="link">here</a>.
+        allowing us to assemble them in our repository and link them to a series of experimental visualizations, which you will find <a href="{base}/data" class="link">here</a>.
       </p>
 
       <p>
@@ -56,7 +56,7 @@
         see this <a href="{base}/timeline" class="link">timeline</a>. The tools we have created allow one to study the frequency of author performance within and across these different venues.
         They permit users to better understand the performance rates of different genres in various national settings.
         Finally, they allow researchers to get a sense of the frequency with which troupes on these stages performed across half a century.
-        In all instances, we have created tools which we hope will allow researchers and others curious about the theater history and cultural history of the
+        In all instances, we have created tools which we hope will allow researchers and others curious about theater history and the cultural history of the
         period to formulate questions that transcend national borders in this cosmopolitan age. The datasets we make available here do not contain the full amount
         of information compiled by our project partners on their <a href="{base}/affiliates" class="link">various web sites</a>. The heterogeneity of the historical record has forced us to focus on the most
         basic comparative categories. We urge our users, once they have explored our tools, to continue their investigations by digging deeper into the data our
@@ -72,7 +72,7 @@
           <u>London</u>: Our data for the Covent Garden and Drury Lane theaters have been generously provided by the teams responsible for the London Stage Database and the Theatronomics  projects.  We are grateful to both teams, and to their project leads, Professors Mattie Burkert and David O'Shaughnessy, for sharing their work.
         </li>
         <li>
-          <u>Madrid</u>: Our data for the Teatro de la Cruz and the Teatro del Principe are derived from a digital transcription of the print work <i>Cartelera teatral madrilena del siglo XVIII: 1708-1808</i>, eds. René Andioc and Mireille Coulon (Toulouse: Presses universitaires du Mirail, 1996).  We thank Professor Coulon for permission to use the data she and her deceased collaborator compiled.
+          <u>Madrid</u>: Our data for the Teatro de la Cruz and the Teatro del Principe are derived from a digital transcription of the print work <i>Cartelera teatral madrilena del siglo XVIII: 1708-1808</i>, eds. René Andioc and Mireille Coulon (Toulouse: Presses universitaires du Mirail, 1996).  We thank Professor Coulon for permission to use the data she and Professor Andioc compiled.
         </li>
         <li>
           <u>New Orleans</u>: Our New Orleans data was generously provided by Professor Jeffery Leichman of Louisiana State University (LSU). He led a team of LSU students who extracted information regarding performances given in four New Orleans theaters in the early nineteenth century from the daily periodical <i>Le Moniteur de Louisane</i>."
@@ -107,12 +107,22 @@
       </p>
 
       <p>
+        <u>Note on Language</u>
+      </p>
+
+      <p>
+        At present the language of this web site is English, because it is the language most common to all of our affiliated project partners.
+        We realize, however, that users may desire access in other languages, which is an entirely appropriate expectation for a project with a transnational focus.
+        Inspired by the tri-lingual web site created by the <a href="https://www.theatreinsaintdomingue.org/" class="link">Theatre in Saint-Domingue</a> team, we hope to be able to offer other language options in the future.
+      </p>
+
+      <p>
         <u>Our Team</u>
       </p>
 
       <p>
         The Transnational Stages web site and data visualizations have been created by the following MIT and Wellesley College students:
-        Rhea Bhattacharjee, Akosua Essah, Tristan Hoang, Nony Otu Ugwu, and Elaine Yang.  We are grateful for technical support from Rebecca Black and Jamie
+        Rhea Bhattacharjee, Akosua Essah, Tristan Hoang, Nony Otu Ugwu, and Elaine Yang. We are grateful for technical support from Rebecca Black and Jamie
         Folsom at <a href="https://www.performantsoftware.com/" class="link">Performant Software Solutions</a>.
       </p>
     </div>

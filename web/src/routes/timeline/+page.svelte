@@ -97,7 +97,10 @@
     <div class="timeline-container">
       <div class="year-labels">
         {#each Array.from({ length: Math.floor((maxYear - minYear) / 15) + 1 }, (_, i) => minYear + i * 15) as year}
-          <div class="year" style="left: {(year - minYear) / yearRange * 100}%">{year}</div>
+          <div class="year" style="left: {(year - minYear) / yearRange * 100}%">
+            {year}
+            <div class="vertical-line" style="height: calc(2rem + {projects.length * 50}px);"></div>
+          </div>
         {/each}
       </div>
 
@@ -238,6 +241,18 @@
     transform: translateX(-50%);
     font-size: 0.9rem;
     color: #666;
+  }
+
+  .vertical-line {
+    position: absolute;
+    top: 1.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 1px;
+    background-color: #ccc;
+    z-index: -1;
+    pointer-events: none;
+    opacity: 0.4;
   }
 
   .lines {
