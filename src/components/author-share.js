@@ -326,8 +326,10 @@ export function authorShareChart(author, formatted_data, colorMap = {}, nameMap 
     .domain(origins)
     .range(origins.map((o, i) => colorMap[o] || d3.schemeObservable10[i % 10]));
 
+  const chartWidth = Math.max(1000, Math.floor(window.innerWidth * 0.92));
+
   const sharedPlotConfig = {
-    width: 1000,
+    width: chartWidth,
     height: 420,
     x: { label: "Year", tickFormat: "d", ticks },
     color: {
@@ -530,7 +532,7 @@ export function authorShareChart(author, formatted_data, colorMap = {}, nameMap 
   let showLabels = true;
   let combineOrigins = false;
 
-  const wrapper = createEl("div", { styles: { display: "grid", gap: "8px" } });
+  const wrapper = createEl("div", { styles: { display: "grid", gap: "8px", width: "100%" } });
 
   // Authors bar (top text)
   const authorsBar = createEl("div", {
@@ -707,7 +709,7 @@ export function authorShareChart(author, formatted_data, colorMap = {}, nameMap 
   };
   updateSearchState(latestAuthorsToCompare);
 
-  const chartHost = createEl("div", { props: { className: "chart-host" } });
+  const chartHost = createEl("div", { props: { className: "chart-host" }, styles: { width: "100%", overflowX: "auto" } });
 
   const authorLegend = createEl("div", {
     styles: { display: "grid", gap: "6px", marginTop: "4px", width: "fit-content" },

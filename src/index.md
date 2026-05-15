@@ -570,6 +570,24 @@ const calendar = viz.includes("Calendar");
 const nolaBubble = viz.includes("NOLA Genre Bubble");
 const heatMap = viz.includes("Heat Map");
 
+const vizFilterConfig = {
+  "Over Time": { yearRange: true, origins: true },
+  "Heat Map": { exactDateRange: true, origins: true },
+  "Days with Performances": { yearRange: true, origins: true },
+  "Author Share": { yearRange: true, origins: true },
+  "Author Bubble": { yearRange: true, authorBubbleControls: true },
+  "Calendar": { calendarControls: true },
+  "NOLA Genre Bubble": { nolaGenres: true }
+};
+
+const activeFilters = Object.assign(
+  {},
+  ...viz.map(label => vizFilterConfig[label] ?? {})
+);
+
+// prioritize year slider when different date selection types are activated in sandbox mode
+activeFilters.exactDateRange = activeFilters.exactDateRange && !activeFilters.yearRange;
+
 ```
 
 <div class="card" style="margin-bottom: 1rem;">
@@ -598,8 +616,8 @@ const nav = html`<div style="display:flex; gap:.5rem; align-items:center; margin
 const venuesMount = html`<div id="venues-mount"></div>`;
 const legendMount = html`<div id="legend-mount"></div>`;
 
-// Only render the controls card if calendar viz is active
-if (calendar) {
+// Only render the controls card if an active visualization uses calendar controls.
+if (activeFilters.calendarControls) {
   display(html`<div style="padding:.6rem; margin:.6rem 0;">
     <div style="display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:.6rem;">
       <div>${anchorIn}</div><div>${nav}</div>
@@ -621,7 +639,9 @@ const nolaGenreInput = Inputs.checkbox(nolaMainGenres, {
   format: d => d.charAt(0).toUpperCase() + d.slice(1)
 });
 
-const nolaSelectedGenres = nolaBubble ? view(nolaGenreInput) : nolaMainGenres;
+const nolaSelectedGenres = activeFilters.nolaGenres
+  ? view(nolaGenreInput)
+  : (display(html`<span hidden></span>`), nolaMainGenres);
 ```
 
 ```js
@@ -634,12 +654,19 @@ const nolaSelectedGenres = nolaBubble ? view(nolaGenreInput) : nolaMainGenres;
     value: [1748, 1793],
     enableTextInput: true
   });
-  const date_range_val = !(calendar || heatMap || nolaBubble)? view(date_range): [1748, 1793];
+  const defaultDateRange = [1748, 1798];
+  const date_range_val = activeFilters.yearRange
+    ? view(date_range)
+    : (display(html`<span hidden></span>`), defaultDateRange);
 ```
 ```js
 
-  const start_date = heatMap? view(start_date_input): (calendar || nolaBubble)? new Date("1748-01-01"): new Date(`${date_range_val[0]}-01-01`);
-  const end_date = heatMap? view(end_date_input): (calendar || nolaBubble)? new Date("1798-12-31"): new Date(`${date_range_val[1]}-12-31`);
+  const start_date = activeFilters.exactDateRange
+    ? view(start_date_input)
+    : (display(html`<span hidden></span>`), new Date(`${date_range_val[0]}-01-01`));
+  const end_date = activeFilters.exactDateRange
+    ? view(end_date_input)
+    : (display(html`<span hidden></span>`), new Date(`${date_range_val[1]}-12-31`));
 
 
   const randomDates = () =>  {
@@ -665,9 +692,14 @@ const originsInput = Inputs.checkbox(originOptions, {
   format: d => name_map[d] || d
 });
 const originsSelect = Inputs.toggle({label: "Select All", value: true})
-const origins = !(calendar || nolaBubble)? view(originsInput): originOptions;
-if (!(calendar || nolaBubble))
+const origins = activeFilters.origins
+  ? view(originsInput)
+  : (display(html`<span hidden></span>`), originOptions);
+if (activeFilters.origins) {
   view(originsSelect);
+} else {
+  display(html`<span hidden></span>`);
+}
 
 originsSelect.oninput = (event) => {
   if (!event.bubbles) return;
@@ -700,11 +732,13 @@ const randomOrigins = () => {
 ```
 
 ```js
+const UNKNOWN_GENRE = "Unknown genre";
+const genreKey = (d) => d.genre || UNKNOWN_GENRE;
+
 const genreOptions = Array.from(new Set(
   formatted_data
     .filter(d => origins.includes(d.origin))
-    .map((d) => d.genre)
-    .filter(Boolean)
+    .map(genreKey)
 )).sort();
 
 
@@ -737,8 +771,14 @@ genreInput.oninput = (event) => {
   }
 }
 
-const genres = genreOptions// view(genreInput);
-// if(genreOptions.length > 0) view(genreSelect);
+const genres = activeFilters.genres
+  ? view(genreInput)
+  : (display(html`<span hidden></span>`), genreOptions);
+if (activeFilters.genres && genreOptions.length > 0) {
+  view(genreSelect);
+} else {
+  display(html`<span hidden></span>`);
+}
 ```
 
 ```js
@@ -767,12 +807,16 @@ const randomAuthor = () => {
 
 ```js
 const percent_absolute = Inputs.radio(["percentage", "absolute"], {label: "Mode", value: "percentage"});
-const percent_absolute_val = bubble?view(percent_absolute):0;
+const percent_absolute_val = activeFilters.authorBubbleControls
+  ? view(percent_absolute)
+  : (display(html`<span hidden></span>`), 0);
 ```
 
 ```js
 const do_overall_threshold = Inputs.toggle({label: "Overall Threshold", value: true});
-const do_overall_threshold_val = bubble?view(do_overall_threshold):false;
+const do_overall_threshold_val = activeFilters.authorBubbleControls
+  ? view(do_overall_threshold)
+  : (display(html`<span hidden></span>`), false);
 
 ```
 ```js
@@ -783,7 +827,9 @@ const overall_threshold = rangeInput({
   value: [0, percent_absolute_val=="percentage"?100:Math.max(...Object.values(maxes))],
   enableTextInput: true
 });
-const overall_threshold_val = do_overall_threshold_val?view(overall_threshold):[0,0];
+const overall_threshold_val = do_overall_threshold_val
+  ? view(overall_threshold)
+  : (display(html`<span hidden></span>`), [0,0]);
 ```
 
 </details>
@@ -905,6 +951,8 @@ if (overTime) {
         </div>`
       : html`<i>No data.</i>`
   );
+} else {
+  display(html`<span hidden></span>`);
 }
 
 // if (divergingGenres) {
@@ -928,10 +976,12 @@ import {
 ```js
 
 if (authorShare) {
-  display(html`<h2>Author Performance Contribution Per Days</h2>`);
-  display(authorShareChart(author, unique_formatted_data, color_map, name_map));
+  display(html`<div class="full-bleed">
+    <h2>Author Performance Contribution Per Days</h2>
+    ${authorShareChart(author, unique_formatted_data, color_map, name_map)}
+  </div>`);
 } else {
-  display(html`<div></div>`)
+  display(html`<span hidden></span>`)
 }
 ```
 
@@ -1244,14 +1294,14 @@ const author_counts = author_filtered_data ? Object.entries(author_filtered_data
 
 ```js
 // display(performanceDays ? html `<h2>Animated Line Chart of Days with Performances</h2>` : html`<div></div>`)
-display(performanceDays ? html `<p> Selected genres: ${genres.length === 0 ? "None" : genres.length === genreOptions.length ? "All" : genres.join(", ")} </p>` : html`<div></div>`)
+display(html`<span hidden></span>`)
 ```
 
 ```js
 const genre_data =
-  genres.length === 0
+  genres.length === 0 || genres.length === genreOptions.length
     ? formatted_data
-    : formatted_data.filter((d) => genres.includes(d.genre));
+    : formatted_data.filter((d) => genres.includes(genreKey(d)));
 ```
 
 <div class="full-bleed days-grid">
@@ -1292,33 +1342,13 @@ function summarize(dataset, label) {
   return { label, data: summary };
 }
 
-// use the already-filtered datasets
-const originToData = {
-  "danish": danish_filtered_data,
-  "french": french_filtered_data,
-  // if you ever add dutch_filtered_data, put it here too
-  "dutch": combined_data
-    .filter(d => d.origin === "dutch")
-    .filter(d => {
-      const dt = asDate(d.date);
-      return dt && dt >= start_date && dt <= end_date;
-    }),
-  "saint-domingue": saintDomingue
-    .filter(d => {
-      const dt = asDate(d.date);
-      return dt && dt >= start_date && dt <= end_date;
-    }),
-  "covent garden": coventGarden
-    .filter(d => {
-      const dt = asDate(d.date);
-      return dt && dt >= start_date && dt <= end_date;
-    }),
-  "drury lane": druryLane
-    .filter(d => {
-      const dt = asDate(d.date);
-      return dt && dt >= start_date && dt <= end_date;
-    }),
-};
+// The animated lines count performance days by origin; genre filtering is reserved for the heat map.
+const originToData = Object.fromEntries(
+  originOptions.map(origin => [
+    origin,
+    formatted_data.filter(d => d.origin === origin)
+  ])
+);
 
 // build the list in the order the user selected
 const summarized_data = origins.map(origin =>
@@ -1326,21 +1356,22 @@ const summarized_data = origins.map(origin =>
 );
 
 
-// clear old charts
-document.getElementById("line-chart-container").innerHTML = "";
-document.getElementById("heatmap-container").innerHTML = "";
-
 const containerWidth = window.innerWidth;
 const containerHeight = window.innerHeight;
 
-origins.length > 0 && performanceDays ? document.getElementById("line-chart-container").append(
-  createMultipleAnimatedLines(summarized_data, { 
+const lineChartContainer = document.getElementById("line-chart-container");
+lineChartContainer.replaceChildren();
+
+if (origins.length > 0 && performanceDays) {
+  lineChartContainer.replaceChildren(createMultipleAnimatedLines(summarized_data, { 
     width: containerWidth, 
     height: containerHeight,
     colorMap: color_map,
     nameMap: name_map
-  })
-) : html`<i>No data.</i>`
+  }));
+} else {
+  lineChartContainer.replaceChildren();
+}
 
 
 ```
@@ -1519,6 +1550,8 @@ if (calendar) {
     New Orleans: <b>${nola.filter(d => d.date <= CAP).length}</b> ·
     total after cap: <b>${allRows.length}</b>
   </div>`);
+} else {
+  display(html`<span hidden></span>`);
 }
 
 // ==============================
@@ -1563,6 +1596,8 @@ const CAL_ID = "calendar-colored";
 // Calendar container only when calendar is active
 if (calendar) {
   display(html`<div id="${CAL_ID}"></div>`);
+} else {
+  display(html`<span hidden></span>`);
 }
 
 function capDate(d){ return new Date(Math.min(+asDate(d), CAP)); }
@@ -1584,7 +1619,12 @@ const initialOriginsList = includeNola.value
   : initialOriginsBase;
 
 let venuesIn = buildVenuesInput(capDate(start_date), capDate(end_date), initialOriginsList);
-venuesMount.replaceChildren(venuesIn);
+if (calendar) {
+  venuesMount.replaceChildren(venuesIn);
+} else {
+  venuesMount.replaceChildren();
+  legendMount.replaceChildren();
+}
 
 function venuesValue() {
   const v = venuesIn.value;
