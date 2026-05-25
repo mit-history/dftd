@@ -112,9 +112,9 @@
    <section class="desc-box">
     <h2 class="desc-title">About These Tools</h2>
     <p>
-      Our goal is to provide users with an intuitive way to explore centuries of European theatre performance data.
-      At present, you can compare information from Amsterdam, Copenhagen, and Paris between 1748 and 1798.
-      Visualizations allow you to examine annual trends, genre differences, author prominence, and seasonal patterns.
+      Click on the categories below to compare the frequency of annual performances and the frequency with which authors are played across our datasets;
+      view daily performances in the various venues by day, week or month; or see the frequency with which different genres were performed in early 19th-century New Orleans.
+      We will continue to add datasets and refine our visualizations as time and resources permit.
     </p>
 </section>
 

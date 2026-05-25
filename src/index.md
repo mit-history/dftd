@@ -575,8 +575,8 @@ const vizFilterConfig = {
   "Heat Map": { exactDateRange: true, origins: true },
   "Days with Performances": { yearRange: true, origins: true },
   "Author Share": { yearRange: true, origins: true },
-  "Author Bubble": { yearRange: true, authorBubbleControls: true },
-  "Calendar": { calendarControls: true },
+  "Author Bubble": { yearRange: true, authorBubbleControls: true, origins: true },
+  "Calendar": { calendarControls: true, origins: true },
   "NOLA Genre Bubble": { nolaGenres: true }
 };
 
@@ -624,7 +624,6 @@ if (activeFilters.calendarControls) {
       <div>${modeIn}</div><div>${overlayIn}</div>
       <div style="grid-column:1/-1">${includeNola}</div>
       <div style="grid-column:1/-1">${venuesMount}</div>
-      <div style="grid-column:1/-1">${legendMount}</div>
     </div>
   </div>`);
 }else{
@@ -649,12 +648,13 @@ const nolaSelectedGenres = activeFilters.nolaGenres
   const end_date_input = Inputs.date({label: "End", value: "1798-12-31"})
   const date_range = rangeInput({
     min: 1748,
-    max: 1793,
+    max: 1815,
     step: 1,
-    value: [1748, 1793],
+    value: [1748, 1815],
     enableTextInput: true
   });
-  const defaultDateRange = [1748, 1798];
+  const defaultDateRange = [1748, 1815];
+  display(activeFilters.yearRange? html`<span style="margin-right: 1rem">Year Range</span>`:html`<span hidden></span>`)
   const date_range_val = activeFilters.yearRange
     ? view(date_range)
     : (display(html`<span hidden></span>`), defaultDateRange);
@@ -686,16 +686,29 @@ const nolaSelectedGenres = activeFilters.nolaGenres
 ```js
 
 const originOptions = ["danish", "dutch", "french", "saint-domingue", 'covent garden', 'drury lane', 'new orleans'];
+const reactiveOrigins = Inputs.input(["danish", "dutch", "french"]);
+const react = Generators.input(reactiveOrigins)
+
+```
+```js
+
 const originsInput = Inputs.checkbox(originOptions, {
-  label: "Origin",
-  value: originOptions,
-  format: d => name_map[d] || d
-});
-const originsSelect = Inputs.toggle({label: "Select All", value: true})
+    label: !overTime? "Origin": "Origin (max 3)",
+    value: reactiveOrigins,
+    format:  d => html`<span class="cal-key"><span class="cal-dot" style="background:${color_map[d] || '#999'}"></span>${name_map[d] || d}</span>`,
+    // name_map[d] || d,
+    // disabled: ['new orleans']
+    disabled: originOptions.filter((o) => (!overTime? false: (3 <= react.length) && !react.includes(o)))
+  })
+const bindedInput = Inputs.bind(
+  originsInput,
+  reactiveOrigins
+)
+const originsSelect = Inputs.toggle({label: "Select All", value: false})
 const origins = activeFilters.origins
   ? view(originsInput)
   : (display(html`<span hidden></span>`), originOptions);
-if (activeFilters.origins) {
+if (activeFilters.origins && !overTime) {
   view(originsSelect);
 } else {
   display(html`<span hidden></span>`);
@@ -813,23 +826,15 @@ const percent_absolute_val = activeFilters.authorBubbleControls
 ```
 
 ```js
-const do_overall_threshold = Inputs.toggle({label: "Overall Threshold", value: true});
-const do_overall_threshold_val = activeFilters.authorBubbleControls
-  ? view(do_overall_threshold)
-  : (display(html`<span hidden></span>`), false);
-
-```
-```js
-const overall_threshold = rangeInput({
+const threshold = rangeInput({
   min: 0,
   max: percent_absolute_val=="percentage"?100:Math.max(...Object.values(maxes)),
   step: 1,
   value: [0, percent_absolute_val=="percentage"?100:Math.max(...Object.values(maxes))],
-  enableTextInput: true
+  enableTextInput: true,
 });
-const overall_threshold_val = do_overall_threshold_val
-  ? view(overall_threshold)
-  : (display(html`<span hidden></span>`), [0,0]);
+display(bubble? html`<span style="margin-right: 1rem">Threshold</span>`:html`<span hidden></span>`)
+const threshold_val = bubble? view(threshold):display(html`<span hidden></span>`)
 ```
 
 </details>
@@ -896,36 +901,6 @@ function compareYearsChart(data) {
 ```
 
 ```js
-// console.log('cv experiments')
-// const new_cv = []
-// let dates = new Set()
-
-// for (const event of formatted_cv){
-//   if (!dates.has(event.date)){
-//     new_cv.push(event);
-//     dates.add(event.date)
-//   }
-// }
-
-// const new_stdmg = []
-// dates = new Set()
-// for (const event of formatted_stdmg){
-//   if (!dates.has(event.date)){
-//     new_stdmg.push(event);
-//     dates.add(event.date)
-//   }
-// }
-// console.log('stdmg experiments')
-// console.log(new_stdmg)
-
-// const new_dl = []
-// dates = new Set()
-// for (const event of formatted_dl){
-//   if (!dates.has(event.date)){
-//     new_dl.push(event);
-//     dates.add(event.date)
-//   }
-// }
 
 const unique_formatted_data = []
 for (const origin of originOptions){
@@ -1000,144 +975,125 @@ for(const loc of [combined_data.filter(d => d.origin == 'french'), combined_data
 console.log('maxes', maxes)
 ```
 
-```js
-// display(bubble ? html `<h2>Authors Performed By Location</h2>` : html`<div></div>`);
-```
-
-
-
-<!-- ```js
-display(bubble? html `<div></h2>` : html`<div></div>`);
-const percent_absolute = Inputs.radio(["percentage", "absolute"], {label: "Mode", value: "percentage"});
-const percent_absolute_val = bubble?view(percent_absolute):0;
-```
 
 ```js
-display(bubble? html `<div></h2>` : html`<div></div>`);
-const do_overall_threshold = Inputs.toggle({label: "Overall Threshold", value: true});
-const do_overall_threshold_val = bubble?view(do_overall_threshold):false;
-
-```
-```js
-display(bubble? html `<div></h2>` : html`<div></div>`);
-const overall_threshold = rangeInput({
-  min: 0,
-  max: percent_absolute_val=="percentage"?100:Math.max(...Object.values(maxes)),
-  step: 1,
-  value: [0, percent_absolute_val=="percentage"?100:Math.max(...Object.values(maxes))],
-  enableTextInput: true
-});
-const overall_threshold_val = do_overall_threshold_val?view(overall_threshold):[0,0];
-``` -->
-
-
-```js
-display(bubble? html `<h2>Comédie-Française (Paris)</h2>` : html`<div></div>`);
-display(bubble&&!do_overall_threshold_val? html`<p>Threshold Range</p>`:html`<div></div>`);
-const french_threshold = rangeInput({
-  min: 0,
-  max: percent_absolute_val=="percentage"?100:maxes.french,
-  step: 1,
-  value: [0, percent_absolute_val=="percentage"?100:maxes.french],
-  enableTextInput: true
-});
-const french_threshold_val = bubble? (do_overall_threshold_val?overall_threshold_val:view(french_threshold)):[0,0];
-
+if(bubble){
+  for(const origin of origins){
+    display(bubble? html `<h2>${name_map[origin]}</h2>` : html`<div></div>`);
+    display(
+    bubble
+      ? authorBubble(
+          combined_data,
+          origin,
+          0,
+        threshold_val,
+          date_range_val[0],
+          date_range_val[1],
+          percent_absolute_val
+        )
+      : html`<div></div>`
+  );
+  }
+}
 ```
 
 ```js
-display(
-   bubble
-     ? authorBubble(
-         combined_data,
-        "french",
-        0,
-       french_threshold_val,
-        date_range_val[0],
-         date_range_val[1],
-         percent_absolute_val
-       )
-     : html`<div></div>`
- );
+// display(bubble? html `<h2>Comédie-Française (Paris)</h2>` : html`<div></div>`);
+```
+
+```js
+// display(
+//    bubble
+//      ? authorBubble(
+//          combined_data,
+//         "french",
+//         0,
+//        french_threshold_val,
+//         date_range_val[0],
+//          date_range_val[1],
+//          percent_absolute_val
+//        )
+//      : html`<div></div>`
+//  );
 ```
 
 ```js
 
-display(bubble? html `<h2>Schouwburg Theater (Amsterdam)</h2>` : html`<div></div>`);
-display(bubble&&!do_overall_threshold_val? html`<p>Threshold Range</p>`:html`<div></div>`);
-const dutch_threshold = rangeInput({
-  min: 0,
-  max: percent_absolute_val=="percentage"?100:maxes.dutch,
-  step: 1,
-  value: [0, percent_absolute_val=="percentage"?100:maxes.dutch],
-  enableTextInput: true
-});
-const dutch_threshold_val = bubble? (do_overall_threshold_val?overall_threshold_val:view(dutch_threshold)):[0,0];
+// display(bubble? html `<h2>Schouwburg Theater (Amsterdam)</h2>` : html`<div></div>`);
+// display(bubble&&!do_overall_threshold_val? html`<p>Threshold Range</p>`:html`<div></div>`);
+// const dutch_threshold = rangeInput({
+//   min: 0,
+//   max: percent_absolute_val=="percentage"?100:maxes.dutch,
+//   step: 1,
+//   value: [0, percent_absolute_val=="percentage"?100:maxes.dutch],
+//   enableTextInput: true
+// });
+// const dutch_threshold_val = bubble? (do_overall_threshold_val?overall_threshold_val:view(dutch_threshold)):[0,0];
 
 
 ```
 
 ```js
-display(bubble? authorBubble(combined_data, 'dutch', 0, dutch_threshold_val, date_range_val[0], date_range_val[1], percent_absolute_val): html`<div></div>`);
+// display(bubble? authorBubble(combined_data, 'dutch', 0, dutch_threshold_val, date_range_val[0], date_range_val[1], percent_absolute_val): html`<div></div>`);
 ```
 
 ```js
-display(bubble? html `<h2>Saint-Domingue (All Theaters)</h2>` : html`<div></div>`)
-display(bubble&&!do_overall_threshold_val? html`<p>Threshold Range</p>`:html`<div></div>`);
-const stdmg_threshold = rangeInput({
-  min: 0,
-  max: percent_absolute_val=="percentage"?100:maxes['saint-domingue'],
-  step: 1,
-  value: [0, percent_absolute_val=="percentage"?100:maxes['saint-domingue']],
-  enableTextInput: true
-});
-const stdmg_threshold_val = bubble? (do_overall_threshold_val?overall_threshold_val:view(stdmg_threshold)):[0,0];
-display(bubble? html`<p>Year Range</p>`:html`<div></div>`);
+// display(bubble? html `<h2>Saint-Domingue (All Theaters)</h2>` : html`<div></div>`)
+// display(bubble&&!do_overall_threshold_val? html`<p>Threshold Range</p>`:html`<div></div>`);
+// const stdmg_threshold = rangeInput({
+//   min: 0,
+//   max: percent_absolute_val=="percentage"?100:maxes['saint-domingue'],
+//   step: 1,
+//   value: [0, percent_absolute_val=="percentage"?100:maxes['saint-domingue']],
+//   enableTextInput: true
+// });
+// const stdmg_threshold_val = bubble? (do_overall_threshold_val?overall_threshold_val:view(stdmg_threshold)):[0,0];
+// display(bubble? html`<p>Year Range</p>`:html`<div></div>`);
 
 
 ```
 
 ```js
-display(bubble? authorBubble(saintDomingue, 'saint-domingue', 0, stdmg_threshold_val, date_range_val[0], date_range_val[1], percent_absolute_val): html`<div></div>`);
+// display(bubble? authorBubble(saintDomingue, 'saint-domingue', 0, stdmg_threshold_val, date_range_val[0], date_range_val[1], percent_absolute_val): html`<div></div>`);
 ```
 
 ```js
-display(bubble? html `<h2>Covent Garden (London)</h2>` : html`<div></div>`)
-display(bubble&&!do_overall_threshold_val? html`<p>Threshold Range</p>`:html`<div></div>`);
-const cv_threshold = rangeInput({
-  min: 0,
-  max: percent_absolute_val=="percentage"?100:maxes['covent garden'],
-  step: 1,
-  value: [0, percent_absolute_val=="percentage"?100:maxes['covent garden']],
-  enableTextInput: true
-});
-const cv_threshold_val = bubble? (do_overall_threshold_val?overall_threshold_val:view(cv_threshold)):[0,0];
+// display(bubble? html `<h2>Covent Garden (London)</h2>` : html`<div></div>`)
+// display(bubble&&!do_overall_threshold_val? html`<p>Threshold Range</p>`:html`<div></div>`);
+// const cv_threshold = rangeInput({
+//   min: 0,
+//   max: percent_absolute_val=="percentage"?100:maxes['covent garden'],
+//   step: 1,
+//   value: [0, percent_absolute_val=="percentage"?100:maxes['covent garden']],
+//   enableTextInput: true
+// });
+// const cv_threshold_val = bubble? (do_overall_threshold_val?overall_threshold_val:view(cv_threshold)):[0,0];
 
 
 
 ```
 
 ```js
-display(bubble? authorBubble(coventGarden, 'covent garden', 0, cv_threshold_val, date_range_val[0], date_range_val[1], percent_absolute_val): html`<div></div>`);
+// display(bubble? authorBubble(coventGarden, 'covent garden', 0, cv_threshold_val, date_range_val[0], date_range_val[1], percent_absolute_val): html`<div></div>`);
 ```
 
 ```js
-display(bubble? html `<h2>Drury Lane (London)</h2>` : html`<div></div>`)
-display(bubble&&!do_overall_threshold_val? html`<p>Threshold Range</p>`:html`<div></div>`);
-const dl_threshold = rangeInput({
-  min: 0,
-  max: percent_absolute_val=="percentage"?100:maxes['drury lane'],
-  step: 1,
-  value: [0, percent_absolute_val=="percentage"?100:maxes['drury lane']],
-  enableTextInput: true
-});
-const dl_threshold_val = bubble? (do_overall_threshold_val?overall_threshold_val:view(dl_threshold)):[0,0];
+// display(bubble? html `<h2>Drury Lane (London)</h2>` : html`<div></div>`)
+// display(bubble&&!do_overall_threshold_val? html`<p>Threshold Range</p>`:html`<div></div>`);
+// const dl_threshold = rangeInput({
+//   min: 0,
+//   max: percent_absolute_val=="percentage"?100:maxes['drury lane'],
+//   step: 1,
+//   value: [0, percent_absolute_val=="percentage"?100:maxes['drury lane']],
+//   enableTextInput: true
+// });
+// const dl_threshold_val = bubble? (do_overall_threshold_val?overall_threshold_val:view(dl_threshold)):[0,0];
 
 
 ```
 
 ```js
-display(bubble? authorBubble(druryLane, 'drury lane', 0, dl_threshold_val, date_range_val[0], date_range_val[1], percent_absolute_val): html`<div></div>`);
+// display(bubble? authorBubble(druryLane, 'drury lane', 0, dl_threshold_val, date_range_val[0], date_range_val[1], percent_absolute_val): html`<div></div>`);
 ```
 
 
@@ -1363,8 +1319,8 @@ const lineChartContainer = document.getElementById("line-chart-container");
 lineChartContainer.replaceChildren();
 
 if (origins.length > 0 && performanceDays) {
-  lineChartContainer.replaceChildren(createMultipleAnimatedLines(summarized_data, { 
-    width: containerWidth, 
+  lineChartContainer.replaceChildren(createMultipleAnimatedLines(summarized_data, {
+    width: containerWidth,
     height: containerHeight,
     colorMap: color_map,
     nameMap: name_map
@@ -1828,8 +1784,8 @@ if (nolaBubble) {
       : {
           name: "genres",
           children: d3.rollups(
-            expandedData.filter(d => nolaSelectedGenres.includes(d.main_genre)), 
-            v => v.length, 
+            expandedData.filter(d => nolaSelectedGenres.includes(d.main_genre)),
+            v => v.length,
             d => d.main_genre
           )
             .map(([name, value]) => ({ name, value }))
@@ -1916,8 +1872,8 @@ if (nolaBubble) {
             .sort((a, b) => d3.descending(a.works, b.works));
         })
       : d3.rollups(
-          expandedData.filter(d => nolaSelectedGenres.includes(d.main_genre)), 
-          v => v.length, 
+          expandedData.filter(d => nolaSelectedGenres.includes(d.main_genre)),
+          v => v.length,
           d => d.main_genre
         )
           .map(([main_genre, works]) => ({ main_genre: formatLabel(main_genre), works }))
