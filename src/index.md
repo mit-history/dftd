@@ -225,8 +225,6 @@ const combined_data = [
     origin: 'new orleans'
   }))
 ];
-// console.log('combined data')
-// console.log(combined_data.filter(d=>d.origin=='new orleans'))
 
 ```
 
@@ -601,47 +599,7 @@ activeFilters.exactDateRange = activeFilters.exactDateRange && !activeFilters.ye
 import { rangeInput } from "./components/range_input.js";
 ```
 
-```js
-// Calendar-specific controls only
-const modeIn       = Inputs.radio(["Month","Week","Day"], { label: "Calendar view", value: "Month" });
-const overlayIn    = Inputs.toggle({ label: "Overlay major events", value: true });
-const anchorIn     = Inputs.date({ label: "Date displayed", value: start_date });
-const includeNola  = Inputs.toggle({ label: "Include New Orleans (NOLA)", value: true });
 
-const nav = html`<div style="display:flex; gap:.5rem; align-items:center; margin:.25rem 0;">
-  <button id="prev">◀ Prev</button><button id="next">Next ▶</button>
-</div>`;
-
-// Dedicated mount nodes so we *replace* contents instead of appending
-const venuesMount = html`<div id="venues-mount"></div>`;
-const legendMount = html`<div id="legend-mount"></div>`;
-
-// Only render the controls card if an active visualization uses calendar controls.
-if (activeFilters.calendarControls) {
-  display(html`<div style="padding:.6rem; margin:.6rem 0;">
-    <div style="display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:.6rem;">
-      <div>${anchorIn}</div><div>${nav}</div>
-      <div>${modeIn}</div><div>${overlayIn}</div>
-      <div style="grid-column:1/-1">${includeNola}</div>
-      <div style="grid-column:1/-1">${venuesMount}</div>
-    </div>
-  </div>`);
-}else{
-  display(html`<span></span>`);
-}
-
-const nolaMainGenres = ["drame", "tragedy", "comedy", "vaudeville", "opera", "other"];
-
-const nolaGenreInput = Inputs.checkbox(nolaMainGenres, {
-  label: "Filter NOLA Genres",
-  value: nolaMainGenres,
-  format: d => d.charAt(0).toUpperCase() + d.slice(1)
-});
-
-const nolaSelectedGenres = activeFilters.nolaGenres
-  ? view(nolaGenreInput)
-  : (display(html`<span hidden></span>`), nolaMainGenres);
-```
 
 ```js
   const start_date_input = Inputs.date({label: "Start", value: "1748-01-01"})
@@ -703,45 +661,109 @@ const originsInput = Inputs.checkbox(originOptions, {
 const bindedInput = Inputs.bind(
   originsInput,
   reactiveOrigins
-)
-const originsSelect = Inputs.toggle({label: "Select All", value: false})
-const origins = activeFilters.origins
-  ? view(originsInput)
-  : (display(html`<span hidden></span>`), originOptions);
-if (activeFilters.origins && !overTime) {
-  view(originsSelect);
-} else {
-  display(html`<span hidden></span>`);
-}
+);
+const origins = activeFilters.origins ? view(originsInput) : (display(html`<span hidden></span>`), originOptions);
 
-originsSelect.oninput = (event) => {
+const selectAll = Inputs.button("Select All");
+const clearAll = Inputs.button("Clear All");
+
+if(activeFilters.origins && !overTime){
+  view(selectAll);
+}
+view(clearAll);
+
+function toggleAll(event, clear){
   if (!event.bubbles) return;
-  if(originsSelect.value) {
-    originsInput.value = originOptions;
-  }
-  else {
-    originsInput.value = [];
-  }
-
+  originsInput.value = clear? []: originOptions;
   originsInput.dispatchEvent(new Event("input"));
 }
 
-originsInput.oninput = (event) => {
-  if(originsInput.value.length !== originOptions.length)  {
-    originsSelect.value = false;
-  } else {
-    originsSelect.value = true;
-  }
+clearAll.addEventListener
+clearAll.onclick = (event) => toggleAll(event, true);
+selectAll.onclick = (event) => toggleAll(event, false);
+
+
+
+
+// const originsSelect = Inputs.toggle({label: "Select All", value: false})
+// const origins = activeFilters.origins
+//   ? view(originsInput)
+//   : (display(html`<span hidden></span>`), originOptions);
+// if (activeFilters.origins && !overTime) {
+//   view(originsSelect);
+// } else {
+//   display(html`<span hidden></span>`);
+// }
+
+// originsSelect.oninput = (event) => {
+//   if (!event.bubbles) return;
+//   if(originsSelect.value) {
+//     originsInput.value = originOptions;
+//   }
+//   else {
+//     originsInput.value = [];
+//   }
+
+//   originsInput.dispatchEvent(new Event("input"));
+// }
+
+// originsInput.oninput = (event) => {
+//   if(originsInput.value.length !== originOptions.length)  {
+//     originsSelect.value = false;
+//   } else {
+//     originsSelect.value = true;
+//   }
+// }
+
+// const randomOrigins = () => {
+//   const newValue = originOptions.filter(i => Math.round(Math.random()));
+//   originsInput.value = newValue;
+//   originsInput.dispatchEvent(new Event("input"));
+
+//   if(newValue.length === 3) originsSelect.value = true;
+//   else originsSelect.value = false;
+// }
+```
+```js
+// Calendar-specific controls only
+const modeIn       = Inputs.radio(["Month","Week","Day"], { label: "Calendar view", value: "Month" });
+const overlayIn    = Inputs.toggle({ label: "Overlay major events", value: true });
+const anchorIn     = Inputs.date({ label: "Date displayed", value: start_date });
+const includeNola  = Inputs.toggle({ label: "Include New Orleans (NOLA)", value: true });
+
+const nav = html`<div style="display:flex; gap:.5rem; align-items:center; margin:.25rem 0;">
+  <button id="prev">◀ Prev</button><button id="next">Next ▶</button>
+</div>`;
+
+// Dedicated mount nodes so we *replace* contents instead of appending
+const venuesMount = html`<div id="venues-mount"></div>`;
+const legendMount = html`<div id="legend-mount"></div>`;
+
+// Only render the controls card if an active visualization uses calendar controls.
+if (activeFilters.calendarControls) {
+  display(html`<div style="padding:.6rem; margin:.6rem 0;">
+    <div style="display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:.6rem;">
+      <div>${anchorIn}</div><div>${nav}</div>
+      <div>${modeIn}</div><div>${overlayIn}</div>
+      <div style="grid-column:1/-1">${includeNola}</div>
+      <div style="grid-column:1/-1">${venuesMount}</div>
+    </div>
+  </div>`);
+}else{
+  display(html`<span></span>`);
 }
 
-const randomOrigins = () => {
-  const newValue = originOptions.filter(i => Math.round(Math.random()));
-  originsInput.value = newValue;
-  originsInput.dispatchEvent(new Event("input"));
+const nolaMainGenres = ["drame", "tragedy", "comedy", "vaudeville", "opera", "other"];
 
-  if(newValue.length === 3) originsSelect.value = true;
-  else originsSelect.value = false;
-}
+const nolaGenreInput = Inputs.checkbox(nolaMainGenres, {
+  label: "Filter NOLA Genres",
+  value: nolaMainGenres,
+  format: d => d.charAt(0).toUpperCase() + d.slice(1)
+});
+
+const nolaSelectedGenres = activeFilters.nolaGenres
+  ? view(nolaGenreInput)
+  : (display(html`<span hidden></span>`), nolaMainGenres);
 ```
 
 ```js
@@ -835,6 +857,13 @@ const threshold = rangeInput({
 });
 display(bubble? html`<span style="margin-right: 1rem">Threshold</span>`:html`<span hidden></span>`)
 const threshold_val = bubble? view(threshold):display(html`<span hidden></span>`)
+```
+
+```js
+const combinedHeatmap = Inputs.checkbox( [''], { label: "Combined Heat Map", value: "Combined Heat Map" })
+```
+```js
+const combinedHeatmapVal = heatMap? view(combinedHeatmap): false
 ```
 
 </details>
@@ -1336,9 +1365,20 @@ if (origins.length > 0 && performanceDays) {
 
 
 ```js
-// display(heatMap ? html `<h2>Heatmap of Days with Performances</h2>` : html`<div></div>`)
+if(heatMap && combinedHeatmapVal.includes('')){
+  display(html `<h2>Combined Heat Map</h2>`)
 
-display(origins.length > 0 && heatMap ? createHeatmap(genre_data, { width: containerWidth, height: containerHeight }) : heatMap? html`<i>No data.</i>`: html`<span></span>`)
+  display(origins.length > 0? createHeatmap(genre_data, { width: containerWidth, height: containerHeight }) : html`<i>No data.</i>`)
+}
+if(heatMap){
+  for(const origin of origins){
+    display(html `<h2>${name_map[origin]}</h2>`)
+    const data = formatted_data.filter(d=>d.origin===origin);
+
+    display(data.length > 0? createHeatmap(data, { width: containerWidth, height: containerHeight }) : html`<i>No data.</i>`)
+  }
+}
+
 
 ```
 
