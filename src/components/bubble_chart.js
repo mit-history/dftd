@@ -86,7 +86,15 @@ export function BubbleChart(data, {
       .append("circle")
         .attr("r", d => d.r);
 
-    leaf.append("text")
+    const labeledLeaf = leaf.filter(d => {
+      const text = `${L[d.data]}`;
+      const estimatedWidth = text.length * fontSize * 0.6;
+      const diameter = d.r * 2;
+
+      return estimatedWidth < diameter*1.3;
+    });
+
+    labeledLeaf.append("text")
         .attr("clip-path", d => `url(${new URL(`#${uid}-clip-${d.data}`, location)})`)
       .selectAll("tspan")
       .data(d => `${L[d.data]}`.split(/\n/g))

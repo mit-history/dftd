@@ -12,15 +12,16 @@ const saintDomingue = await FileAttachment("data/saint_domingue/formatted_saint_
 const london = await FileAttachment('data/london/formatted_london.json').json()
 const coventGarden = london.filter(d => d.place == "Covent Garden").map(d =>{
   d.origin = 'covent garden';
+  d.author = d.author||'unknown'
   return d;
 });
 const druryLane = london.filter(d => d.place == "Drury Lane").map(d =>{
   d.origin = 'drury lane';
+  d.author = d.author||'unknown'
   return d;
 });
 const newOrleans = await FileAttachment("data/new_orleans/new_o_frequent_performances.csv").csv({typed: false});
-console.log(coventGarden)
-console.log(druryLane)
+
 
 
 const color_map = {
@@ -118,7 +119,7 @@ const danish = danish_raw.map((perf) => {
       null,
     genre: genreFromWorks || null,
     place: perf.place?.name ?? null,
-    author: authorFromWorks || null,
+    author: authorFromWorks || 'unknown',
     origin: "danish",
   };
 });
@@ -210,9 +211,9 @@ data_origin.set("saint-domingue", saintDomingue);
 
 const combined_data = [
   ...danish,
-  ...french.map(d => ({ ...d, origin: "french" })),
-  ...dutch.map(d => ({ ...d, origin: "dutch" })),
-  ...saintDomingue.map(d => ({ ...d, origin: "saint-domingue" })),
+  ...french.map(d => ({ ...d, origin: "french", author: d.author||'unknown' })),
+  ...dutch.map(d => ({ ...d, origin: "dutch", author: d.author||'unknown'  })),
+  ...saintDomingue.map(d => ({ ...d, origin: "saint-domingue", author: d.author||'unknown'  })),
   ...coventGarden,
   ...druryLane,
   ...newOrleans.map(d=>({
@@ -220,7 +221,7 @@ const combined_data = [
     title: d['works mentioned'],
     genre: d.genre,
     place: d['Performance Location'],
-    author: d.author,
+    author: d.author||'unknown',
     year: Number(d.year),
     origin: 'new orleans'
   }))
@@ -228,83 +229,6 @@ const combined_data = [
 
 ```
 
-
-```js
-function percentageYearsChart(data) {
-  return Plot.plot({
-    title: `Percentage of performances per year of works by ${author},${start_date.getUTCFullYear()} - ${end_date.getFullYear()}`,
-    fx: { padding: 0, label: null },
-    x: { axis: null, paddingOuter: 0.2 },
-    y: { grid: true, label: "Percentage" },
-    color: {
-      domain: Object.keys(color_map),
-      range: Object.values(color_map),
-      tickFormat: d => name_map[d] || d,
-      legend: true
-    },
-    width: window.innerWidth,
-    height: 500,
-    marks: [
-      Plot.barY(data, {x: "origin", y: "percentage", fx: "year", fill: "origin", tip: true}),
-      Plot.ruleY([0])
-    ]
-  });
-}
-
-```
-
-```js
-const paris = {latitude: 48.856667, longitude: 2.352222}
-const copenhagen = {latitude: 55.676111, longitude: 12.568333}
-const amsterdam = {latitude: 52.372778, longitude: 4.893611}
-```
-
-```js
-const world = FileAttachment("data/countries-110m.json").json()
-```
-
-```js
-const circle = d3.geoCircle().center([7, 50]).radius(10).precision(2)()
-const land = topojson.feature(world, world.objects.land)
-```
-
-```js
-function mapPlot(data) {
-  return Plot.plot({
-    title: `Total number of performances of works by ${author},${start_date.getUTCFullYear()} - ${end_date.getFullYear()}`,
-    width: window.innerWidth,
-    height: 450,
-    projection: {
-      type: "azimuthal-equidistant",
-      rotate: [-7, -50],
-      domain: circle,
-      inset: 10
-    },
-    marks: [
-      Plot.graticule(),
-      Plot.geo(land, {fill: "currentColor", fillOpacity: 0.3}),
-      Plot.dot(data, {
-        x: "longitude",
-        y: "latitude",
-        r: "count",
-        stroke: d => color_map[d.origin],
-        fill: d => color_map[d.origin],
-        fillOpacity: 0.8,
-        channels: {Location: d => name_map[d.origin] || d.origin},
-        tip: {
-          format: {
-            x: false,
-            y: false,
-            Location: true,
-            count: true,
-          }
-        }
-      }),
-      Plot.frame()
-    ]
-  })
-}
-```
 
 ```js
 function processPerformanceGenres(fullData, comedyData, dramaData, tragedyData, balletData, origin) {
@@ -356,145 +280,6 @@ function genreLegend() {
 }
 ```
 
-```js
-function divergentPlot() {
-  return Plot.plot({
-    title: `Diverging Genre Performance Chart (${start_date.getUTCFullYear()} - ${end_date.getFullYear()})`,
-    width: window.innerWidth,
-    height: 700,
-    x: {
-      label: "Number of Performances",
-      tickFormat: Math.abs
-    },
-    y: {
-      label: "Year",
-      reverse: true,
-      tickFormat: d => String(d)
-    },
-    color: {
-      domain: [
-        "danish-comedy", "danish-drama", "danish-ballet", "danish-other",
-        "french-comedy", "french-drama", "french-ballet", "french-other"
-      ],
-      range: ["#fca5a5", "#fb7185", "#ef4444", "#a3a3a3", "#93c5fd", "#60a5fa", "#3b82f6", "#6b7280"]
-    },
-
-    marks: [
-      // 左侧（丹麦）：堆叠柱状图（负数）
-      Plot.barX(
-        danish_summary.flatMap(d => {
-          const parts = [];
-          let x = 0;
-          for (const type of ["comedy", "drama", "ballet", "other"]) {
-            const value = d[type];
-            parts.push({
-              year: d.year,
-              x1: -x,
-              x2: -(x + value),
-              type,
-              origin: "danish",
-              percent: `${Math.round(d.percent[type] * 100)}%`
-            });
-            x += value;
-          }
-          return parts;
-        }),
-        {
-          x1: "x1",
-          x2: "x2",
-          y: "year",
-          fill: d => `${d.origin}-${d.type}`
-        }
-      ),
-
-      // 右侧（法国）：堆叠柱状图（正数）
-      Plot.barX(
-        french_summary.flatMap(d => {
-          const parts = [];
-          let x = 0;
-          for (const type of ["comedy", "drama", "ballet", "other"]) {
-            const value = d[type];
-            parts.push({
-              year: d.year,
-              x1: x,
-              x2: x + value,
-              type,
-              origin: "french",
-              percent: `${Math.round(d.percent[type] * 100)}%`
-            });
-            x += value;
-          }
-          return parts;
-        }),
-        {
-          x1: "x1",
-          x2: "x2",
-          y: "year",
-          fill: d => `${d.origin}-${d.type}`
-        }
-      ),
-
-      // 中心线
-      Plot.ruleX([0]),
-
-      // 百分比文字标签（丹麦）
-      Plot.text(
-        danish_summary.flatMap(d => {
-          const labels = [];
-          let x = 0;
-          for (const type of ["comedy", "drama", "ballet", "other"]) {
-            const value = d[type];
-            if (value > 0) {
-              labels.push({
-                year: d.year,
-                x: -(x + value / 2),
-                text: `${Math.round(d.percent[type] * 100)}%`
-              });
-            }
-            x += value;
-          }
-          return labels;
-        }),
-        {
-          x: "x",
-          y: "year",
-          text: "text",
-          fill: "black",
-          textAnchor: "middle"
-        }
-      ),
-
-      // 百分比文字标签（法国）
-      Plot.text(
-        french_summary.flatMap(d => {
-          const labels = [];
-          let x = 0;
-          for (const type of ["comedy", "drama", "ballet", "other"]) {
-            const value = d[type];
-            if (value > 0) {
-              labels.push({
-                year: d.year,
-                x: x + value / 2,
-                text: `${Math.round(d.percent[type] * 100)}%`
-              });
-            }
-            x += value;
-          }
-          return labels;
-        }),
-        {
-          x: "x",
-          y: "year",
-          text: "text",
-          fill: "black",
-          textAnchor: "middle"
-        }
-      )
-    ]
-  })
-}
-```
-
 <div>
 
 <!-- toggle to go to visualizations -->
@@ -526,8 +311,6 @@ const vizLabelById = {
 const opt = [
   "Over Time",
   "Heat Map",
-  // "Diverging Genres",
-  // "By Author",
   "Days with Performances",
   "Author Share",
   "Author Bubble",
@@ -603,7 +386,7 @@ import { rangeInput } from "./components/range_input.js";
 
 ```js
   const start_date_input = Inputs.date({label: "Start", value: "1748-01-01"})
-  const end_date_input = Inputs.date({label: "End", value: "1798-12-31"})
+  const end_date_input = Inputs.date({label: "End", value: "1815-12-31"})
   const date_range = rangeInput({
     min: 1748,
     max: 1815,
@@ -627,16 +410,16 @@ import { rangeInput } from "./components/range_input.js";
     : (display(html`<span hidden></span>`), new Date(`${date_range_val[1]}-12-31`));
 
 
-  const randomDates = () =>  {
-    const start = new Date("1748-01-01");
-    const end = new Date("1798-12-31"); // was 1778-12-31 before
-    const new_start = new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
-    const new_end = new Date(new_start.getTime() + Math.random() * (end.getTime() - new_start.getTime()));
-    start_date_input.value = new_start;
-    end_date_input.value = new_end;
-    start_date_input.dispatchEvent(new Event("input"));
-    end_date_input.dispatchEvent(new Event("input"));
-  }
+  // const randomDates = () =>  {
+  //   const start = new Date("1748-01-01");
+  //   const end = new Date("1798-12-31"); // was 1778-12-31 before
+  //   const new_start = new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
+  //   const new_end = new Date(new_start.getTime() + Math.random() * (end.getTime() - new_start.getTime()));
+  //   start_date_input.value = new_start;
+  //   end_date_input.value = new_end;
+  //   start_date_input.dispatchEvent(new Event("input"));
+  //   end_date_input.dispatchEvent(new Event("input"));
+  // }
 
 
 ```
@@ -648,14 +431,12 @@ const reactiveOrigins = Inputs.input(["danish", "dutch", "french"]);
 const react = Generators.input(reactiveOrigins)
 
 ```
-```js
 
+```js
 const originsInput = Inputs.checkbox(originOptions, {
     label: !overTime? "Origin": "Origin (max 3)",
     value: reactiveOrigins,
     format:  d => html`<span class="cal-key"><span class="cal-dot" style="background:${color_map[d] || '#999'}"></span>${name_map[d] || d}</span>`,
-    // name_map[d] || d,
-    // disabled: ['new orleans']
     disabled: originOptions.filter((o) => (!overTime? false: (3 <= react.length) && !react.includes(o)))
   })
 const bindedInput = Inputs.bind(
@@ -664,13 +445,14 @@ const bindedInput = Inputs.bind(
 );
 const origins = activeFilters.origins ? view(originsInput) : (display(html`<span hidden></span>`), originOptions);
 
-const selectAll = Inputs.button("Select All");
-const clearAll = Inputs.button("Clear All");
+const toggleButtonContent = !overTime? [["Select All", v => v], ["Clear All", v => v]]: [["Clear All", v => v]];
+const toggleButtons = Inputs.button(toggleButtonContent);
 
-if(activeFilters.origins && !overTime){
-  view(selectAll);
-}
-view(clearAll);
+const selectAll = overTime? null: toggleButtons.firstElementChild;
+const clearAll = toggleButtons.lastElementChild;
+
+display(activeFilters.origins? toggleButtons: html`<span></span>`)
+
 
 function toggleAll(event, clear){
   if (!event.bubbles) return;
@@ -678,52 +460,12 @@ function toggleAll(event, clear){
   originsInput.dispatchEvent(new Event("input"));
 }
 
-clearAll.addEventListener
 clearAll.onclick = (event) => toggleAll(event, true);
-selectAll.onclick = (event) => toggleAll(event, false);
+if(!overTime)
+  selectAll.onclick = (event) => toggleAll(event, false);
 
-
-
-
-// const originsSelect = Inputs.toggle({label: "Select All", value: false})
-// const origins = activeFilters.origins
-//   ? view(originsInput)
-//   : (display(html`<span hidden></span>`), originOptions);
-// if (activeFilters.origins && !overTime) {
-//   view(originsSelect);
-// } else {
-//   display(html`<span hidden></span>`);
-// }
-
-// originsSelect.oninput = (event) => {
-//   if (!event.bubbles) return;
-//   if(originsSelect.value) {
-//     originsInput.value = originOptions;
-//   }
-//   else {
-//     originsInput.value = [];
-//   }
-
-//   originsInput.dispatchEvent(new Event("input"));
-// }
-
-// originsInput.oninput = (event) => {
-//   if(originsInput.value.length !== originOptions.length)  {
-//     originsSelect.value = false;
-//   } else {
-//     originsSelect.value = true;
-//   }
-// }
-
-// const randomOrigins = () => {
-//   const newValue = originOptions.filter(i => Math.round(Math.random()));
-//   originsInput.value = newValue;
-//   originsInput.dispatchEvent(new Event("input"));
-
-//   if(newValue.length === 3) originsSelect.value = true;
-//   else originsSelect.value = false;
-// }
 ```
+
 ```js
 // Calendar-specific controls only
 const modeIn       = Inputs.radio(["Month","Week","Day"], { label: "Calendar view", value: "Month" });
@@ -767,80 +509,6 @@ const nolaSelectedGenres = activeFilters.nolaGenres
 ```
 
 ```js
-const UNKNOWN_GENRE = "Unknown genre";
-const genreKey = (d) => d.genre || UNKNOWN_GENRE;
-
-const genreOptions = Array.from(new Set(
-  formatted_data
-    .filter(d => origins.includes(d.origin))
-    .map(genreKey)
-)).sort();
-
-
-const genreInput = Inputs.checkbox(
-  genreOptions,
-  {
-    label: "Select genre(s)",
-    value: genreOptions // default: all
-  }
-);
-
-const genreSelect = Inputs.toggle({label: "Select All", value: true})
-
-genreSelect.oninput = (event) => {
-  if(genreSelect.value) {
-    genreInput.value = genreOptions;
-  }
-  else {
-    genreInput.value = [];
-  }
-
-  genreInput.dispatchEvent(new Event("input"));
-}
-
-genreInput.oninput = (event) => {
-  if(genreInput.value.length !== genreOptions.length)  {
-    genreSelect.value = false;
-  } else {
-    genreSelect.value = true;
-  }
-}
-
-const genres = activeFilters.genres
-  ? view(genreInput)
-  : (display(html`<span hidden></span>`), genreOptions);
-if (activeFilters.genres && genreOptions.length > 0) {
-  view(genreSelect);
-} else {
-  display(html`<span hidden></span>`);
-}
-```
-
-```js
-const authorOptions = [
-    "No author",
-    ...Array.from(
-      new Set([
-        ...french.map((d) => d.author?.split(" ; ")).flat().filter(Boolean),
-        ...danish.flatMap((d) => d.author?.split(/[,;]\s*/)).filter(Boolean),
-        ...danish.map((d) => d.author?.split(/[,;]\s*/)).flat().filter(Boolean),
-        ...dutch.map((d) => d.author).filter(Boolean),
-        ...saintDomingue.map((d) => d.author).filter(Boolean),
-        ...london.map((d) => d.author).filter(Boolean)
-      ])
-    ).sort()
-];
-
-const authorInput = Inputs.select( authorOptions, { label: "Filter by author", value: "No author" })
-const author = 'No author';
-
-const randomAuthor = () => {
-  authorInput.value = authorOptions[Math.floor(Math.random() * authorOptions.length)];
-  authorInput.dispatchEvent(new Event("input"));
-}
-```
-
-```js
 const percent_absolute = Inputs.radio(["percentage", "absolute"], {label: "Mode", value: "percentage"});
 const percent_absolute_val = activeFilters.authorBubbleControls
   ? view(percent_absolute)
@@ -858,12 +526,12 @@ const threshold = rangeInput({
 display(bubble? html`<span style="margin-right: 1rem">Threshold</span>`:html`<span hidden></span>`)
 const threshold_val = bubble? view(threshold):display(html`<span hidden></span>`)
 ```
+```js
+const sideBySide = bubble? view(Inputs.toggle({label: "Side by Side View", value: false})): false
+```
 
 ```js
-const combinedHeatmap = Inputs.checkbox( [''], { label: "Combined Heat Map", value: "Combined Heat Map" })
-```
-```js
-const combinedHeatmapVal = heatMap? view(combinedHeatmap): false
+const combinedHeatmap = heatMap? view(Inputs.toggle({ label: "Combined Heat Map", value: true })):false
 ```
 
 </details>
@@ -875,22 +543,10 @@ const formatted_data = combined_data.filter(d => {
   const dt = asDate(d.date);
   return dt && dt > start_date && dt <= end_date && origins.includes(d.origin);
 });
-
-
-
-const yearsInView = Array.from(
-  new Set(formatted_data.map(d => +d.year).filter(Boolean))
-).sort((a, b) => a - b);
-
-
-yearsInView.slice(0,10).concat("...").concat(yearsInView.slice(-10))
-
 ```
 
 ```js
 function compareYearsChart(data) {
-  console.log('this is data')
-  console.log(data)
   const years = Array.from(new Set(data.map(d => d.year).filter(Boolean))).sort((a, b) => a - b);
   const n = years.length;
   const step =
@@ -930,7 +586,6 @@ function compareYearsChart(data) {
 ```
 
 ```js
-
 const unique_formatted_data = []
 for (const origin of originOptions){
   const dates = new Set()
@@ -941,13 +596,8 @@ for (const origin of originOptions){
     }
   }
 }
-// console.log('formatted data')
-// console.log(unique_formatted_data.filter(d=>d.origin=='new orleans'))
-// console.log(new_cv.length)
-// console.log(formatted_cv.length)
-// const full_formatted_data = unique_formatted_data.concat(new_stdmg).concat(new_cv.map(d => {d.origin = 'covent garden'; return d})).concat(new_dl.map(d => {d.origin = 'drury lane'; return d}));
+
 if (overTime) {
-  // display(html`<h2>Comparative Performances Over Time</h2>`);
   display(
     unique_formatted_data.length > 0
       ? html`<div class="full-bleed" id="french-graph-container">
@@ -958,10 +608,6 @@ if (overTime) {
 } else {
   display(html`<span hidden></span>`);
 }
-
-// if (divergingGenres) {
-  // display(html`<h2>Comparative Performance Genres Over Time</h2>`);
-// }
 
 ```
 
@@ -982,7 +628,7 @@ import {
 if (authorShare) {
   display(html`<div class="full-bleed">
     <h2>Author Performance Contribution Per Days</h2>
-    ${authorShareChart(author, unique_formatted_data, color_map, name_map)}
+    ${authorShareChart("No author", unique_formatted_data, color_map, name_map)}
   </div>`);
 } else {
   display(html`<span hidden></span>`)
@@ -1001,299 +647,46 @@ for(const loc of [combined_data.filter(d => d.origin == 'french'), combined_data
       return acc;
   }, {})))
 }
-console.log('maxes', maxes)
 ```
 
 
 ```js
 if(bubble){
+  const style = sideBySide? "display: grid; grid-template-columns: 50% 50%;": "";
+  const test = 'class="hiii"'
+  display(html`<div id="bubbleContainer" style=${style} ></div>`)
   for(const origin of origins){
-    display(bubble? html `<h2>${name_map[origin]}</h2>` : html`<div></div>`);
-    display(
-    bubble
-      ? authorBubble(
-          combined_data,
-          origin,
-          0,
-        threshold_val,
-          date_range_val[0],
-          date_range_val[1],
-          percent_absolute_val
-        )
-      : html`<div></div>`
-  );
+    const newDiv = document.createElement("div")
+    const title = document.createElement("h2");
+    title.innerHTML = name_map[origin]
+    const bubble = authorBubble(
+            combined_data,
+            origin,
+            0,
+          threshold_val,
+            date_range_val[0],
+            date_range_val[1],
+            percent_absolute_val
+          )
+    newDiv.appendChild(title);
+    newDiv.appendChild(bubble);
+
+    document.getElementById("bubbleContainer").appendChild(newDiv)
   }
 }
-```
-
-```js
-// display(bubble? html `<h2>Comédie-Française (Paris)</h2>` : html`<div></div>`);
-```
-
-```js
-// display(
-//    bubble
-//      ? authorBubble(
-//          combined_data,
-//         "french",
-//         0,
-//        french_threshold_val,
-//         date_range_val[0],
-//          date_range_val[1],
-//          percent_absolute_val
-//        )
-//      : html`<div></div>`
-//  );
-```
-
-```js
-
-// display(bubble? html `<h2>Schouwburg Theater (Amsterdam)</h2>` : html`<div></div>`);
-// display(bubble&&!do_overall_threshold_val? html`<p>Threshold Range</p>`:html`<div></div>`);
-// const dutch_threshold = rangeInput({
-//   min: 0,
-//   max: percent_absolute_val=="percentage"?100:maxes.dutch,
-//   step: 1,
-//   value: [0, percent_absolute_val=="percentage"?100:maxes.dutch],
-//   enableTextInput: true
-// });
-// const dutch_threshold_val = bubble? (do_overall_threshold_val?overall_threshold_val:view(dutch_threshold)):[0,0];
-
-
-```
-
-```js
-// display(bubble? authorBubble(combined_data, 'dutch', 0, dutch_threshold_val, date_range_val[0], date_range_val[1], percent_absolute_val): html`<div></div>`);
-```
-
-```js
-// display(bubble? html `<h2>Saint-Domingue (All Theaters)</h2>` : html`<div></div>`)
-// display(bubble&&!do_overall_threshold_val? html`<p>Threshold Range</p>`:html`<div></div>`);
-// const stdmg_threshold = rangeInput({
-//   min: 0,
-//   max: percent_absolute_val=="percentage"?100:maxes['saint-domingue'],
-//   step: 1,
-//   value: [0, percent_absolute_val=="percentage"?100:maxes['saint-domingue']],
-//   enableTextInput: true
-// });
-// const stdmg_threshold_val = bubble? (do_overall_threshold_val?overall_threshold_val:view(stdmg_threshold)):[0,0];
-// display(bubble? html`<p>Year Range</p>`:html`<div></div>`);
-
-
-```
-
-```js
-// display(bubble? authorBubble(saintDomingue, 'saint-domingue', 0, stdmg_threshold_val, date_range_val[0], date_range_val[1], percent_absolute_val): html`<div></div>`);
-```
-
-```js
-// display(bubble? html `<h2>Covent Garden (London)</h2>` : html`<div></div>`)
-// display(bubble&&!do_overall_threshold_val? html`<p>Threshold Range</p>`:html`<div></div>`);
-// const cv_threshold = rangeInput({
-//   min: 0,
-//   max: percent_absolute_val=="percentage"?100:maxes['covent garden'],
-//   step: 1,
-//   value: [0, percent_absolute_val=="percentage"?100:maxes['covent garden']],
-//   enableTextInput: true
-// });
-// const cv_threshold_val = bubble? (do_overall_threshold_val?overall_threshold_val:view(cv_threshold)):[0,0];
-
-
-
-```
-
-```js
-// display(bubble? authorBubble(coventGarden, 'covent garden', 0, cv_threshold_val, date_range_val[0], date_range_val[1], percent_absolute_val): html`<div></div>`);
-```
-
-```js
-// display(bubble? html `<h2>Drury Lane (London)</h2>` : html`<div></div>`)
-// display(bubble&&!do_overall_threshold_val? html`<p>Threshold Range</p>`:html`<div></div>`);
-// const dl_threshold = rangeInput({
-//   min: 0,
-//   max: percent_absolute_val=="percentage"?100:maxes['drury lane'],
-//   step: 1,
-//   value: [0, percent_absolute_val=="percentage"?100:maxes['drury lane']],
-//   enableTextInput: true
-// });
-// const dl_threshold_val = bubble? (do_overall_threshold_val?overall_threshold_val:view(dl_threshold)):[0,0];
-
-
-```
-
-```js
-// display(bubble? authorBubble(druryLane, 'drury lane', 0, dl_threshold_val, date_range_val[0], date_range_val[1], percent_absolute_val): html`<div></div>`);
 ```
 
 
 </div>
 
 ```js
-const danish_comedy = danish.filter( (d) =>
-  d.genre && (d.genre.toLowerCase().includes("comed") || d.genre.toLowerCase().includes("coméd"))
-).filter(d => (new Date(d.date) > start_date) && (new Date(d.date)));
-
-const french_comedy = french.filter(d => d.genre === "comédie").filter(d => (new Date(d.date) > start_date) && (new Date(d.date)));
-
-// filter out french tragedy, ballet and drama genres
-const french_tragedy = french.filter(
-  (d) => d.genre && (d.genre.toLowerCase().includes("tragédie"))
-).filter(d => (new Date(d.date) > start_date) && (new Date(d.date)));
-
-const french_ballet = french.filter(
-  (d) =>
-    d.genre &&
-    (d.genre.toLowerCase().includes("ballet"))
-).filter(d => (new Date(d.date) > start_date) && (new Date(d.date)));
-
-const french_drama = french.filter(
-  (d) =>
-    d.genre &&
-    (d.genre.toLowerCase().includes("drame"))).filter(d => (new Date(d.date) > start_date) && (new Date(d.date)));
-
-// filter out danish tragedy, ballet and drama genres
-const danish_tragedy = danish.filter(
-  (d) =>
-    d.genre &&
-    (d.genre.toLowerCase().includes("tragedia per musica") ||
-      d.genre.toLowerCase().includes("tragedy"))
-).filter(d => (new Date(d.date) > start_date) && (new Date(d.date)));
-
-const danish_ballet = danish.filter(
-  (d) =>
-    d.genre &&
-    (d.genre.toLowerCase().includes("ballet") ||
-      d.genre.toLowerCase().includes("ballet,ballet")||
-      d.genre.toLowerCase().includes("ballet,ballet,ballet"))
-).filter(d => (new Date(d.date) > start_date) && (new Date(d.date)));
-
-const danish_drama = danish.filter(
-  (d) =>
-    d.genre &&
-    (d.genre.toLowerCase().includes("drama") ||
-      d.genre.toLowerCase().includes("dramma giocoso per musica") ||
-      d.genre.toLowerCase().includes("dramma pastorale")||
-      d.genre.toLowerCase().includes("dramma per musica"))
-).filter(d => (new Date(d.date) > start_date) && (new Date(d.date)));
-```
-
-```js
-const danish_filtered_data = danish.filter(d => {
-  const dt = asDate(d.date);
-  return dt && dt > start_date && dt <= end_date;
-});
-const french_filtered_data = french.filter(d => {
-  const dt = asDate(d.date);
-  return dt && dt > start_date && dt <= end_date;
-});
-
-const danish_summary = processPerformanceGenres(danish_filtered_data, danish_comedy, danish_drama, danish_tragedy, danish_ballet, "danish");
-const french_summary = processPerformanceGenres(french_filtered_data, french_comedy, french_drama, french_tragedy, french_ballet, "french");
-```
-
-```js
-// display(divergingGenres ? genreLegend() : html`<div></div>`);
-```
-
-```js
-// display(divergingGenres
-//   ? ((danish_filtered_data.length > 0 && french_filtered_data.length > 0)
-//       ? html`<div class="full-bleed">${divergentPlot()}</div>`
-//       : html`<i>No data.</i>`)
-//   : html`<div></div>`
-// )
-
-```
-
-```js
-// Apply filter
-const author_filtered_data =
-  author === "No author selected" ? undefined : formatted_data.filter((d) => d.author === author || d.author?.includes(author));
-```
-
-```js
-const author_data_combined = author_filtered_data ? author_filtered_data .map((d, i, arr) => {
-    const total = combined_data.filter(f => f.year === d.year && f.origin === d.origin).reduce((a, b) => a + 1, 0);
-    const author = arr.filter(f => f.year === d.year && f.origin === d.origin).reduce((a, b) => a + 1, 0);
-    return {year: d.year, origin: d.origin, percentage: (author / total) };
-  }) : undefined;
-
-const author_data = Array.from(new Set(author_data_combined?.map(JSON.stringify))).map(JSON.parse);
-```
-
-```js
-const author_counts = author_filtered_data ? Object.entries(author_filtered_data.reduce((acc, d) => {
-  acc[d.origin] = (acc[d.origin] || 0) + 1;
-  return acc;
-}, {})).map(([origin, count]) => {
-  const coordinates = {
-    "danish": copenhagen,
-    "dutch": amsterdam,
-    "french": paris,
-    "covent garden": {latitude: 51.5072, longitude: -0.14}, // London, slightly offset left
-    "drury lane": {latitude: 51.5072, longitude: -0.11},    // London, slightly offset right
-    "saint-domingue": {latitude: 18.9, longitude: -72.2},
-    "teatro de la cruz": {latitude: 40.4168, longitude: -3.7038},
-    "teatro del principe": {latitude: 40.4168, longitude: -3.7038},
-    "new orleans": {latitude: 29.9511, longitude: -90.0715}
-  }[origin] || {latitude: 0, longitude: 0};
-  return { origin, count, ...coordinates };
-}) : undefined;
-```
-
-```js
-// display(byAuthor ? html `<h2>Performances by Author</h2>` : html`<div></div>`)
-```
-
-```js
-// display(byAuthor ? html `<h3>Percentage by Author</h3>` : html`<div></div>`)
-```
-
-```js
-// display(byAuthor
-//   ? (author_data.length > 0
-//       ? html`<div class="full-bleed">
-//           ${percentageYearsChart(author_data)}
-//         </div>`
-//       : html`<i>No data.</i>`)
-//   : html`<div></div>`
-// )
-
-```
-
-```js
-// display(byAuthor ? html `<h3>Percentage by Location</h3>` : html`<div></div>`)
-```
-
-```js
-// display(byAuthor
-//   ? (author_counts
-//       ? html`<div class="full-bleed">
-//           ${mapPlot(author_counts)}
-//         </div>`
-//       : html`<i>No data.</i>`)
-//   : html`<div></div>`
-// )
-
-```
-
-```js
-// display(performanceDays ? html `<h2>Animated Line Chart of Days with Performances</h2>` : html`<div></div>`)
-display(html`<span hidden></span>`)
-```
-
-```js
-const genre_data =
-  genres.length === 0 || genres.length === genreOptions.length
-    ? formatted_data
-    : formatted_data.filter((d) => genres.includes(genreKey(d)));
+const genre_data = formatted_data
 ```
 
 <div class="full-bleed days-grid">
   <div id="line-chart-container"></div>
   <div id="heatmap-container"></div>
 </div>
-
 
 ```js
 import {
@@ -1362,10 +755,8 @@ if (origins.length > 0 && performanceDays) {
 ```
 </div>
 
-
-
 ```js
-if(heatMap && combinedHeatmapVal.includes('')){
+if(heatMap && combinedHeatmap){
   display(html `<h2>Combined Heat Map</h2>`)
 
   display(origins.length > 0? createHeatmap(genre_data, { width: containerWidth, height: containerHeight }) : html`<i>No data.</i>`)
@@ -1374,7 +765,7 @@ if(heatMap){
   for(const origin of origins){
     display(html `<h2>${name_map[origin]}</h2>`)
     const data = formatted_data.filter(d=>d.origin===origin);
-
+    if(origin == 'new orleans') display(data)
     display(data.length > 0? createHeatmap(data, { width: containerWidth, height: containerHeight }) : html`<i>No data.</i>`)
   }
 }
@@ -1382,15 +773,8 @@ if(heatMap){
 
 ```
 
-
-
 ```js
 // Heading for the calendar section – only when calendar viz is active
-// display(
-//   calendar
-//     ? html`<h2>Global Theatre Calendar (1748 – 1798)</h2>`
-//     : html`<div></div>`
-// );
 
 import { injectCalendarStyles, buildEvents, renderCalendar, ORIGIN_COLOR } from "./components/calendar.js";
 
@@ -1512,7 +896,7 @@ const nolaGenres = await FileAttachment("data/new_orleans/genre_two_level_FIXED.
 const CAP_NON_NOLA = Date.UTC(1799, 11, 31);
 const CAP          = Date.UTC(1812, 11, 31);  // global max
 
-const allRows = [
+const allRowsUnfiltered = [
   ...Danish.filter(d => d.date <= CAP_NON_NOLA),
   ...French.filter(d => d.date <= CAP_NON_NOLA),
   ...Dutch.filter(d => d.date <= CAP_NON_NOLA),
@@ -1521,6 +905,8 @@ const allRows = [
   ...DruryLane.filter(d => d.date <= CAP_NON_NOLA),
   ...nola.filter(d => d.date <= CAP)          // NOLA up to 1812
 ];
+const allRows = allRowsUnfiltered.filter(d=> origins.includes(d.origin))
+
 
 // Color map + legend colors (keys match origin values now)
 const COLOR = new Map([
@@ -1550,37 +936,6 @@ if (calendar) {
   display(html`<span hidden></span>`);
 }
 
-// ==============================
-// 5) Controls and mount points
-//    👉 uses global start_date / end_date / origins
-// ==============================
-
-// // Calendar-specific controls only
-// const modeIn       = Inputs.radio(["Month","Week","Day"], { label: "Calendar view", value: "Month" });
-// const overlayIn    = Inputs.toggle({ label: "Overlay major events", value: true });
-// const anchorIn     = Inputs.date({ label: "Date displayed", value: start_date });
-// const includeNola  = Inputs.toggle({ label: "Include New Orleans (NOLA)", value: true });
-
-// const nav = html`<div style="display:flex; gap:.5rem; align-items:center; margin:.25rem 0;">
-//   <button id="prev">◀ Prev</button><button id="next">Next ▶</button>
-// </div>`;
-
-// // Dedicated mount nodes so we *replace* contents instead of appending
-// const venuesMount = html`<div id="venues-mount"></div>`;
-// const legendMount = html`<div id="legend-mount"></div>`;
-
-// // Only render the controls card if calendar viz is active
-// if (calendar) {
-//   display(html`<div class="card" style="padding:.6rem; margin:.6rem 0;">
-//     <div style="display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:.6rem;">
-//       <div>${anchorIn}</div><div>${nav}</div>
-//       <div>${modeIn}</div><div>${overlayIn}</div>
-//       <div style="grid-column:1/-1">${includeNola}</div>
-//       <div style="grid-column:1/-1">${venuesMount}</div>
-//       <div style="grid-column:1/-1">${legendMount}</div>
-//     </div>
-//   </div>`);
-// }
 
 // ==============================
 // 6) Imperative render with global filters
