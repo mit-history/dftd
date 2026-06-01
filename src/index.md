@@ -433,40 +433,6 @@ const react = Generators.input(reactiveOrigins)
 ```
 
 ```js
-const originsInput = Inputs.checkbox(originOptions, {
-    label: !overTime? "Origin": "Origin (max 3)",
-    value: reactiveOrigins,
-    format:  d => html`<span class="cal-key"><span class="cal-dot" style="background:${color_map[d] || '#999'}"></span>${name_map[d] || d}</span>`,
-    disabled: originOptions.filter((o) => (!overTime? false: (3 <= react.length) && !react.includes(o)))
-  })
-const bindedInput = Inputs.bind(
-  originsInput,
-  reactiveOrigins
-);
-const origins = activeFilters.origins ? view(originsInput) : (display(html`<span hidden></span>`), originOptions);
-
-const toggleButtonContent = !overTime? [["Select All", v => v], ["Clear All", v => v]]: [["Clear All", v => v]];
-const toggleButtons = Inputs.button(toggleButtonContent);
-
-const selectAll = overTime? null: toggleButtons.firstElementChild;
-const clearAll = toggleButtons.lastElementChild;
-
-display(activeFilters.origins? toggleButtons: html`<span></span>`)
-
-
-function toggleAll(event, clear){
-  if (!event.bubbles) return;
-  originsInput.value = clear? []: originOptions;
-  originsInput.dispatchEvent(new Event("input"));
-}
-
-clearAll.onclick = (event) => toggleAll(event, true);
-if(!overTime)
-  selectAll.onclick = (event) => toggleAll(event, false);
-
-```
-
-```js
 // Calendar-specific controls only
 const modeIn       = Inputs.radio(["Month","Week","Day"], { label: "Calendar view", value: "Month" });
 const overlayIn    = Inputs.toggle({ label: "Overlay major events", value: true });
@@ -507,6 +473,42 @@ const nolaSelectedGenres = activeFilters.nolaGenres
   ? view(nolaGenreInput)
   : (display(html`<span hidden></span>`), nolaMainGenres);
 ```
+
+
+```js
+const originsInput = Inputs.checkbox(originOptions, {
+    label: !overTime? "Origin": "Origin (max 3)",
+    value: reactiveOrigins,
+    format:  d => html`<span class="cal-key"><span class="cal-dot" style="background:${color_map[d] || '#999'}"></span>${name_map[d] || d}</span>`,
+    disabled: originOptions.filter((o) => (!overTime? false: (3 <= react.length) && !react.includes(o)))
+  })
+const bindedInput = Inputs.bind(
+  originsInput,
+  reactiveOrigins
+);
+const origins = activeFilters.origins ? view(originsInput) : (display(html`<span hidden></span>`), originOptions);
+
+const toggleButtonContent = !overTime? [["Select All", v => v], ["Clear All", v => v]]: [["Clear All", v => v]];
+const toggleButtons = Inputs.button(toggleButtonContent);
+
+const selectAll = overTime? null: toggleButtons.firstElementChild;
+const clearAll = toggleButtons.lastElementChild;
+
+display(activeFilters.origins? toggleButtons: html`<span></span>`)
+
+
+function toggleAll(event, clear){
+  if (!event.bubbles) return;
+  originsInput.value = clear? []: originOptions;
+  originsInput.dispatchEvent(new Event("input"));
+}
+
+clearAll.onclick = (event) => toggleAll(event, true);
+if(!overTime)
+  selectAll.onclick = (event) => toggleAll(event, false);
+
+```
+
 
 ```js
 const percent_absolute = Inputs.radio(["percentage", "absolute"], {label: "Mode", value: "percentage"});
@@ -641,14 +643,17 @@ import { BubbleChart, authorBubble } from "./components/bubble_chart.js";
 
 ```js
 const maxes = {}
-for(const loc of [combined_data.filter(d => d.origin == 'french'), combined_data.filter(d => d.origin == 'dutch'), coventGarden, druryLane, saintDomingue]){
+for(const loc of Object.values(combined_data.reduce((acc, d) => {
+  if (!acc[d.origin]) acc[d.origin] = []
+  acc[d.origin].push(d)
+  return acc
+}, {}))){
   maxes[loc[0].origin] = Math.max(...Object.values(loc.reduce((acc, d) => {
       acc[d.author] = (acc[d.author] || 0) + 1;
       return acc;
   }, {})))
 }
 ```
-
 
 ```js
 if(bubble){
@@ -765,7 +770,6 @@ if(heatMap){
   for(const origin of origins){
     display(html `<h2>${name_map[origin]}</h2>`)
     const data = formatted_data.filter(d=>d.origin===origin);
-    if(origin == 'new orleans') display(data)
     display(data.length > 0? createHeatmap(data, { width: containerWidth, height: containerHeight }) : html`<i>No data.</i>`)
   }
 }
@@ -806,7 +810,7 @@ const Danish = DanishRaw.map((perf, i) => {
   return {
     id: typeof perf.id === "string" ? perf.id : `Danish-${i}`,
     date: d, year: d ? d.getUTCFullYear() : null,
-    title: titleFromWorks || perf.formatted_title.slice(0, perf.formatted_title.indexOf(' by The Royal Danish')) || perf.production?.formatted_title.slice(0, perf.formatted_title.indexOf(' by The Royal Danish')) || "Untitled",
+    title: titleFromWorks || perf.formatted_title.slice(0, perf.formatted_title.indexOf(' by The Royal Danish')).slice(0, perf.formatted_title.indexOf(' by Italian')) || perf.production?.formatted_title.slice(0, perf.formatted_title.indexOf(' by The Royal Danish')).slice(0, perf.formatted_title.indexOf(' by Italian')) || "Untitled",
     origin: "danish",
     theater: perf.place?.name ?? perf.theater ?? perf.venue ?? "Unknown venue",
     city: perf.place?.name ?? null
@@ -971,7 +975,7 @@ const initialOriginsList = includeNola.value
 
 let venuesIn = buildVenuesInput(capDate(start_date), capDate(end_date), initialOriginsList);
 if (calendar) {
-  venuesMount.replaceChildren(venuesIn);
+  venuesMount.replaceChildren(); //to readd venues mount, add venuesIn here
 } else {
   venuesMount.replaceChildren();
   legendMount.replaceChildren();
