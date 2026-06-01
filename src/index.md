@@ -500,7 +500,7 @@ display(activeFilters.origins? toggleButtons: html`<span></span>`)
 function toggleAll(event, clear){
   if (!event.bubbles) return;
   originsInput.value = clear? []: originOptions;
-  originsInput.dispatchEvent(new Event("input"));
+  originsInput.dispatchEvent(new Event("input", { bubbles: true }));
 }
 
 clearAll.onclick = (event) => toggleAll(event, true);
