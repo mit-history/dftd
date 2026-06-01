@@ -5,8 +5,30 @@
 <script>
   const baseNotebookUrl = "https://transnationalstages.net/data";
   const notebookUrl = `${baseNotebookUrl}?viz=authorShare`;
+  
+  let showPopup = true;
 </script>
 
+{#if showPopup}
+  <!-- svelte-ignore a11y-click-events-have-key-events -->
+  <!-- svelte-ignore a11y-no-static-element-interactions -->
+  <div 
+    id="author-share-popup" 
+    style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.5); z-index: 9999; display: flex; align-items: center; justify-content: center; cursor: pointer;" 
+    on:click={() => showPopup = false}
+  >
+    <div style="max-width: 700px; width: 90%; background: #fdfd96; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); display: flex; align-items: center; justify-content: center; flex-direction: column; padding: 2rem;">
+      <h3 style="margin: 0 0 1rem 0; color: #333;">
+        We have not yet standardized the names of playwrights who appear in more than one of our datasets.
+        But you can use this tool to visualize the presence of an author in multiple venues.
+        As an example, type in the name of Shakespeare, Molière, Voltaire, Mercier, or Holberg in the "Search and add author" bar.
+        Add all spellings of the author's name that appear up to a total of three, and the graph
+        will display performances of the author's plays in multiple datasets.
+      </h3>
+      <p style="margin: 0; color: #666; text-align: center;">Click anywhere to dismiss</p>
+    </div>  
+  </div>
+{/if}
 
 
 <main class="viz-page">
