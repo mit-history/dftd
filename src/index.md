@@ -810,7 +810,7 @@ const Danish = DanishRaw.map((perf, i) => {
   return {
     id: typeof perf.id === "string" ? perf.id : `Danish-${i}`,
     date: d, year: d ? d.getUTCFullYear() : null,
-    title: titleFromWorks || perf.formatted_title.slice(0, perf.formatted_title.indexOf(' by The Royal Danish')).slice(0, perf.formatted_title.indexOf(' by Italian')) || perf.production?.formatted_title.slice(0, perf.formatted_title.indexOf(' by The Royal Danish')).slice(0, perf.formatted_title.indexOf(' by Italian')) || "Untitled",
+    title: titleFromWorks || perf.formatted_title.slice(0, perf.formatted_title.indexOf('by The Royal Danish')).slice(0, perf.formatted_title.indexOf('by Italian')) || perf.production?.formatted_title.slice(0, perf.formatted_title.indexOf('by The Royal Danish')).slice(0, perf.formatted_title.indexOf('by Italian')) || "Untitled",
     origin: "danish",
     theater: perf.place?.name ?? perf.theater ?? perf.venue ?? "Unknown venue",
     city: perf.place?.name ?? null
