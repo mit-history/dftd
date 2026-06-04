@@ -23,7 +23,7 @@ Papa.parse(csvFile, {
         entry['year'] = Number(date.slice(0, 4));
 
         for (const key in entry){
-            if (entry[key] == 'NULL')
+            if (entry[key] == 'NULL' || entry[key] == 'ull]')
                 entry[key] = null;
         }
         return entry
