@@ -26,6 +26,8 @@ jobs:
           cache: npm
       - run: npm install
       - run: npm run build
+        env:
+          TIMELINE_OVERRIDES: ${{ vars.TIMELINE_OVERRIDES }}
       - uses: actions/configure-pages@v4
       - uses: actions/upload-pages-artifact@v3
         with:

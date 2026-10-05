@@ -7,6 +7,9 @@
     "build": "npm install && vite build",
     "preview": "vite preview"
   },
+  "dependencies": {
+    "d3-dsv": "^3.0.1"
+  },
   "devDependencies": {
     "@sveltejs/adapter-auto": "^6.0.0",
     "@sveltejs/adapter-static": "^3.0.8",

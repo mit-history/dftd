@@ -1,61 +1,61 @@
 <script>
   import { base } from '$app/paths';
+  import { yearTicks } from './year-ticks.js';
+  export let data;
 
   const projects = [
     {
       name: 'Schouwburg Theater (Amsterdam)',
       link: 'https://www.vondel.humanities.uva.nl/onstage/',
-      ranges: [{ start: 1748, end: 1798 }],
+      ranges: data.ranges.dutch ? [data.ranges.dutch] : [],
       color: '#EFB119'
     },
     {
       name: 'Comédie-Française (Paris)',
       link: 'https://www.cfregisters.org/#!/',
-      ranges: [
-        { start: 1748, end: 1793 }],
+      ranges: [data.ranges.french],
       color: '#FF725C'
     },
     {
       name: 'Royal Danish Theater (Copenhagen)',
       link: 'https://artex.au.dk/',
-      ranges: [
-        { start: 1748, end: 1798 }],
+      ranges: data.ranges.danish ? [data.ranges.danish] : [],
       color: '#4269D0'
     },
     {
       name: 'Covent Garden (London)',
       // link: '',
-      ranges: [{ start: 1766, end: 1800 }],
+      ranges: data.ranges.coventGarden ? [data.ranges.coventGarden] : [],
       color: '#4DA011'
     },
     {
       name: 'Drury Lane (London)',
       // link: '',
-      ranges: [{ start: 1766, end: 1800 }],
+      ranges: data.ranges.druryLane ? [data.ranges.druryLane] : [],
       color: '#DF789A'
     },
     {
       name: 'Teatro de la Cruz (Madrid)',
       // link: '',
-      ranges: [{ start: 1748, end: 1790 }],
+      ranges: [data.ranges.madridCruz],
       color: '#97BBF5'
     },
     {
       name: 'Teatro de la Principe (Madrid)',
       // link: '',
-      ranges: [{ start: 1748, end: 1790 }],
+      ranges: [data.ranges.madridPrincipe],
       color: '#9C6B4E'
     },
     {
       name: 'Saint-Domingue (All theaters)',
       link: 'https://www.theatreinsaintdomingue.org/',
-      ranges: [{ start: 1764, end: 1791 }],
+      ranges: data.ranges.saintDomingue ? [data.ranges.saintDomingue] : [],
       color: '#6BC5B0'
     },
     {
       name: 'New Orleans (All theaters)',
       // link: '',
-      ranges: [{ start: 1805, end: 1812 }],
+      ranges: data.ranges.newOrleans ? [data.ranges.newOrleans] : [],
       color: '#A855F7'
     },
   ];
@@ -66,11 +66,11 @@
   const earliestYear = Math.min(...allStarts);
   const latestYear = Math.max(...allEnds);
 
-  const minYear = 1740;
-  // const minYear = Math.floor(earliestYear / 5) * 5;
-  const maxYear = 1815;
-  // const maxYear = Math.ceil(latestYear / 5) * 5 + 5;
+  const minYear = data.axisOverrides.start ?? Math.floor(earliestYear / 5) * 5;
+  const maxYear = data.axisOverrides.end ?? Math.ceil(latestYear / 5) * 5 + 5;
   const yearRange = maxYear - minYear;
+  let timelineWidth = 600;
+  $: ticks = yearTicks(minYear, maxYear, timelineWidth);
 </script>
 
 <svelte:head>
@@ -89,14 +89,12 @@
 
   <section class="timeline-section">
     <p class="intro-text">
-      The timelines below indicate the current chronology of the data available in our visualizations for each theatrical venue listed, as of Spring 2026.
-      In the future we plan to add data from the late seventeenth century to the mid-eighteenth century, to provide a fuller picture of theatrical activity in
-      these locations during the 1700s.
+      The timelines below indicate the date ranges of the local datasets for each theatrical venue listed.
     </p>
 
     <div class="timeline-container">
-      <div class="year-labels">
-        {#each Array.from({ length: Math.floor((maxYear - minYear) / 15) + 1 }, (_, i) => minYear + i * 15) as year}
+      <div class="year-labels" bind:clientWidth={timelineWidth}>
+        {#each ticks as year}
           <div class="year" style="left: {(year - minYear) / yearRange * 100}%">
             {year}
             <div class="vertical-line" style="height: calc(2rem + {projects.length * 50}px);"></div>
