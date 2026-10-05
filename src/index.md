@@ -5,11 +5,11 @@ toc: false
 
 ```js
 const french = await FileAttachment("data/french-performances.json").json();
-console.log('lengths')
 const french_dates = new Set(french.filter(d=> d.year === 1775).map(d=> d.date))
 const dutch = await FileAttachment("data/dutch-performances.csv").csv({typed: true});
 const saintDomingue = await FileAttachment("data/saint_domingue/formatted_saint_domingue.json").json();
 const london = await FileAttachment('data/london/formatted_london.json').json()
+
 const coventGarden = london.filter(d => d.place == "Covent Garden").map(d =>{
   d.origin = 'covent garden';
   d.author = d.author||'unknown'
@@ -21,6 +21,17 @@ const druryLane = london.filter(d => d.place == "Drury Lane").map(d =>{
   return d;
 });
 const newOrleans = await FileAttachment("data/new_orleans/new_o_frequent_performances.csv").csv({typed: false});
+const madrid = await FileAttachment("data/madrid-performances.json").json();
+const teatroDeLaCruz = madrid['Teatro de la Cruz'].filter(d => d.title).map(d => {
+  d.origin = 'teatro de la cruz';
+  d.author = d.author||'unkown';
+  return d;
+});
+const teatroDelPrincipe = madrid['Teatro del Príncipe'].filter(d => d.title).map(d => {
+  d.origin = 'teatro del principe';
+  d.author = d.author||'unkown';
+  return d;
+});
 
 
 
@@ -32,8 +43,8 @@ const color_map = {
   'new orleans': '#A855F7',
   'covent garden': '#4DA011',
   'drury lane': '#DF789A',
-  // 'teatro de la cruz': '#97BBF5',
-  // 'teatro del principe': '#9C6B4E',
+  'teatro de la cruz': '#97BBF5',
+  'teatro del principe': '#9C6B4E',
   // 'incoming data': '#B2C400',
 };
 
@@ -224,7 +235,9 @@ const combined_data = [
     author: d.author||'unknown',
     year: Number(d.year),
     origin: 'new orleans'
-  }))
+  })),
+  ...teatroDeLaCruz,
+  ...teatroDelPrincipe
 ];
 
 ```
@@ -410,23 +423,11 @@ import { rangeInput } from "./components/range_input.js";
     : (display(html`<span hidden></span>`), new Date(`${date_range_val[1]}-12-31`));
 
 
-  // const randomDates = () =>  {
-  //   const start = new Date("1748-01-01");
-  //   const end = new Date("1798-12-31"); // was 1778-12-31 before
-  //   const new_start = new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
-  //   const new_end = new Date(new_start.getTime() + Math.random() * (end.getTime() - new_start.getTime()));
-  //   start_date_input.value = new_start;
-  //   end_date_input.value = new_end;
-  //   start_date_input.dispatchEvent(new Event("input"));
-  //   end_date_input.dispatchEvent(new Event("input"));
-  // }
-
-
 ```
 
 ```js
 
-const originOptions = ["danish", "dutch", "french", "saint-domingue", 'covent garden', 'drury lane', 'new orleans'];
+const originOptions = ["danish", "dutch", "french", "saint-domingue", 'covent garden', 'drury lane', 'new orleans', 'teatro de la cruz', 'teatro del principe'];
 const reactiveOrigins = Inputs.input(["danish", "dutch", "french"]);
 const react = Generators.input(reactiveOrigins)
 
@@ -480,7 +481,7 @@ const originsInput = Inputs.checkbox(originOptions, {
     label: !overTime? "Origin": "Origin (max 3)",
     value: reactiveOrigins,
     format:  d => html`<span class="cal-key"><span class="cal-dot" style="background:${color_map[d] || '#999'}"></span>${name_map[d] || d}</span>`,
-    disabled: originOptions.filter((o) => (!overTime? false: (3 <= react.length) && !react.includes(o)))
+    disabled: originOptions.filter((o) => (['teatro de la cruz', 'teatro del principe'].includes(o) && (bubble || authorShare))?true:(!overTime? false:(3 <= react.length) && !react.includes(o)))
   })
 const bindedInput = Inputs.bind(
   originsInput,
@@ -658,7 +659,6 @@ for(const loc of Object.values(combined_data.reduce((acc, d) => {
 ```js
 if(bubble){
   const style = sideBySide? "display: grid; grid-template-columns: 50% 50%;": "";
-  const test = 'class="hiii"'
   display(html`<div id="bubbleContainer" style=${style} ></div>`)
   for(const origin of origins){
     const newDiv = document.createElement("div")
@@ -793,6 +793,15 @@ const LondonRaw = await FileAttachment('data/london/formatted_london.json').json
 const CoventGardenRaw = LondonRaw.filter(d=>d.place=='Covent Garden').map(d=>({...d, origin: 'covent garden'}));
 const DruryLaneRaw = LondonRaw.filter(d=>d.place=='Drury Lane').map(d=>({...d, origin: 'drury lane'}));
 const nolaCsv   = await FileAttachment("data/new_orleans/new_o_frequent_performances.csv").csv({typed: false});
+const MadridRaw = await FileAttachment("data/madrid-performances.json").json();
+const TeatroDeLaCruzRaw = MadridRaw['Teatro de la Cruz'].filter(d => d.title).map(d => {
+  d.origin = 'teatro de la cruz';
+  return d;
+});
+const TeatroDelPrincipeRaw = MadridRaw['Teatro del Príncipe'].filter(d => d.title).map(d => {
+  d.origin = 'teatro del principe';
+  return d;
+});
 
 
 // ==============================
@@ -877,6 +886,30 @@ const DruryLane = DruryLaneRaw.map((r,i) => {
   };
 }).filter(d => d.date);
 
+const TeatroDeLaCruz = TeatroDeLaCruzRaw.map((r,i) => {
+  const d = asDate(r.date ?? r.Date ?? r.performance_date ?? r.start_date);
+  return {
+    id: r.id ?? r.ID ?? `Teatro-de-la-Cruz-${i}`,
+    date: d, year: d ? d.getUTCFullYear() : (r.year ?? r.Year ?? null),
+    title: r.title ?? r.Title ?? r.play ?? r.Play ?? "Untitled",
+    origin: "teatro de la cruz",
+    theater: r.theater ?? r.Theater ?? r.venue ?? r.Venue ?? r.place ?? r.Place ?? "Unknown venue",
+    city: r.city ?? r.City ?? null
+  };
+}).filter(d => d.date);
+
+const TeatroDelPrincipe = TeatroDelPrincipeRaw.map((r,i) => {
+  const d = asDate(r.date ?? r.Date ?? r.performance_date ?? r.start_date);
+  return {
+    id: r.id ?? r.ID ?? `Teatro-del-Principe-${i}`,
+    date: d, year: d ? d.getUTCFullYear() : (r.year ?? r.Year ?? null),
+    title: r.title ?? r.Title ?? r.play ?? r.Play ?? "Untitled",
+    origin: "teatro del principe",
+    theater: r.theater ?? r.Theater ?? r.venue ?? r.Venue ?? r.place ?? r.Place ?? "Unknown venue",
+    city: r.city ?? r.City ?? null
+  };
+}).filter(d => d.date);
+
 const nolaRows = nolaCsv.map(obj => { const out = {}; for (const k of Object.keys(obj)) out[normKey(k)] = obj[k]; return out; });
 const nola = nolaRows.map((r,i) => {
   const d = asDate(r["date of performance"] ?? r["date"]);
@@ -907,6 +940,8 @@ const allRowsUnfiltered = [
   ...SaintDomingue.filter(d => d.date <= CAP_NON_NOLA),
   ...CoventGarden.filter(d => d.date <= CAP_NON_NOLA),
   ...DruryLane.filter(d => d.date <= CAP_NON_NOLA),
+  ...TeatroDeLaCruz.filter(d => d.date <= CAP_NON_NOLA),
+  ...TeatroDelPrincipe.filter(d => d.date <= CAP_NON_NOLA),
   ...nola.filter(d => d.date <= CAP)          // NOLA up to 1812
 ];
 const allRows = allRowsUnfiltered.filter(d=> origins.includes(d.origin))
