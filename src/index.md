@@ -531,6 +531,7 @@ const threshold_val = bubble? view(threshold):display(html`<span hidden></span>`
 ```
 ```js
 const sideBySide = bubble? view(Inputs.toggle({label: "Side by Side View", value: false})): false
+const hideNull = bubble? view(Inputs.toggle({label: "Hide Unknown", value: false})): false
 ```
 
 ```js
@@ -658,6 +659,7 @@ for(const loc of Object.values(combined_data.reduce((acc, d) => {
 
 ```js
 if(bubble){
+  console.log(combined_data)
   const style = sideBySide? "display: grid; grid-template-columns: 50% 50%;": "";
   display(html`<div id="bubbleContainer" style=${style} ></div>`)
   for(const origin of origins){
@@ -665,7 +667,7 @@ if(bubble){
     const title = document.createElement("h2");
     title.innerHTML = name_map[origin]
     const bubble = authorBubble(
-            combined_data,
+            combined_data.filter(p=>(hideNull?p.author != 'unknown':true)),
             origin,
             0,
           threshold_val,
