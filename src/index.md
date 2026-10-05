@@ -398,16 +398,16 @@ import { rangeInput } from "./components/range_input.js";
 
 
 ```js
-  const start_date_input = Inputs.date({label: "Start", value: "1748-01-01"})
+  const start_date_input = Inputs.date({label: "Start", value: "1680-01-01"})
   const end_date_input = Inputs.date({label: "End", value: "1815-12-31"})
   const date_range = rangeInput({
-    min: 1748,
+    min: 1680,
     max: 1815,
     step: 1,
-    value: [1748, 1815],
+    value: [1680, 1815],
     enableTextInput: true
   });
-  const defaultDateRange = [1748, 1815];
+  const defaultDateRange = [1680, 1815];
   display(activeFilters.yearRange? html`<span style="margin-right: 1rem">Year Range</span>`:html`<span hidden></span>`)
   const date_range_val = activeFilters.yearRange
     ? view(date_range)
