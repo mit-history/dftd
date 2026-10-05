@@ -781,6 +781,7 @@ if(heatMap){
 // Heading for the calendar section – only when calendar viz is active
 
 import { injectCalendarStyles, buildEvents, renderCalendar, ORIGIN_COLOR } from "./components/calendar.js";
+import { danishPerformanceTitle } from "./components/danish-title.js";
 
 // ==============================
 // 1) Load data again
@@ -805,12 +806,10 @@ function normKey(k){ return String(k||"").trim().toLowerCase().replace(/\s+/g," 
 // ==============================
 const Danish = DanishRaw.map((perf, i) => {
   const d = asDate(perf.date);
-  const works = perf.production?.works ?? [];
-  const titleFromWorks = works.map(w => w.title).filter(Boolean).join("; ");
   return {
     id: typeof perf.id === "string" ? perf.id : `Danish-${i}`,
     date: d, year: d ? d.getUTCFullYear() : null,
-    title: titleFromWorks || perf.formatted_title.slice(0, perf.formatted_title.indexOf('by The Royal Danish')).slice(0, perf.formatted_title.indexOf('by Italian')) || perf.production?.formatted_title.slice(0, perf.formatted_title.indexOf('by The Royal Danish')).slice(0, perf.formatted_title.indexOf('by Italian')) || "Untitled",
+    title: danishPerformanceTitle(perf),
     origin: "danish",
     theater: perf.place?.name ?? perf.theater ?? perf.venue ?? "Unknown venue",
     city: perf.place?.name ?? null
