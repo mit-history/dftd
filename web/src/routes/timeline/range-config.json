@@ -23,7 +23,7 @@
       "key": "french",
       "source": null,
       "fallback": {
-        "start": 1748,
+        "start": 1680,
         "end": 1793
       },
       "overrides": {
