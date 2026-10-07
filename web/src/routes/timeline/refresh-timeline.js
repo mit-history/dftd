@@ -24,7 +24,7 @@ function dateRange(rows) {
 
 export async function refreshRanges(previous, { read = readData, fetchData = fetch, warn = console.warn } = {}) {
   const [dutch, danish, london, madrid, saintDomingue, newOrleans] = await Promise.all([
-    read('dutch_data_1748_1798.csv'), read('danish-performances.csv'),
+    read('dutch_data_1638_1800.csv'), read('danish-performances.csv'),
     read('london/formatted_london.json'), read('madrid-database.xlsx'),
     read('saint_domingue/formatted_saint_domingue.json'),
     read('new_orleans/new_orleans_totalperf.csv')
