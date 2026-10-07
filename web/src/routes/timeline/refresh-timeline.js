@@ -24,7 +24,7 @@ function dateRange(rows) {
 
 export async function refreshRanges(previous, { read = readData, fetchData = fetch, warn = console.warn } = {}) {
   const [dutch, danish, london, madrid, saintDomingue, newOrleans] = await Promise.all([
-    read('dutch_data_1638_1800.csv'), read('danish-performances.csv'),
+    read('dutch_data_1638_1800.csv'), read('danish-performances.json'),
     read('london/formatted_london.json'), read('madrid-database.xlsx'),
     read('saint_domingue/formatted_saint_domingue.json'),
     read('new_orleans/new_orleans_totalperf.csv')
@@ -43,7 +43,9 @@ export async function refreshRanges(previous, { read = readData, fetchData = fet
   }
   const ranges = {
     dutch: dateRange(csvParse(dutch.toString())),
-    danish: dateRange(csvParse(danish.toString())),
+    danish: dateRange(JSON.parse(danish.toString())
+      .map(row => ({ date: row.date?.replace(/ AD$/, '') }))
+      .filter(row => row.date && row.date < '1816-01-01')),
     coventGarden: dateRange(londonRows.filter(row => row.place === 'Covent Garden')),
     druryLane: dateRange(londonRows.filter(row => row.place === 'Drury Lane')),
     madridCruz: worksheetRange('Teatro de la Cruz'),
