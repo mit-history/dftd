@@ -21,8 +21,44 @@ from urllib.error import HTTPError
 ENDPOINT = "https://api.lod.uba.uva.nl/datasets/CREATE/ONSTAGE/services/ONSTAGE/sparql"
 HTML_CACHE_DIR = Path(".cache/dutch_html")
 NO_AUTHOR_INDEX_PATH = Path("src/data/dutch_plays_without_authors.json")
+CSV_FIELDS = ["id", "date", "playTitle", "authorName", "originalTitle", "originalAuthorName", "translatorName", "genre", "fullTitle"]
+
+
+def inferred_translators(row):
+    """Infer translators/adapters from creators only when original authors are known."""
+    originals = {name.strip().casefold() for name in (row.get("originalAuthorName") or "").split(";") if name.strip()}
+    if not originals:
+        return None
+    creators = {name.strip() for name in (row.get("authorName") or "").split(";") if name.strip()}
+    return "; ".join(sorted(name for name in creators if name.casefold() not in originals)) or None
+
+
+def backfill_translators(output_path, checkpoint_path, state):
+    """Upgrade committed CSV rows and keep the resume byte offset in sync."""
+    with output_path.open("rb") as source:
+        committed = source.read(state["csv_bytes"]).decode("utf-8")
+    committed_count = sum(1 for _ in csv.DictReader(io.StringIO(committed)))
+    with output_path.open(encoding="utf-8", newline="") as source:
+        reader = csv.DictReader(source)
+        if "translatorName" in (reader.fieldnames or []):
+            return
+        rows = list(reader)
+    temporary = output_path.with_suffix(output_path.suffix + ".tmp")
+    with temporary.open("w", encoding="utf-8", newline="") as output:
+        writer = csv.DictWriter(output, fieldnames=CSV_FIELDS)
+        writer.writeheader()
+        committed_bytes = output.tell()
+        for index, row in enumerate(rows, 1):
+            row["translatorName"] = inferred_translators(row)
+            writer.writerow(row)
+            if index == committed_count:
+                committed_bytes = output.tell()
+    temporary.replace(output_path)
+    state["csv_bytes"] = committed_bytes
+    save_checkpoint(checkpoint_path, state)
 # static definition of number of show entries to update spreadsheet when running parser
 BATCH_SIZE = 250
+MAX_YEAR = 1800
 # increments internal id starting from 1 for chronological purposes
 QUERY = """
 PREFIX schema: <https://schema.org/>
@@ -34,6 +70,8 @@ WHERE {
     SELECT DISTINCT ?show WHERE {
       VALUES ?eventType { schema:TheatreEvent schema:TheaterEvent }
       ?show a ?eventType .
+      ?show schema:startDate ?cutoffDate .
+      FILTER(STR(?cutoffDate) < "__END_DATE__")
       FILTER(REGEX(STR(?show), "^https?://www[.]vondel[.]humanities[.]uva[.]nl/onstage/shows/[0-9]+$"))
       BIND(xsd:integer(REPLACE(STR(?show), "^.*/", "")) AS ?id)
       FILTER(?id > __LAST_ID__)
@@ -74,7 +112,7 @@ def request_csv(query):
 
 # query on sparql endpoint
 def query_sparql(last_id=0):
-    query = QUERY.replace("__LIMIT__", str(BATCH_SIZE)).replace("__LAST_ID__", str(last_id))
+    query = QUERY.replace("__LIMIT__", str(BATCH_SIZE)).replace("__LAST_ID__", str(last_id)).replace("__END_DATE__", f"{MAX_YEAR + 1}-01-01")
     return request_csv(query)
 
 
@@ -188,6 +226,19 @@ def compile_no_author_index():
 GENRES = (
     "treurspel", "blyspel", "blijspel", "kluchtspel", "klucht", "zinnespel",
     "tragedie", "tragédie", "comédie", "comedie", "pantomime", "ballet",
+    "tooneelspel", "toneelspel", "drama", "indisch blijspel", "zangspel",
+    "opera", "opéra", "operette", "komedie", "melodrama", "spel",
+    "blyspél", "kluchtspél", "treurspél", "bly-spel", "treur-spel", "zang-spel",
+    "bly-eyndend-treurspel", "bly-eyndigh treur-spel", "kluchtig blyspél",
+    "blijspel met zang", "blyspel; met zang", "opera bouffon",
+    "groote opera", "groote opéra", "groot melodrama",
+    "oorspronkelijk tooneelspel", "historisch tooneelspel", "historisch drama",
+    "geschiedkundig tooneelspel", "romantisch tooneelspel",
+    "ballet-pantomime", "groot ballet-pantomime", "nieuw groot ballet-pantomime",
+    "nieuw groot toover-ballet-pantomime", "komiek ballet-pantomime",
+    "groot balletpantomime", "groot arlequinade-balletpantomime",
+    "blijspel in vijf bedrijven", "tooneelspel in vijf bedrijven",
+    "romantisch toneelspel in vier bedrijven, met dansen en koren",
 )
 
 # remove trailing `translated by` annotations and genre
@@ -198,7 +249,7 @@ def split_genre(title):
         r"(?:\s*\[[^\[\]]*\bby\b[^\[\]]*\])+\s*$",
         "", title, flags=re.IGNORECASE,
     ).strip()
-    genres = "|".join(re.escape(genre) for genre in GENRES)
+    genres = "|".join(re.escape(genre) for genre in sorted(GENRES, key=len, reverse=True))
     match = re.fullmatch(rf"(.+?)(?:\s*[.;,]\s*|\s+)({genres})\.?", title, re.IGNORECASE)
     if not match:
         return title, None
@@ -236,6 +287,7 @@ def performance_rows(link, html):
                     continue
                 if value is None and field != "genre":
                     logging.warning("%s (%s): missing %s", link, play_url, field)
+            row["translatorName"] = inferred_translators(row)
             rows.append(row)
     return rows
 
@@ -319,6 +371,7 @@ def parse_api_rows(records, html_fallback=False):
             for field in ("originalTitle", "originalAuthorName"):
                 if row[field] is None:
                     logging.warning("show %s (%s): missing %s", row["id"], row["fullTitle"] or "untitled work", field)
+        row["translatorName"] = inferred_translators(row)
         rows.append(row)
     return rows
 
@@ -368,13 +421,14 @@ def main(output_path=Path("src/data/dutch_show_data.csv"), restart=False):
         if not output_path.exists() or output_path.stat().st_size < state["csv_bytes"]:
             raise ValueError("CSV is missing or shorter than its checkpoint; restore it before resuming.")
         print(f"Resuming after {state['offset']} shows", file=sys.stderr)
-    records = list(csv.DictReader(io.StringIO(query_sparql(state["last_id"]))))
     if resume:
         # Discard rows written after the last completed batch to avoid duplicates.
         with output_path.open("r+b") as output:
             output.truncate(state["csv_bytes"])
+        backfill_translators(output_path, checkpoint_path, state)
+    records = list(csv.DictReader(io.StringIO(query_sparql(state["last_id"]))))
     with output_path.open("a" if resume else "w", encoding="utf-8", newline="") as output:
-        writer = csv.DictWriter(output, fieldnames=["id", "date", "playTitle", "authorName", "originalTitle", "originalAuthorName", "genre", "fullTitle"])
+        writer = csv.DictWriter(output, fieldnames=CSV_FIELDS)
         if not resume:
             writer.writeheader()
             output.flush()

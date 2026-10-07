@@ -15,6 +15,28 @@ SHOW_HTML = '''<time property="schema:startDate" datetime="1752-09-23"></time>
 
 
 class ParsingTests(unittest.TestCase):
+    def test_query_caps_shows_before_pagination_at_end_of_1800(self):
+        with patch.object(extraction, "request_csv", return_value="show\n") as request:
+            extraction.query_sparql(123)
+        query = request.call_args.args[0]
+        self.assertIn('FILTER(STR(?cutoffDate) < "1801-01-01")', query)
+        self.assertLess(query.index('?show schema:startDate ?cutoffDate'), query.index('LIMIT 250'))
+        self.assertIn('FILTER(?id > 123)', query)
+
+    def test_additional_observed_genres(self):
+        cases = [
+            ("A play; tooneelspel", "A play", "tooneelspel"),
+            ("A play, drama", "A play", "drama"),
+            ("A play. Indisch blijspel", "A play", "indisch blijspel"),
+            ("A play, Zangspel", "A play", "zangspel"),
+            ("A play, nieuw groot ballet-pantomime", "A play", "nieuw groot ballet-pantomime"),
+            ("A play, blyspel; met zang", "A play", "blyspel; met zang"),
+            ("A play, of Stantvastige liefde", "A play, of Stantvastige liefde", None),
+        ]
+        for title, expected_title, expected_genre in cases:
+            with self.subTest(title=title):
+                self.assertEqual(extraction.split_genre(title), (expected_title, expected_genre))
+
     def test_normal_title(self):
         self.assertEqual(extraction.split_genre("Andromaché"), ("Andromaché", None))
 
@@ -120,6 +142,7 @@ class ApiTests(unittest.TestCase):
         self.assertEqual(len(rows), 1)
         self.assertEqual(rows[0]["authorName"], "Meijer, Lodewijk; Nil Volentibus Arduum group")
         self.assertEqual(rows[0]["originalAuthorName"], "Racine, Jean")
+        self.assertEqual(rows[0]["translatorName"], "Meijer, Lodewijk; Nil Volentibus Arduum group")
         self.assertEqual(rows[0]["playTitle"], "Andromaché")
         records.append(dict(records[0], performance="rank2"))
         self.assertEqual(len(extraction.parse_api_rows(records)), 2)
@@ -133,6 +156,24 @@ class ApiTests(unittest.TestCase):
 
 
 class ResumeTests(unittest.TestCase):
+    def test_translators_exclude_originals_and_require_known_original(self):
+        self.assertEqual(extraction.inferred_translators({"authorName": "Racine, Jean; Meijer, Lodewijk; Meijer, Lodewijk", "originalAuthorName": "Racine, Jean"}), "Meijer, Lodewijk")
+        self.assertIsNone(extraction.inferred_translators({"authorName": "First; Second"}))
+        self.assertIsNone(extraction.inferred_translators({"authorName": "Original", "originalAuthorName": "Original"}))
+
+    def test_backfill_keeps_checkpoint_bytes_and_authors(self):
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory) / "shows.csv"
+            output.write_text('id,authorName,originalAuthorName\n1,Original; Translator,Original\n')
+            checkpoint = output.with_suffix(".checkpoint.json")
+            state = {"version": 3, "last_id": 1, "csv_bytes": output.stat().st_size}
+            extraction.backfill_translators(output, checkpoint, state)
+            with output.open() as source:
+                row = next(csv.DictReader(source))
+            self.assertEqual(row["translatorName"], "Translator")
+            self.assertEqual(row["authorName"], "Original; Translator")
+            self.assertEqual(json.loads(checkpoint.read_text())["csv_bytes"], output.stat().st_size)
+
     def test_filename_uses_date_extremes_and_resume_finds_renamed_file(self):
         with tempfile.TemporaryDirectory() as directory:
             output = Path(directory) / "shows.csv"
