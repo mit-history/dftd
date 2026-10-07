@@ -6,7 +6,9 @@
     "build": "cd web && npm run build && cd .. && observable build",
     "dev": "observable preview",
     "deploy": "observable deploy",
-    "observable": "observable"
+    "observable": "observable",
+    "timeline:refresh": "node web/src/routes/timeline/refresh-timeline.js",
+    "parse:dutch": "python3 scripts/fetch_dutch_ids.py"
   },
   "dependencies": {
     "@observablehq/framework": "^1.13.2",

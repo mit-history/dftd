@@ -4,11 +4,13 @@
   "private": true,
   "scripts": {
     "dev": "vite dev",
-    "build": "npm install && vite build",
-    "preview": "vite preview"
+    "build": "npm install && npm run timeline:refresh && vite build",
+    "preview": "vite preview",
+    "timeline:refresh": "node src/routes/timeline/refresh-timeline.js"
   },
   "dependencies": {
-    "d3-dsv": "^3.0.1"
+    "d3-dsv": "^3.0.1",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@sveltejs/adapter-auto": "^6.0.0",

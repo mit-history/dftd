@@ -1,18 +1,7 @@
-import { csvParse } from 'd3-dsv';
+import cache from './range-cache.json';
 import { datasets, axisOverrides } from './range-config.json';
 
 export const prerender = true;
-
-const sources = import.meta.glob([
-  '../../../../src/data/dutch_data_1638_1940.csv',
-  '../../../../src/data/danish-performances.csv',
-  '../../../../src/data/london/formatted_london.json',
-  '../../../../src/data/saint_domingue/formatted_saint_domingue.json',
-  '../../../../src/data/new_orleans/new_orleans_totalperf.csv'
-], {
-  query: '?raw', import: 'default'
-});
-const sourceRoot = '../../../../src/data/';
 
 function resolveRange(detected, config) {
   const range = {};
@@ -27,20 +16,7 @@ function resolveRange(detected, config) {
   return range;
 }
 
-function yearRange(rows) {
-  let start = Infinity;
-  let end = -Infinity;
-  for (const row of rows) {
-    const match = /^(\d{4})-\d{2}-\d{2}(?:T|$)/.exec(row.date ?? '');
-    if (!match || !Number.isFinite(Date.parse(row.date))) continue;
-    const year = Number(match[1]);
-    start = Math.min(start, year);
-    end = Math.max(end, year);
-  }
-  return Number.isFinite(start) ? { start, end } : null;
-}
-
-export async function load() {
+export function load() {
   const overrides = JSON.parse(process.env.TIMELINE_OVERRIDES || '{}');
   if (!overrides || typeof overrides !== 'object' || Array.isArray(overrides)) {
     throw new Error('TIMELINE_OVERRIDES must be a JSON object.');
@@ -59,32 +35,10 @@ export async function load() {
     }
   }
 
-  const files = new Map();
-  async function detectRange(source) {
-    if (!source) return null;
-    if (!files.has(source.file)) {
-      files.set(source.file, (async () => {
-        const raw = await sources[sourceRoot + source.file]();
-        return source.format === 'csv' ? csvParse(raw) : JSON.parse(raw);
-      })());
-    }
-    let rows = await files.get(source.file);
-    if (source.yearsInColumns) {
-      const years = rows.columns.filter(column => /^\d{4}$/.test(column)).map(Number);
-      return years.length ? { start: Math.min(...years), end: Math.max(...years) } : null;
-    }
-    if (source.place) rows = rows.filter(row => row.place === source.place);
-    return yearRange(rows);
-  }
-  const results = await Promise.allSettled(datasets.map(dataset => detectRange(dataset.source)));
   return {
     axisOverrides: { ...axisOverrides, ...overrides.axis },
-    ranges: Object.fromEntries(datasets.map((dataset, index) => {
-      const result = results[index];
-      if (result.status === 'rejected') {
-        console.warn(`Timeline ${dataset.key}: using configured fallback`, result.reason);
-      }
-      const detected = result.status === 'fulfilled' ? result.value : null;
+    ranges: Object.fromEntries(datasets.map(dataset => {
+      const detected = cache.ranges[dataset.key] ?? null;
       return [dataset.key, resolveRange(detected, {
         ...dataset, overrides: { ...dataset.overrides, ...overrides[dataset.key] }
       })];
