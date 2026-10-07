@@ -13,7 +13,7 @@ export const popupContent = {
   },
   'madrid': {
     title: 'Madrid, Spain',
-    description: 'Performance data for Teatro de la Cruz, 1748-1800.\nPerformance data for Teatro del Principe, 1748-1800.',
+    description: 'Performance data for Teatro de la Cruz, 1748-1800.\nPerformance data for Teatro del Príncipe, 1748-1800.',
   },
   'london': {
     title: 'London, England',

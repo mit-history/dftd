@@ -41,7 +41,7 @@
       color: '#97BBF5'
     },
     {
-      name: 'Teatro de la Principe (Madrid)',
+      name: 'Teatro del Príncipe (Madrid)',
       // link: '',
       ranges: [data.ranges.madridPrincipe],
       color: '#9C6B4E'

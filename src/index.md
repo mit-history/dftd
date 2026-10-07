@@ -57,7 +57,7 @@ const name_map = {
   'drury lane': 'Drury Lane (London)',
   'new orleans': 'New Orleans (All theaters)',
   'teatro de la cruz': 'Teatro de la Cruz (Madrid)',
-  'teatro del principe': 'Teatro del Principe (Madrid)'
+  'teatro del principe': 'Teatro del Príncipe (Madrid)'
 };
 
 // Load & normalize the Danish performances directly from the raw JSON
