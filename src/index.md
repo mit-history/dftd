@@ -4,6 +4,13 @@ toc: false
 
 
 ```js
+const yearBounds = await FileAttachment("data/timeline-ranges.json").json();
+const minGraphYear = yearBounds.minYear;
+const maxGraphYear = yearBounds.maxYear;
+function withinGraphBounds(row) {
+  const year = row.year ?? asDate(row.date)?.getUTCFullYear();
+  return year >= minGraphYear && year <= maxGraphYear;
+}
 const french = await FileAttachment("data/french-performances.json").json();
 const french_dates = new Set(french.filter(d=> d.year === 1775).map(d=> d.date))
 const dutch = await FileAttachment("data/dutch-performances.csv").csv({typed: true});
@@ -238,7 +245,7 @@ const combined_data = [
   })),
   ...teatroDeLaCruz,
   ...teatroDelPrincipe
-];
+].filter(withinGraphBounds);
 
 ```
 
@@ -398,16 +405,16 @@ import { rangeInput } from "./components/range_input.js";
 
 
 ```js
-  const start_date_input = Inputs.date({label: "Start", value: "1680-01-01"})
-  const end_date_input = Inputs.date({label: "End", value: "1815-12-31"})
+  const start_date_input = Inputs.date({label: "Start", value: `${minGraphYear}-01-01`})
+  const end_date_input = Inputs.date({label: "End", value: `${maxGraphYear}-12-31`})
   const date_range = rangeInput({
-    min: 1680,
-    max: 1815,
+    min: minGraphYear,
+    max: maxGraphYear,
     step: 1,
-    value: [1680, 1815],
+    value: [minGraphYear, maxGraphYear],
     enableTextInput: true
   });
-  const defaultDateRange = [1680, 1815];
+  const defaultDateRange = [minGraphYear, maxGraphYear];
   display(activeFilters.yearRange? html`<span style="margin-right: 1rem">Year Range</span>`:html`<span hidden></span>`)
   const date_range_val = activeFilters.yearRange
     ? view(date_range)
@@ -545,7 +552,7 @@ const combinedHeatmap = heatMap? view(Inputs.toggle({ label: "Combined Heat Map"
 ```js
 const formatted_data = combined_data.filter(d => {
   const dt = asDate(d.date);
-  return dt && dt > start_date && dt <= end_date && origins.includes(d.origin);
+  return dt && dt >= start_date && dt <= end_date && origins.includes(d.origin);
 });
 ```
 
@@ -561,7 +568,7 @@ function compareYearsChart(data) {
 
   return Plot.plot({
     title: `Compare performances per year, ${start_date.getFullYear()}–${end_date.getFullYear()}`,
-    fx: { label: null, padding: 0.1 },
+    fx: { label: null, padding: 0.1, domain: d3.range(start_date.getUTCFullYear(), end_date.getUTCFullYear() + 1) },
     x: { axis: null, paddingOuter: 0.2 },
     y: { grid: true, label: "Performances", domain: [0, 366] },
     color: {
@@ -927,25 +934,10 @@ const nola = nolaRows.map((r,i) => {
 // load the two layer genre file
 const nolaGenres = await FileAttachment("data/new_orleans/genre_two_level_FIXED.csv").csv({ typed: true });
 
-// ==============================
-// 4) Combine and cap
-//    - Danish / French / Dutch ≤ 1799-12-31
-//    - New Orleans ≤ 1812-12-31
-// ==============================
-const CAP_NON_NOLA = Date.UTC(1799, 11, 31);
-const CAP          = Date.UTC(1812, 11, 31);  // global max
-
 const allRowsUnfiltered = [
-  ...Danish.filter(d => d.date <= CAP_NON_NOLA),
-  ...French.filter(d => d.date <= CAP_NON_NOLA),
-  ...Dutch.filter(d => d.date <= CAP_NON_NOLA),
-  ...SaintDomingue.filter(d => d.date <= CAP_NON_NOLA),
-  ...CoventGarden.filter(d => d.date <= CAP_NON_NOLA),
-  ...DruryLane.filter(d => d.date <= CAP_NON_NOLA),
-  ...TeatroDeLaCruz.filter(d => d.date <= CAP_NON_NOLA),
-  ...TeatroDelPrincipe.filter(d => d.date <= CAP_NON_NOLA),
-  ...nola.filter(d => d.date <= CAP)          // NOLA up to 1812
-];
+  ...Danish, ...French, ...Dutch, ...SaintDomingue,
+  ...CoventGarden, ...DruryLane, ...TeatroDeLaCruz, ...TeatroDelPrincipe, ...nola
+].filter(withinGraphBounds);
 const allRows = allRowsUnfiltered.filter(d=> origins.includes(d.origin))
 
 
@@ -966,11 +958,11 @@ try { for (const [k,c] of COLOR) ORIGIN_COLOR.set(k, c); } catch {}
 // Summary text – only when calendar viz is active
 if (calendar) {
   display(html`<div style="font:12px system-ui; margin:.25rem 0;">
-    Number of Performances displayed per dataset (≤1799 Europe, ≤1812 New Orleans) —
-    Danish: <b>${Danish.filter(d => d.date <= CAP_NON_NOLA).length}</b> ·
-    French: <b>${French.filter(d => d.date <= CAP_NON_NOLA).length}</b> ·
-    Dutch: <b>${Dutch.filter(d => d.date <= CAP_NON_NOLA).length}</b> ·
-    New Orleans: <b>${nola.filter(d => d.date <= CAP).length}</b> ·
+    Number of Performances displayed per dataset (within graph bounds) —
+    Danish: <b>${Danish.filter(withinGraphBounds).length}</b> ·
+    French: <b>${French.filter(withinGraphBounds).length}</b> ·
+    Dutch: <b>${Dutch.filter(withinGraphBounds).length}</b> ·
+    New Orleans: <b>${nola.filter(withinGraphBounds).length}</b> ·
     total after cap: <b>${allRows.length}</b>
   </div>`);
 } else {
@@ -992,7 +984,9 @@ if (calendar) {
   display(html`<span hidden></span>`);
 }
 
-function capDate(d){ return new Date(Math.min(+asDate(d), CAP)); }
+function capDate(d){
+  return new Date(Math.max(Date.UTC(minGraphYear, 0, 1), Math.min(+asDate(d), Date.UTC(maxGraphYear, 11, 31))));
+}
 
 function buildVenuesInput(startDate, endDate, originsList) {
   const opts = Array.from(new Set(

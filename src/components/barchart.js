@@ -286,7 +286,7 @@ export function createHeatmap(data, { width = 900, height = 500 } = {}) {
         ? d.performance_date
         : d.performance_date.toISOString();
     let [year, month, _] = dateString.split("-").map(Number);
-    if (year >= 1748 && year <= 1815) {
+    if (Number.isInteger(year) && month >= 1 && month <= 12) {
       let key = `${year}-${month}`;
       if (!heatmapData.has(key)) {
         heatmapData.set(key, new Set());

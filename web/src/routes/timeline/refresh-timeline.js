@@ -1,11 +1,12 @@
 import { readFile, writeFile, rename } from 'node:fs/promises';
-import { pathToFileURL } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { csvParse } from 'd3-dsv';
 import * as XLSX from 'xlsx';
 
 // Run `npm run timeline:refresh in terminal for local debugging`
 
 const cacheUrl = new URL('./range-cache.json', import.meta.url);
+const exportUrl = new URL('../../../../src/data/timeline-ranges.json', import.meta.url);
 const dataRoot = new URL('../../../../src/data/', import.meta.url);
 const readData = file => readFile(new URL(file, dataRoot));
 
@@ -84,6 +85,13 @@ async function main() {
     await writeFile(temporary, content);
     await rename(temporary, cacheUrl);
   }
+  const temporaryExportPath = `${fileURLToPath(exportUrl)}.tmp`;
+  const bounds = {
+    minYear: Math.min(...Object.values(cache.ranges).map(range => range.start)),
+    maxYear: Math.max(...Object.values(cache.ranges).map(range => range.end))
+  };
+  await writeFile(temporaryExportPath, JSON.stringify(bounds, null, 2) + '\n');
+  await rename(temporaryExportPath, exportUrl);
   console.log(`Timeline cache refreshed (${Object.keys(cache.ranges).length} datasets).`);
 }
 
