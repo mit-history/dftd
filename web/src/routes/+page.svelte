@@ -7,10 +7,21 @@
   import { base } from '$app/paths';
   import { onMount } from 'svelte';
   import mapSvg from './assets/interstage_world_map_empty.svg';
+  import MapTimeline from '$lib/MapTimeline.svelte';
   import { markers } from './markers_config.js';
   import { fade } from 'svelte/transition';
   import { popupContent } from './popup_config.js';
+  import { ranges } from './timeline/range-cache.json';
 
+  const markerDatasets = {
+    paris: ['french'], amsterdam: ['dutch'], copenhagen: ['danish'],
+    madrid: ['madridCruz', 'madridPrincipe'], london: ['coventGarden', 'druryLane'],
+    'saint-domingue': ['saintDomingue'], 'new orleans': ['newOrleans']
+  };
+  const startYears = Object.fromEntries(markers.map(marker => [
+    marker.id, Math.min(...markerDatasets[marker.id].map(key => ranges[key].start))
+  ]));
+  let shownThroughYear = -Infinity;
   const ZOOM_SCALE = 2.4;
   let selectedMarkerId = null;
   let navigationHeight = 48;
@@ -63,6 +74,7 @@
   }
 
   function clearSelection() {
+    if (!selectedMarkerId) return;
     selectedMarkerId = null;
   }
 </script>
@@ -80,6 +92,7 @@
         <div class="map-content" style="transform: {activeTransform};">
           <img class="map-image" src={mapSvg} alt="Map of the Atlantic World" />
           {#each markers as marker}
+            {#if shownThroughYear >= startYears[marker.id]}
             <div 
               class="marker {selectedMarkerId === marker.id ? 'selected' : ''}" 
               on:click={(e) => handleMarkerClick(marker.id, e)}
@@ -97,8 +110,11 @@
                 clip-path: {marker.clipPath};
               "></span>
             </div>
+            {/if}
           {/each}
         </div>
+      <MapTimeline targetYear={selectedMarkerId ? startYears[selectedMarkerId] : null}
+        onYear={(year) => { shownThroughYear = Math.max(shownThroughYear, year); }} />
       {#if selectedMarker}
         <div class="popup-panel {isRightSide ? 'left' : 'right'}" transition:fade={{ duration: 250 }}>
           <h2>{popupTitle}</h2>
@@ -193,6 +209,7 @@
     transform: translate(-53%, -100%);
     pointer-events: none;
     cursor: pointer;
+    animation: marker-arrival 350ms ease-out both;
   }
 
   .marker-shape {
@@ -234,6 +251,14 @@
     filter: drop-shadow(0 4px 6px rgba(0,0,0,0.4));
   }
 
+  @keyframes marker-arrival {
+    from { opacity: 0; translate: 0 10px; }
+    to { opacity: 1; translate: 0 0; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .marker { animation: none; }
+  }
+
   .popup-panel {
     position: absolute;
     top: 50%;
@@ -266,6 +291,7 @@
   }
 
   .hero-text h1 {
+    position: relative;
     text-align: center;
     font-size: clamp(2rem, 4vw, 3.2rem);
     font-weight: 700;
