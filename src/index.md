@@ -558,7 +558,13 @@ const formatted_data = combined_data.filter(d => {
 
 ```js
 function compareYearsChart(data) {
-  const years = Array.from(new Set(data.map(d => d.year).filter(Boolean))).sort((a, b) => a - b);
+  const years = d3.range(start_date.getUTCFullYear(), end_date.getUTCFullYear() + 1);
+  const counts = d3.rollup(data, rows => rows.length, row => Number(row.year), row => row.origin);
+  const yearCounts = years.flatMap(year => origins.map(origin => ({
+    year,
+    origin,
+    count: counts.get(year)?.get(origin) ?? 0
+  })));
   const n = years.length;
   const step =
     n > 60 ? 10 :
@@ -580,7 +586,8 @@ function compareYearsChart(data) {
     width: window.innerWidth,
     marginBottom: 60,
     marks: [
-      Plot.barY(data, Plot.groupX({y2: "count"}, {x: "origin", fx: "year", fill: "origin", tip: true})),
+      Plot.axisY({facetAnchor: "left"}),
+      Plot.barY(yearCounts, {y: "count", x: "origin", fx: "year", fill: "origin", tip: true}),
       Plot.ruleY([0]),
       // 👇 labels below instead of above
       Plot.axisFx({
