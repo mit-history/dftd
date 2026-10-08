@@ -22,6 +22,15 @@
     marker.id, Math.min(...markerDatasets[marker.id].map(key => ranges[key].start))
   ]));
   let shownThroughYear = -Infinity;
+  const markerRevealLeadYears = 3;
+  const largeGapRevealLeadYears = 6;
+  const startDates = [...new Set(Object.values(startYears))].sort((a, b) => a - b);
+  const revealYears = Object.fromEntries(Object.entries(startYears).map(([id, year]) => {
+    const previousYear = startDates[startDates.indexOf(year) - 1];
+    const lead = previousYear !== undefined && year - previousYear > 100
+      ? largeGapRevealLeadYears : markerRevealLeadYears;
+    return [id, year - lead];
+  }));
   const ZOOM_SCALE = 2.4;
   let selectedMarkerId = null;
   let navigationHeight = 48;
@@ -92,7 +101,7 @@
         <div class="map-content" style="transform: {activeTransform};">
           <img class="map-image" src={mapSvg} alt="Map of the Atlantic World" />
           {#each markers as marker}
-            {#if shownThroughYear >= startYears[marker.id]}
+            {#if shownThroughYear >= revealYears[marker.id]}
             <div 
               class="marker {selectedMarkerId === marker.id ? 'selected' : ''}" 
               on:click={(e) => handleMarkerClick(marker.id, e)}
