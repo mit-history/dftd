@@ -148,7 +148,7 @@
   .date { position: absolute; top: 0; width: 48px; transform: translateX(-50%); text-align: center; color: #f6f3de; font-size: 0.85rem; line-height: 18px; font-variant-numeric: tabular-nums; white-space: nowrap; }
   /* The arrow occupies only the last slice, after the last repeated stick. */
   .ending { width: var(--tail); background-position: calc(var(--step) * -703.5 / 129) var(--date-height); }
-  .scrolling .track { animation: scroll-timeline 3s cubic-bezier(0.7, 0, 0.3, 1) forwards; }
+  .scrolling .track { animation: scroll-timeline 2s cubic-bezier(0.2, 0, 0.8, 1) forwards; }
   .focused .track { transform: translate3d(calc(var(--step) * var(--focus-step)), 0, 0); }
   @keyframes scroll-timeline {
     from { transform: translate3d(0, 0, 0); }
