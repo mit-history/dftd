@@ -5,6 +5,7 @@
 
 <script>
   import { base } from '$app/paths';
+  import { onMount } from 'svelte';
   import mapSvg from './assets/interstage_world_map_empty.svg';
   import { markers } from './markers_config.js';
   import { fade } from 'svelte/transition';
@@ -12,8 +13,26 @@
 
   const ZOOM_SCALE = 2.4;
   let selectedMarkerId = null;
+  let navigationHeight = 48;
+  let mapContainer;
+  let mapScale = 1;
+
+  onMount(() => {
+    const navigation = document.querySelector('.top-bar');
+    if (!navigation) return;
+    const updateHeight = () => {
+      navigationHeight = navigation.getBoundingClientRect().height;
+      mapScale = mapContainer.getBoundingClientRect().width / 780;
+    };
+    updateHeight();
+    const observer = new ResizeObserver(updateHeight);
+    observer.observe(navigation);
+    observer.observe(mapContainer);
+    return () => observer.disconnect();
+  });
 
   $: selectedMarker = markers.find(m => m.id === selectedMarkerId);
+  $: popupTitle = selectedMarker ? popupContent[selectedMarker.id]?.title || selectedMarker.name : '';
   $: isRightSide = selectedMarker ? parseFloat(selectedMarker.left) > 50 : false;
   $: activeTransform = selectedMarker ? calculateTransform(selectedMarker) : 'translate(0%, 0%) scale(1)';
 
@@ -48,12 +67,13 @@
   }
 </script>
 
-<div class="page-wrapper" style="overflow-x: hidden;">
+<div class="page-wrapper" style="overflow-x: hidden; --navigation-height: {navigationHeight}px; --map-scale: {mapScale};">
   <section class="hero-container">
     <div class="image-wrapper" style="position: relative;">
       <!-- svelte-ignore a11y-click-events-have-key-events -->
       <!-- svelte-ignore a11y-no-static-element-interactions -->
       <div class="map-container" 
+           bind:this={mapContainer}
            on:click={clearSelection}
            class:zoomed={!!selectedMarkerId}
       >
@@ -64,26 +84,29 @@
               class="marker {selectedMarkerId === marker.id ? 'selected' : ''}" 
               on:click={(e) => handleMarkerClick(marker.id, e)}
               style="
-                width: {marker.width};
+                width: calc({marker.width} * var(--map-scale));
                 top: {marker.top}; 
                 left: {marker.left}; 
-                -webkit-mask-image: url('{marker.src}'); 
+              "
+            >
+              <span class="marker-shape" style="
+                --pin-center-x: calc({marker.pinCenterX} * var(--map-scale));
+                -webkit-mask-image: url('{marker.src}');
                 mask-image: url('{marker.src}');
                 -webkit-clip-path: {marker.clipPath};
                 clip-path: {marker.clipPath};
-              "
-            ></div>
+              "></span>
+            </div>
           {/each}
         </div>
-      </div>
-
       {#if selectedMarker}
         <div class="popup-panel {isRightSide ? 'left' : 'right'}" transition:fade={{ duration: 250 }}>
-          <h2>{popupContent[selectedMarker.id]?.title || selectedMarker.name}</h2>
+          <h2>{popupTitle}</h2>
           <p class="description-text">{popupContent[selectedMarker.id]?.description || `Content for ${selectedMarker.name} coming soon.`}</p>
           <p style="font-size: 0.85rem; color: #666; margin-top: 1rem;"><i>Click anywhere on the map to zoom out.</i></p>
         </div>
       {/if}
+      </div>
     </div>
 
     <div class="hero-text">
@@ -115,7 +138,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
-    padding: 80px 50px 20px;
+    padding: var(--navigation-height) 0 20px;
     width: 100%;
     box-sizing: border-box;
   }
@@ -124,23 +147,24 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    max-width: 1000px; /* Widened slightly to give the popup more breathing room */
     width: 100%;
-    gap: 2rem;
+    gap: 0.5rem;
   }
 
   .image-wrapper {
     width: 100%;
+    padding: 0 300px;
+    box-sizing: border-box;
     display: flex;
     justify-content: center;
   }
 
   .map-container {
+    --popup-inset: 24px;
     position: relative;
     width: 100%;
-    max-width: 780px; /* scaled up slightly for 100% zoom */
     z-index: 1;
-    border-radius: 4px;
+    border-radius: 0;
     box-shadow: 0px 20px 50px -20px rgba(0, 0, 0, 0.3);
     overflow: hidden;
   }
@@ -164,8 +188,18 @@
 
   .marker {
     position: absolute;
-    height: 80px;
+    height: calc(80px * var(--map-scale));
     scale: 78%;
+    transform: translate(-53%, -100%);
+    pointer-events: none;
+    cursor: pointer;
+  }
+
+  .marker-shape {
+    display: block;
+    width: 100%;
+    height: 100%;
+    pointer-events: auto;
     
     -webkit-mask-size: contain;
     mask-size: contain;
@@ -184,23 +218,29 @@
     mask-image: none !important;
     background-color: rgba(255, 0, 0, 0.5) !important; */
     
-    transform: translate(-53%, -100%);
+    transform: scale(1);
+    /* The pin is offset from the center of the artwork, which includes its label. */
+    transform-origin: var(--pin-center-x) 100%;
     transition: transform 0.2s ease, background-color 0.2s ease, filter 0.2s ease;
-    cursor: pointer;
   }
 
   .marker:hover, .marker.selected {
-    transform: translate(-50%, -110%) scale(1.1);
+    z-index: 10;
+  }
+
+  .marker:hover .marker-shape, .marker.selected .marker-shape {
+    transform: scale(1.1);
     background-color: #fafafa;
     filter: drop-shadow(0 4px 6px rgba(0,0,0,0.4));
-    z-index: 10;
   }
 
   .popup-panel {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    width: 320px; 
+    width: min(320px, calc(100% - 2 * var(--popup-inset)));
+    max-height: calc(100% - 2 * var(--popup-inset));
+    overflow-y: auto;
     background: #F6F3DE;
     border-radius: 12px;
     box-shadow: 0 20px 50px rgba(0,0,0,0.3);
@@ -209,6 +249,7 @@
     box-sizing: border-box;
   }
   .popup-panel h2 {
+    position: relative;
     margin-top: 0;
     color: #2e332b;
   }
@@ -216,11 +257,12 @@
     margin-top: 0.25rem;
     white-space: pre-line;
   }
-  .popup-panel.left { left: 0; }
-  .popup-panel.right { right: 0; }
+  .popup-panel.left { left: var(--popup-inset); }
+  .popup-panel.right { right: var(--popup-inset); }
 
   .hero-text {
     text-align: center;
+    padding: 0 12px;
   }
 
   .hero-text h1 {
@@ -245,15 +287,14 @@
     line-height: 1.8;
     color: #222;
     margin: 0 auto;
-    max-width: 850px;
+    max-width: 1000px;
   }
 
   /* Responsive Adjustments */
   @media (max-width: 768px) {
-    .page-wrapper {
-      padding: 40px 15px;
+    .image-wrapper {
+      padding: 0 12px;
     }
-    
     .hero-container {
       gap: 2rem;
     }

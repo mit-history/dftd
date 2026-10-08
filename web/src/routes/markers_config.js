@@ -6,9 +6,9 @@ import saintDomingueMarkerSvg from './assets/saint-domingue marker.svg';
 import londonMarkerSvg from './assets/london marker.svg';
 import newOrleansMarkerSvg from './assets/new orleans marker.svg';
 
-function generateClipPath(widthStr, isMirrored = false) {
+function markerGeometry(widthStr, isMirrored = false) {
   // measurements made manually through paris pin
-  const width = parseInt(widthStr, 10);
+  const width = parseFloat(widthStr);
   const scale = 60 / width;
 
   const points = [
@@ -25,11 +25,16 @@ function generateClipPath(widthStr, isMirrored = false) {
     return `${Number(scaledX.toFixed(1))}% ${y}%`;
   });
 
-  return `polygon(
+  const clipPath = `polygon(
       ${scaledPoints.slice(0, 9).join(', ')},
       ${scaledPoints.slice(9, 13).join(', ')},
       ${scaledPoints.slice(13).join(', ')}
     )`;
+
+  return {
+    clipPath,
+    pinCenterX: `${isMirrored ? width - 13.4 : 13.4}px`
+  };
 }
 
 export const markers = [
@@ -40,7 +45,7 @@ export const markers = [
     top: '37.5%',
     left: '79.8%',
     width: '60px',
-    clipPath: generateClipPath('60px'),
+    ...markerGeometry('60px'),
     popupImage: '/french_graph.png'
   },
 
@@ -51,7 +56,7 @@ export const markers = [
     top: '31.5%',
     left: '83.5%',
     width: '101px',
-    clipPath: generateClipPath('101px')
+    ...markerGeometry('101px')
   },
 
   {
@@ -61,7 +66,7 @@ export const markers = [
     top: '25.5%',
     left: '86.4%',
     width: '106px', 
-    clipPath: generateClipPath('106px')
+    ...markerGeometry('106px')
   },
 
   {
@@ -71,7 +76,7 @@ export const markers = [
     top: '52%',
     left: '76%',
     width: '76px',
-    clipPath: generateClipPath('76px')
+    ...markerGeometry('76px')
   },
 
   {
@@ -81,7 +86,7 @@ export const markers = [
     top: '86.9%',
     left: '25.8%',
     width: '134.3px',
-    clipPath: generateClipPath('134.3px')
+    ...markerGeometry('134.3px')
   },
 
   {
@@ -91,7 +96,7 @@ export const markers = [
     top: '65%',
     left: '13.5%',
     width: '112px',
-    clipPath: generateClipPath('112px')
+    ...markerGeometry('112px')
   },
 
   {
@@ -101,6 +106,6 @@ export const markers = [
     top: '32%',
     left: '73.4%',
     width: '76.9px',
-    clipPath: generateClipPath('76.9px', true)
+    ...markerGeometry('76.9px', true)
   },
 ];
