@@ -58,7 +58,7 @@ def backfill_translators(output_path, checkpoint_path, state):
     save_checkpoint(checkpoint_path, state)
 # static definition of number of show entries to update spreadsheet when running parser
 BATCH_SIZE = 250
-MAX_YEAR = 1800
+MAX_YEAR = 1815
 # increments internal id starting from 1 for chronological purposes
 QUERY = """
 PREFIX schema: <https://schema.org/>

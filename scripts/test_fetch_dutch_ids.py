@@ -15,11 +15,11 @@ SHOW_HTML = '''<time property="schema:startDate" datetime="1752-09-23"></time>
 
 
 class ParsingTests(unittest.TestCase):
-    def test_query_caps_shows_before_pagination_at_end_of_1800(self):
+    def test_query_caps_shows_before_pagination_at_end_of_1815(self):
         with patch.object(extraction, "request_csv", return_value="show\n") as request:
             extraction.query_sparql(123)
         query = request.call_args.args[0]
-        self.assertIn('FILTER(STR(?cutoffDate) < "1801-01-01")', query)
+        self.assertIn('FILTER(STR(?cutoffDate) < "1816-01-01")', query)
         self.assertLess(query.index('?show schema:startDate ?cutoffDate'), query.index('LIMIT 250'))
         self.assertIn('FILTER(?id > 123)', query)
 
