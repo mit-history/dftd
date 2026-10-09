@@ -56,6 +56,8 @@
   let selectedMarkerId = null;
   let isRightSide = false;
   let navigationHeight = 48;
+  let heroText;
+  let heroTextHeight = 260;
   let mapContainer;
   let mapScale = 1;
   let reducedMotion = false;
@@ -72,16 +74,22 @@
     if (!navigation) return;
     const updateHeight = () => {
       navigationHeight = navigation.getBoundingClientRect().height;
+      heroTextHeight = heroText.getBoundingClientRect().height;
       mapScale = mapContainer.getBoundingClientRect().width / 780 * 612 / mapBounds.width;
     };
     updateHeight();
     const observer = new ResizeObserver(updateHeight);
     observer.observe(navigation);
     observer.observe(mapContainer);
+    observer.observe(heroText);
     return () => observer.disconnect();
   });
 
   $: selectedMarker = displayMarkers.find(m => m.id === selectedMarkerId);
+  $: selectedRange = selectedMarker ? {
+    start: Math.min(...markerDatasets[selectedMarker.id].map(key => ranges[key].start)),
+    end: Math.max(...markerDatasets[selectedMarker.id].map(key => ranges[key].end))
+  } : null;
   $: popupTitle = selectedMarker ? popupContent[selectedMarker.id]?.title || selectedMarker.name : '';
   $: if (selectedMarker) isRightSide = parseFloat(selectedMarker.left) > 50;
   $: activeTransform = selectedMarker ? calculateTransform(selectedMarker) : 'translate(0%, 0%) scale(1)';
@@ -162,7 +170,7 @@
 
 <svelte:window on:keydown={(event) => { if (event.key === 'Escape') clearSelection(); }} />
 
-<div class="page-wrapper" style="overflow-x: hidden; --navigation-height: {navigationHeight}px; --map-scale: {mapScale};">
+<div class="page-wrapper" style="overflow-x: hidden; --navigation-height: {navigationHeight}px; --hero-text-height: {heroTextHeight}px; --map-scale: {mapScale}; --map-aspect: {mapBounds.width / mapBounds.height};">
   <section class="hero-container">
     <div class="image-wrapper" style="position: relative;">
       <!-- svelte-ignore a11y-click-events-have-key-events -->
@@ -204,8 +212,8 @@
             {/if}
           {/each}
         </div>
-      <MapTimeline targetYear={selectedMarkerId ? startYears[selectedMarkerId] : null}
-        leftCorner={!!selectedMarker && !isRightSide}
+      <MapTimeline {selectedRange}
+        panelSide={selectedMarker ? (isRightSide ? 'left' : 'right') : null}
         onYear={(year) => { shownThroughYear = Math.max(shownThroughYear, year); }} />
       {#if selectedMarker}
         {#key isRightSide}
@@ -230,7 +238,7 @@
       </div>
     </div>
 
-    <div class="hero-text">
+    <div class="hero-text" bind:this={heroText}>
       <h1>Transnational Stages</h1>
       <h3 class="subtitle">Theatrical Circulation and Exchange in the Eighteenth-Century Atlantic World</h3>
       <p class="intro">
@@ -283,6 +291,8 @@
   .map-container {
     position: relative;
     width: 100%;
+    max-width: max(320px, calc((100svh - var(--navigation-height) - var(--hero-text-height) - 28px) * var(--map-aspect)));
+    box-sizing: border-box;
     z-index: 1;
     border-radius: 0;
     box-shadow: 0px 20px 50px -20px rgba(0, 0, 0, 0.3);
@@ -409,7 +419,7 @@
   .description-text { margin-top: 0.75rem; white-space: pre-line; line-height: 1.6; }
   .panel-link { color: #2e332b; text-underline-offset: 3px; }
   .panel-hint { margin-top: 1.5rem; font-size: 0.85rem; color: #666; }
-  @media (max-width: 768px) { .marker-panel { width: min(360px, 85%); padding: 1rem; } }
+  @media (max-width: 768px) { .marker-panel { width: min(360px, 85%); padding: 1rem; bottom: 70px; } }
 
   .hero-text {
     text-align: center;

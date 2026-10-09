@@ -41,7 +41,7 @@
 <svg class="travel-dots" {viewBox} aria-hidden="true">
   <defs>
     <filter id="travel-boat-color" color-interpolation-filters="sRGB">
-      <feFlood flood-color="#918976" />
+      <feFlood flood-color="#B8B19D" />
       <feComposite in2="SourceAlpha" operator="in" />
     </filter>
   </defs>
@@ -59,7 +59,7 @@
         keyTimes={`0;${travelFraction};1`}
         dur={`${cycleDuration}s`} begin={`${delay}s`} repeatCount="indefinite" />
     </g>
-    <circle r="1.5" fill="#918976">
+    <circle r="1.5" fill="#B8B19D">
       <animateMotion path={route.dotPath} dur={`${route.duration}s`} begin={`${delay - 3}s`}
         repeatCount="indefinite" calcMode="linear" />
     </circle>
