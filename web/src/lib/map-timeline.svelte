@@ -4,6 +4,7 @@
   import { ranges } from '../routes/timeline/range-cache.json';
   export let onYear = () => {};
   export let targetYear = null;
+  export let leftCorner = false;
 
   const datasetStarts = Object.values(ranges).map(range => range.start);
   const firstYear = Math.floor(Math.min(...datasetStarts) / 5) * 5;
@@ -90,7 +91,7 @@
   </div>
 {/snippet}
 
-<div class="map-timeline" bind:this={container} class:scrolling={loaded && visible && !focused} class:focused aria-hidden="true"
+<div class="map-timeline" bind:this={container} class:left-corner={leftCorner} class:scrolling={loaded && visible && !focused} class:focused aria-hidden="true"
   style="--artwork: url('{artwork}'); --sections-to-scroll: {stickCount - 3 + 0.6}; --focus-step: {1 - ((targetYear ?? lastYear) - firstYear) / 5};">
   <img class="preload" bind:this={image} src={artwork} alt="" on:load={() => { loaded = true; }} />
   <div class="viewport">
@@ -110,6 +111,11 @@
     transform: scale(0.5);
     transform-origin: bottom right;
     pointer-events: none;
+  }
+  .map-timeline.left-corner {
+    left: 6px;
+    right: auto;
+    transform-origin: bottom left;
   }
   .preload { display: none; }
   .viewport {

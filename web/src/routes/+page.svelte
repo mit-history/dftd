@@ -205,6 +205,7 @@
           {/each}
         </div>
       <MapTimeline targetYear={selectedMarkerId ? startYears[selectedMarkerId] : null}
+        leftCorner={!!selectedMarker && !isRightSide}
         onYear={(year) => { shownThroughYear = Math.max(shownThroughYear, year); }} />
       {#if selectedMarker}
         {#key isRightSide}
