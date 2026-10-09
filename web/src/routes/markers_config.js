@@ -1,3 +1,10 @@
+import parisArtwork from './assets/paris marker.svg?raw';
+import amsterdamArtwork from './assets/amsterdam marker.svg?raw';
+import copenhagenArtwork from './assets/copenhagen marker.svg?raw';
+import madridArtwork from './assets/madrid marker.svg?raw';
+import saintDomingueArtwork from './assets/saint-domingue marker.svg?raw';
+import londonArtwork from './assets/london marker.svg?raw';
+import newOrleansArtwork from './assets/new orleans marker.svg?raw';
 import parisMarkerSvg from './assets/paris marker.svg';
 import amsterdamMarkerSvg from './assets/amsterdam marker.svg';
 import copenhagenMarkerSvg from './assets/copenhagen marker.svg';
@@ -42,6 +49,7 @@ export const markers = [
     id: 'paris',
     name: 'Paris',
     src: parisMarkerSvg,
+    artwork: parisArtwork,
     top: '37.5%',
     left: '79.8%',
     width: '60px',
@@ -53,6 +61,7 @@ export const markers = [
     id: 'amsterdam',
     name: 'Amsterdam',
     src: amsterdamMarkerSvg,
+    artwork: amsterdamArtwork,
     top: '31.5%',
     left: '83.5%',
     width: '101px',
@@ -63,6 +72,7 @@ export const markers = [
     id: 'copenhagen',
     name: 'Copenhagen',
     src: copenhagenMarkerSvg,
+    artwork: copenhagenArtwork,
     top: '25.5%',
     left: '86.4%',
     width: '106px', 
@@ -73,6 +83,7 @@ export const markers = [
     id: 'madrid',
     name: 'Madrid',
     src: madridMarkerSvg,
+    artwork: madridArtwork,
     top: '52%',
     left: '76%',
     width: '76px',
@@ -83,6 +94,7 @@ export const markers = [
     id: 'saint-domingue',
     name: 'saint-domingue',
     src: saintDomingueMarkerSvg,
+    artwork: saintDomingueArtwork,
     top: '86.9%',
     left: '25.8%',
     width: '134.3px',
@@ -93,6 +105,7 @@ export const markers = [
     id: 'new orleans',
     name: 'New Orleans',
     src: newOrleansMarkerSvg,
+    artwork: newOrleansArtwork,
     top: '65%',
     left: '13.5%',
     width: '112px',
@@ -103,6 +116,7 @@ export const markers = [
     id: 'london',
     name: 'London',
     src: londonMarkerSvg,
+    artwork: londonArtwork,
     top: '32%',
     left: '73.4%',
     width: '76.9px',

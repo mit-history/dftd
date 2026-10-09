@@ -6,11 +6,14 @@
 <script>
   import { base } from '$app/paths';
   import { onMount } from 'svelte';
-  import mapSvg from './assets/interstage_world_map_empty.svg';
-  import MapTimeline from '$lib/MapTimeline.svelte';
+  import mapSvg from './assets/world_map_expanded_2.svg';
+  import MapTimeline from '$lib/map-timeline.svelte';
+  import TravelDots from '$lib/travel-dots.svelte';
+  import MarkerHitbox from '$lib/marker-hitbox.svelte';
   import { markers } from './markers_config.js';
-  import { fade } from 'svelte/transition';
-  import { popupContent } from './popup_config.js';
+  import { cubicInOut } from 'svelte/easing';
+  import { fly } from 'svelte/transition';
+  import { popupContent, datasetColors } from './popup_config.js';
   import { ranges } from './timeline/range-cache.json';
 
   const markerDatasets = {
@@ -31,18 +34,45 @@
       ? largeGapRevealLeadYears : markerRevealLeadYears;
     return [id, year - lead];
   }));
+  // Edit this one crop: the map image, markers, and travel routes share these bounds.
+  const mapBounds = { x: 20, y: 20, width: 600, height: 290 };
+  const mapViewBox = `${mapBounds.x} ${mapBounds.y} ${mapBounds.width} ${mapBounds.height}`;
+  const displayMarkers = markers.map(marker => ({
+    ...marker,
+    highlight: markerHighlight(marker.id),
+    left: `${(parseFloat(marker.left) * 6.12 - mapBounds.x) / mapBounds.width * 100}%`,
+    top: `${(parseFloat(marker.top) * 3 - mapBounds.y) / mapBounds.height * 100}%`
+  }));
+
+  function markerHighlight(id) {
+    const colors = markerDatasets[id].map(dataset => datasetColors[dataset]);
+    if (colors.length === 1) return colors[0];
+    const stops = colors.map((color, index) =>
+      `${color} ${index / colors.length * 100}% ${(index + 1) / colors.length * 100}%`
+    );
+    return `linear-gradient(135deg, ${stops.join(', ')})`;
+  }
   const ZOOM_SCALE = 2.4;
   let selectedMarkerId = null;
+  let isRightSide = false;
   let navigationHeight = 48;
   let mapContainer;
   let mapScale = 1;
+  let reducedMotion = false;
+  onMount(() => {
+    const preference = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const update = () => { reducedMotion = preference.matches; };
+    update();
+    preference.addEventListener('change', update);
+    return () => preference.removeEventListener('change', update);
+  });
 
   onMount(() => {
     const navigation = document.querySelector('.top-bar');
     if (!navigation) return;
     const updateHeight = () => {
       navigationHeight = navigation.getBoundingClientRect().height;
-      mapScale = mapContainer.getBoundingClientRect().width / 780;
+      mapScale = mapContainer.getBoundingClientRect().width / 780 * 612 / mapBounds.width;
     };
     updateHeight();
     const observer = new ResizeObserver(updateHeight);
@@ -51,16 +81,16 @@
     return () => observer.disconnect();
   });
 
-  $: selectedMarker = markers.find(m => m.id === selectedMarkerId);
+  $: selectedMarker = displayMarkers.find(m => m.id === selectedMarkerId);
   $: popupTitle = selectedMarker ? popupContent[selectedMarker.id]?.title || selectedMarker.name : '';
-  $: isRightSide = selectedMarker ? parseFloat(selectedMarker.left) > 50 : false;
+  $: if (selectedMarker) isRightSide = parseFloat(selectedMarker.left) > 50;
   $: activeTransform = selectedMarker ? calculateTransform(selectedMarker) : 'translate(0%, 0%) scale(1)';
 
   function calculateTransform(m) {
     const px = parseFloat(m.left);
     const py = parseFloat(m.top);
     
-    // Shift the focal point left or right to make room for the wider popup
+    // Shift the focal point away from the data panel
     const targetX = (px > 50) ? 70 : 30;
 
     // centralize zoom to around shifted target
@@ -82,11 +112,55 @@
     selectedMarkerId = id;
   }
 
+  const hoverReleaseDelay = 150;
+  let hoveredMarkerIds = new Set();
+
+  function bufferedHover(node, id) {
+    let releaseTimer;
+    const setHovered = (hovered) => {
+      const next = new Set(hoveredMarkerIds);
+      if (hovered) next.add(id);
+      else next.delete(id);
+      hoveredMarkerIds = next;
+    };
+    const enter = () => {
+      clearTimeout(releaseTimer);
+      setHovered(true);
+    };
+    const leave = () => {
+      clearTimeout(releaseTimer);
+      releaseTimer = setTimeout(() => setHovered(false), hoverReleaseDelay);
+    };
+    node.addEventListener('pointerenter', enter);
+    node.addEventListener('pointerleave', leave);
+    node.addEventListener('pointercancel', leave);
+    return {
+      destroy() {
+        clearTimeout(releaseTimer);
+        node.removeEventListener('pointerenter', enter);
+        node.removeEventListener('pointerleave', leave);
+        node.removeEventListener('pointercancel', leave);
+      }
+    };
+  }
+
   function clearSelection() {
     if (!selectedMarkerId) return;
     selectedMarkerId = null;
   }
+
+  function slidingDoor(node) {
+    const direction = node.classList.contains('left') ? -1 : 1;
+    return fly(node, {
+      x: direction * node.offsetWidth,
+      opacity: 1,
+      duration: reducedMotion ? 0 : 450,
+      easing: cubicInOut
+    });
+  }
 </script>
+
+<svelte:window on:keydown={(event) => { if (event.key === 'Escape') clearSelection(); }} />
 
 <div class="page-wrapper" style="overflow-x: hidden; --navigation-height: {navigationHeight}px; --map-scale: {mapScale};">
   <section class="hero-container">
@@ -99,11 +173,17 @@
            class:zoomed={!!selectedMarkerId}
       >
         <div class="map-content" style="transform: {activeTransform};">
-          <img class="map-image" src={mapSvg} alt="Map of the Atlantic World" />
-          {#each markers as marker}
+          <svg class="map-image" viewBox={mapViewBox} role="img" aria-label="Map of the Atlantic World"
+            style="aspect-ratio: {mapBounds.width} / {mapBounds.height};">
+            <image href={mapSvg} x="-74.25" y="-90.73" width="810.03" height="480.15" />
+          </svg>
+          <TravelDots viewBox={mapViewBox} />
+          {#each displayMarkers as marker}
             {#if shownThroughYear >= revealYears[marker.id]}
             <div 
               class="marker {selectedMarkerId === marker.id ? 'selected' : ''}" 
+              class:hovered={hoveredMarkerIds.has(marker.id)}
+              use:bufferedHover={marker.id}
               on:click={(e) => handleMarkerClick(marker.id, e)}
               style="
                 width: calc({marker.width} * var(--map-scale));
@@ -111,7 +191,9 @@
                 left: {marker.left}; 
               "
             >
+              <MarkerHitbox artwork={marker.artwork} id={marker.id} />
               <span class="marker-shape" style="
+                --marker-highlight: {marker.highlight};
                 --pin-center-x: calc({marker.pinCenterX} * var(--map-scale));
                 -webkit-mask-image: url('{marker.src}');
                 mask-image: url('{marker.src}');
@@ -125,11 +207,24 @@
       <MapTimeline targetYear={selectedMarkerId ? startYears[selectedMarkerId] : null}
         onYear={(year) => { shownThroughYear = Math.max(shownThroughYear, year); }} />
       {#if selectedMarker}
-        <div class="popup-panel {isRightSide ? 'left' : 'right'}" transition:fade={{ duration: 250 }}>
-          <h2>{popupTitle}</h2>
-          <p class="description-text">{popupContent[selectedMarker.id]?.description || `Content for ${selectedMarker.name} coming soon.`}</p>
-          <p style="font-size: 0.85rem; color: #666; margin-top: 1rem;"><i>Click anywhere on the map to zoom out.</i></p>
-        </div>
+        {#key isRightSide}
+          <!-- svelte-ignore a11y_no_static_element_interactions -->
+          <!-- svelte-ignore a11y_click_events_have_key_events -->
+          <aside class="marker-panel {isRightSide ? 'left' : 'right'}" aria-labelledby="marker-panel-title"
+            on:click|stopPropagation
+            transition:slidingDoor|global>
+            <div class="panel-content">
+              <h2 id="marker-panel-title">{popupTitle}<span class="dataset-dots" aria-hidden="true">
+                {#each markerDatasets[selectedMarker.id] as dataset}
+                  <span class="dataset-dot" style="background-color: {datasetColors[dataset]};"></span>
+                {/each}
+              </span></h2>
+            <p class="description-text">{popupContent[selectedMarker.id]?.description || `Content for ${selectedMarker.name} coming soon.`}</p>
+            <a class="panel-link" href="{base}/data">Check Out Visualizations</a>
+            <p class="panel-hint"><i>Click anywhere on the map to zoom out.</i></p>
+            </div>
+          </aside>
+        {/key}
       {/if}
       </div>
     </div>
@@ -178,14 +273,13 @@
 
   .image-wrapper {
     width: 100%;
-    padding: 0 300px;
+    padding: 0 280px;
     box-sizing: border-box;
     display: flex;
     justify-content: center;
   }
 
   .map-container {
-    --popup-inset: 24px;
     position: relative;
     width: 100%;
     z-index: 1;
@@ -209,6 +303,7 @@
     width: 100%;
     height: auto;
     display: block;
+    overflow: hidden;
   }
 
   .marker {
@@ -222,10 +317,11 @@
   }
 
   .marker-shape {
+    position: relative;
     display: block;
     width: 100%;
     height: 100%;
-    pointer-events: auto;
+    pointer-events: none;
     
     -webkit-mask-size: contain;
     mask-size: contain;
@@ -239,25 +335,45 @@
     -webkit-user-select: none;
     user-select: none;
 
-    /* for debugging purposes */
-    /* -webkit-mask-image: none !important;
-    mask-image: none !important;
-    background-color: rgba(255, 0, 0, 0.5) !important; */
-    
     transform: scale(1);
     /* The pin is offset from the center of the artwork, which includes its label. */
     transform-origin: var(--pin-center-x) 100%;
     transition: transform 0.2s ease, background-color 0.2s ease, filter 0.2s ease;
   }
 
-  .marker:hover, .marker.selected {
+  .marker.hovered, .marker.selected {
     z-index: 10;
   }
 
-  .marker:hover .marker-shape, .marker.selected .marker-shape {
+  .marker.hovered .marker-shape, .marker.selected .marker-shape {
     transform: scale(1.1);
-    background-color: #fafafa;
+    background-color: #fff;
     filter: drop-shadow(0 4px 6px rgba(0,0,0,0.4));
+  }
+
+  .marker-shape::before, .marker-shape::after {
+    content: '';
+    position: absolute;
+    left: var(--pin-center-x);
+    top: 34%;
+    width: calc(27px * var(--map-scale));
+    height: 49%;
+    transform: translateX(-50%);
+    pointer-events: none;
+  }
+
+  .marker-shape::before {
+    background: #2e332b;
+  }
+
+  .marker-shape::after {
+    background: var(--marker-highlight);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+
+  .marker.hovered .marker-shape::after, .marker.selected .marker-shape::after {
+    opacity: 1;
   }
 
   @keyframes marker-arrival {
@@ -265,34 +381,34 @@
     to { opacity: 1; translate: 0 0; }
   }
   @media (prefers-reduced-motion: reduce) {
-    .marker { animation: none; }
+    .marker, .marker-shape { animation: none; }
+    .marker-shape::after { transition: none; }
   }
 
-  .popup-panel {
+  .marker-panel {
+    display: flex;
+    flex-direction: column;
     position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    width: min(320px, calc(100% - 2 * var(--popup-inset)));
-    max-height: calc(100% - 2 * var(--popup-inset));
+    top: 0;
+    bottom: 0;
+    width: min(360px, 48%);
     overflow-y: auto;
     background: #F6F3DE;
-    border-radius: 12px;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+    box-shadow: 0 0 30px rgba(0,0,0,0.15);
     padding: 1.5rem;
     z-index: 100;
     box-sizing: border-box;
   }
-  .popup-panel h2 {
-    position: relative;
-    margin-top: 0;
-    color: #2e332b;
-  }
-  .description-text {
-    margin-top: 0.25rem;
-    white-space: pre-line;
-  }
-  .popup-panel.left { left: var(--popup-inset); }
-  .popup-panel.right { right: var(--popup-inset); }
+  .marker-panel.left { left: 0; border-right: 1px solid #2e332b22; }
+  .marker-panel.right { right: 0; border-left: 1px solid #2e332b22; }
+  .marker-panel h2 { margin: 0; font-size: 1.5rem; color: #2e332b; }
+  .panel-content { margin-block: auto; flex-shrink: 0; }
+  .dataset-dots { display: inline-flex; gap: 0.35rem; margin-left: 0.6rem; vertical-align: middle; }
+  .dataset-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .description-text { margin-top: 0.75rem; white-space: pre-line; line-height: 1.6; }
+  .panel-link { color: #2e332b; text-underline-offset: 3px; }
+  .panel-hint { margin-top: 1.5rem; font-size: 0.85rem; color: #666; }
+  @media (max-width: 768px) { .marker-panel { width: min(360px, 85%); padding: 1rem; } }
 
   .hero-text {
     text-align: center;
@@ -328,7 +444,7 @@
   /* Responsive Adjustments */
   @media (max-width: 768px) {
     .image-wrapper {
-      padding: 0 12px;
+      padding: 0;
     }
     .hero-container {
       gap: 2rem;
