@@ -29,6 +29,7 @@ const druryLane = london.filter(d => d.place == "Drury Lane").map(d =>{
 });
 const newOrleans = await FileAttachment("data/new_orleans/new_o_frequent_performances.csv").csv({typed: false});
 const madrid = await FileAttachment("data/madrid-performances.json").json();
+console.log(madrid);
 const teatroDeLaCruz = madrid['Teatro de la Cruz'].filter(d => d.title).map(d => {
   d.origin = 'teatro de la cruz';
   d.author = d.author||'unkown';

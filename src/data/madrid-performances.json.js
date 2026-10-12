@@ -18,6 +18,12 @@ const MONTHS = {
 
 
 export async function load() {
+    // return [];
+    const empty = new Set(["", " ", null, undefined]);
+    const isWhitespace = str => !/\S/.test(str)
+    const getVal = v => {
+        return isWhitespace(v)||empty.has(v)?null:v;
+    }
     const data = readFileSync("./src/data/madrid-database.xlsx");
     const workbook = XLSX.read(data);
     const madrid = {
@@ -27,18 +33,18 @@ export async function load() {
 
     for(const theater of Object.keys(madrid)){
         madrid[theater] = XLSX.utils.sheet_to_json(workbook.Sheets[theater]).reduce((acc, p) => {
-            const dateString = p['Performance Date']?.split(' ');
+            const dateString = getVal(p['Performance Date'])?.split(' ');
             for (let i = 1; i < 4; i++){
                 acc.push({
-                    title: p[`Play ${i} Title`]||null,
-                    author: p[`Author ${i} Name`]||null,
-                    genre: p[`Play ${i} Genre`]||null,
+                    title: getVal(p[`Play ${i} Title`]),
+                    author: getVal(p[`Author ${i} Name`]),
+                    genre: getVal(p[`Play ${i} Genre`]),
                     date: dateString? new Date(Number(dateString[2]), MONTHS[dateString[1]], Number(dateString[0])):null,
                     year: dateString? dateString[2]:null
                 });
             }
             return acc;
-        }, []);
+        }, []).filter(d => d.title);
     }
 
     return madrid;
