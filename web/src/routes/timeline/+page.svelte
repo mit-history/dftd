@@ -24,13 +24,13 @@
     },
     {
       name: 'Covent Garden (London)',
-      // link: '',
+      link: 'https://londonstagedatabase.uoregon.edu/',
       ranges: data.ranges.coventGarden ? [data.ranges.coventGarden] : [],
       color: '#4DA011'
     },
     {
       name: 'Drury Lane (London)',
-      // link: '',
+      link: 'https://www.theatronomics.com/',
       ranges: data.ranges.druryLane ? [data.ranges.druryLane] : [],
       color: '#DF789A'
     },
