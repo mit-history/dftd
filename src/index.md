@@ -436,7 +436,17 @@ import { rangeInput } from "./components/range_input.js";
 ```js
 
 const originOptions = ["danish", "dutch", "french", "saint-domingue", 'covent garden', 'drury lane', 'new orleans', 'teatro de la cruz', 'teatro del principe'];
-const reactiveOrigins = Inputs.input(["danish", "dutch", "french"]);
+const datasetToOrigin = {
+  french: 'french', dutch: 'dutch', danish: 'danish',
+  madridCruz: 'teatro de la cruz', madridPrincipe: 'teatro del principe',
+  coventGarden: 'covent garden', druryLane: 'drury lane',
+  saintDomingue: 'saint-domingue', newOrleans: 'new orleans'
+};
+const requestedOrigins = typeof window === "undefined" ? [] :
+  (new URLSearchParams(window.location.search).get("origins") || "").split(",");
+const initialOrigins = [...new Set(requestedOrigins.map(key => datasetToOrigin[key] ?? key)
+  .filter(origin => originOptions.includes(origin)))];
+const reactiveOrigins = Inputs.input(initialOrigins.length ? initialOrigins : ["danish", "dutch", "french"]);
 const react = Generators.input(reactiveOrigins)
 
 ```
