@@ -43,7 +43,7 @@
         The three collaborators have reached out to colleagues who have compiled datasets on theater performance in several venues in Europe and the Americas.
         Our goal to date has been to create visualizations that allow users to compare data on authors, genres, and performance frequency across the national boundaries in which theater history is traditionally studied.
         Our work began in Fall 2024 and has featured project planning meetings at MIT and the University of Bergen. In between these meetings, project partners have generously shared their datasets,
-        allowing us to assemble them in our repository and link them to a series of experimental visualizations, which you will find <a href="{base}/data" class="link">here</a>.
+        allowing us to assemble them in our repository and link them to a series of experimental visualizations, which you will find <a href="{base}/explore" class="link">here</a>.
       </p>
 
       <p>

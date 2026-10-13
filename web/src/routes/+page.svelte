@@ -229,7 +229,7 @@
                 {/each}
               </span></h2>
             <p class="description-text">{popupContent[selectedMarker.id]?.description || `Content for ${selectedMarker.name} coming soon.`}</p>
-            <a class="panel-link" href="{base}/data">Check Out Visualizations</a>
+            <a class="panel-link" href="{base}/explore">Check Out Visualizations</a>
             <p class="panel-hint"><i>Click anywhere on the map to zoom out.</i></p>
             </div>
           </aside>
@@ -244,7 +244,7 @@
       <p class="intro">
         In the eighteenth-century Atlantic World, plays and performers often moved from one polity to the next across land and sea,
         creating new meanings and audience expectations as they did so.
-        <strong>Transnational Stages</strong> offers users the opportunity <a href="{base}/data" class="link">to study national performance datasets via comparative visualization tools</a>,
+        <strong>Transnational Stages</strong> offers users the opportunity <a href="{base}/explore" class="link">to study national performance datasets via comparative visualization tools</a>,
         thereby creating new insights into international theatrical trends in the Early Modern and Modern periods.
         Our project relies on the foundational work of our <a href="{base}/affiliates" class="link">affiliated project</a> partners. Learn more about our work <a href="{base}/about" class="link">here</a>.
       </p>
