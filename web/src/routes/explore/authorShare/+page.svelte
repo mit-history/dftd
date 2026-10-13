@@ -1,45 +1,66 @@
 <svelte:head>
-  <title>Author Bubble Map • Explore the Data</title>
+  <title>Author Shares • Explore the Data</title>
 </svelte:head>
 
 <script>
   import { dev } from "$app/environment";
-  const baseNotebookUrl = dev ? "http://localhost:3000/" : "https://transnationalstages.net/data";
-  const notebookUrl = `${baseNotebookUrl}?viz=author-bubble`;
+  const baseNotebookUrl = dev ? "/data/" : "https://transnationalstages.net/data";
+  const notebookUrl = `${baseNotebookUrl}?viz=authorShare`;
+  
+  let showPopup = true;
 </script>
+
+{#if showPopup}
+  <!-- svelte-ignore a11y-click-events-have-key-events -->
+  <!-- svelte-ignore a11y-no-static-element-interactions -->
+  <div 
+    id="author-share-popup" 
+    style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.5); z-index: 9999; display: flex; align-items: center; justify-content: center; cursor: pointer;" 
+    on:click={() => showPopup = false}
+  >
+    <div style="max-width: 700px; width: 90%; background: #fdfd96; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); display: flex; align-items: center; justify-content: center; flex-direction: column; padding: 2rem;">
+      <h3 style="margin: 0 0 1rem 0; color: #333;">
+        We have not yet standardized the names of playwrights who appear in more than one of our datasets.
+        But you can use this tool to visualize the presence of an author in multiple venues.
+        As an example, type in the name of Shakespeare, Molière, Voltaire, Mercier, or Holberg in the "Search and add author" bar.
+        Add all spellings of the author's name that appear up to a total of three, and the graph
+        will display performances of the author's plays in multiple datasets.
+      </h3>
+      <p style="margin: 0; color: #666; text-align: center;">Click anywhere to dismiss</p>
+    </div>  
+  </div>
+{/if}
 
 
 <main class="viz-page">
-  <!-- <h1 class="title">Authors by Location</h1> -->
+  <!-- <h1 class="title">Author Shares</h1> -->
 
   <!-- <section class="timeline">
     <div class="timeline-bar">
       <span class="timeline-label">
-        Bubble visualization showing where authors appear across cities and time.
+        Percentage of each city’s repertoire accounted for by a selected author.
       </span>
     </div>
   </section> -->
-
-  <section class="viz-info">
+<section class="viz-info">
   <div class="chip">Authors</div>
-  <h1>Author Presence in Repertories - Bubble Graph</h1>
+  <h1>Author Presence in Repertories - Bar Graph</h1>
 </section>
-
 
   <section class="viz-frame">
     <iframe
       src={notebookUrl}
-      title="Author Bubble Visualization"
+      title="Author Shares Visualization"
       loading="lazy"
     ></iframe>
   </section>
 
   <!-- <section class="below-text">
     <p>
-      This tool visualizes authors across Amsterdam, Copenhagen, and Paris using bubbles whose
-      size corresponds to performance frequency. Adjustable time ranges and thresholds make it
-      easy to identify which authors dominate a given city, which ones overlap across regions,
-      and which appear only locally.
+      This visualization shows how a particular playwright’s works contribute to each city’s
+      repertoire over time. By normalizing each author's performances as a percentage of that
+      city's total output, you can compare influence across Amsterdam, Copenhagen, and Paris even
+      when their overall volumes differ dramatically.
     </p>
   </section> -->
 </main>

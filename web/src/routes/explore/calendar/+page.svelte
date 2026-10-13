@@ -1,38 +1,30 @@
 <svelte:head>
-  <title>Performances Over Time • Explore the Data</title>
+  <title>Global Theatre Calendar • Explore the Data</title>
 </svelte:head>
 
 <script>
   import { dev } from "$app/environment";
-  const baseNotebookUrl = dev ? "http://localhost:3000/" : "https://transnationalstages.net/data";
-  const notebookUrl = `${baseNotebookUrl}?viz=over-time`;
+  const baseNotebookUrl = dev ? "/data/" : "https://transnationalstages.net/data";
+  const notebookUrl = `${baseNotebookUrl}?viz=calendar`;
 </script>
 
 
-<main class="viz-page">
-  <!-- Title -->
-  <!-- <h1 class="title">Performances Over Time</h1> -->
 
-  <!-- Dummy timeline -->
+<main class="viz-page">
+  <!-- <h1 class="title">Global Theatre Calendar</h1> -->
+
+  <!-- Dummy timeline / context bar -->
   <!-- <section class="timeline">
     <div class="timeline-bar">
-      <span class="timeline-label">Timeline (placeholder – 1748 → 1798)</span>
+      <span class="timeline-label">
+        Calendar view of performances across Amsterdam, Copenhagen, Paris, and New Orleans.
+      </span>
     </div>
   </section> -->
 
-  <!-- Text below visualization
-  <section class="below-text">
-    <p>
-      This view focuses on how performance counts change over time in each city’s repertoire.
-      Use the filters in the visualization to narrow the date range, toggle cities, and explore
-      periods of growth, decline, or disruption. This is especially useful for spotting shifts
-      around major historical events or theatre reforms.
-    </p>
-  </section> -->
-
   <section class="viz-info">
-  <div class="chip">Annual Performance Comparison</div>
-  <h1>Annual Performance Counts</h1>
+  <div class="chip">Performance Calendar</div>
+  <h1>Global Theatre Calendar</h1>
 </section>
 
 
@@ -40,12 +32,21 @@
   <section class="viz-frame">
     <iframe
       src={notebookUrl}
-      title="Performances Over Time Visualization"
+      title="Global Theatre Calendar Visualization"
       loading="lazy"
     ></iframe>
   </section>
 
-
+  <!-- Text below visualization
+  <section class="below-text">
+    <p>
+      This calendar visualization lets you browse performances day by day across multiple cities.
+      You can adjust the date range, switch between monthly, weekly, or daily views, and filter by
+      venue and dataset. Overlays for major historical events provide additional context for shifts
+      in theatrical activity. It is designed to make it easier to see moments of intensive
+      performance, periods of silence, and how New Orleans enters the transatlantic theatre network.
+    </p>
+  </section> -->
 </main>
 
 <style>

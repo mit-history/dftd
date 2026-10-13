@@ -1,52 +1,61 @@
 <svelte:head>
-  <title>Performances Over Time • Explore the Data</title>
+  <title>Performances by Author • Explore the Data</title>
 </svelte:head>
 
 <script>
   import { dev } from "$app/environment";
-  const baseNotebookUrl = dev ? "http://localhost:3000/" : "https://transnationalstages.net/data";
-
-  const notebookUrl = `${baseNotebookUrl}?viz=heat-map`;
+  const baseNotebookUrl = dev ? "/data/" : "https://transnationalstages.net/data";
+  const notebookUrl = `${baseNotebookUrl}?viz=authors`;
 </script>
 
 
 <main class="viz-page">
-  <!-- Title -->
-  <!-- <h1 class="title">Performances Over Time</h1> -->
+  <!-- <h1 class="title">Performances by Author</h1> -->
 
   <!-- Dummy timeline -->
   <!-- <section class="timeline">
     <div class="timeline-bar">
-      <span class="timeline-label">Timeline (placeholder – 1748 → 1798)</span>
+      <span class="timeline-label">Timeline (placeholder – author presence across years)</span>
     </div>
   </section> -->
 
-  <!-- Text below visualization
-  <section class="below-text">
-    <p>
-      This view focuses on how performance counts change over time in each city’s repertoire.
-      Use the filters in the visualization to narrow the date range, toggle cities, and explore
-      periods of growth, decline, or disruption. This is especially useful for spotting shifts
-      around major historical events or theatre reforms.
-    </p>
-  </section> -->
-
   <section class="viz-info">
-  <div class="chip">Annual Performance Comparison</div>
-  <h1>Heat Map Showing Performance Patterns</h1>
-</section>
+  <div class="chip">Performances by Author</div>
 
+  <h1>Comparing Author Influence Across Theatre Traditions</h1>
+
+  <p>
+    This visualization highlights how frequently different playwrights appear in the
+    Danish, French, and Dutch repertoires. Use it to trace patterns of influence,
+    measure the reach of major writers, and uncover how cultural preferences shift
+    across time and geographical regions.
+  </p>
+
+  <ul class="keypoints">
+    <li>Select an author to examine their annual performance presence across cities.</li>
+    <li>Explore percentages and absolute counts to understand cultural dominance or decline.</li>
+    <li>View geographic patterns of performances to see where authors gained popularity.</li>
+  </ul>
+</section>
 
   <!-- Interactive visualization -->
   <section class="viz-frame">
     <iframe
       src={notebookUrl}
-      title="Heatmap Visualization"
+      title="Performances by Author Visualization"
       loading="lazy"
     ></iframe>
   </section>
 
-
+  <!-- Text below visualization
+  <section class="below-text">
+    <p>
+      This view helps you trace how often individual authors appear in each repertoire over time.
+      You might use it to compare local playwrights with international figures, identify periods
+      when a particular author dominates the stage, or see how long an author’s works persist in
+      a given city’s repertoire.
+    </p>
+  </section> -->
 </main>
 
 <style>

@@ -4,7 +4,7 @@
 
 <script>
   import { dev } from "$app/environment";
-  const baseNotebookUrl = dev ? "http://localhost:3000/" : "https://transnationalstages.net/data";
+  const baseNotebookUrl = dev ? "/data/" : "https://transnationalstages.net/data";
   const notebookUrl = `${baseNotebookUrl}?viz=days`;
 </script>
 

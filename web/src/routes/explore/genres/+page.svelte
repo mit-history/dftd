@@ -1,52 +1,58 @@
 <svelte:head>
-  <title>Global Theatre Calendar • Explore the Data</title>
+  <title>Genres Across Cities • Explore the Data</title>
 </svelte:head>
 
 <script>
   import { dev } from "$app/environment";
-  const baseNotebookUrl = dev ? "http://localhost:3000/" : "https://transnationalstages.net/data";
-  const notebookUrl = `${baseNotebookUrl}?viz=calendar`;
+  const baseNotebookUrl = dev ? "/data/" : "https://transnationalstages.net/data";
+  const notebookUrl = `${baseNotebookUrl}?viz=genres`;
 </script>
 
 
-
 <main class="viz-page">
-  <!-- <h1 class="title">Global Theatre Calendar</h1> -->
+  <!-- <h1 class="title">Genres Across Cities</h1> -->
 
-  <!-- Dummy timeline / context bar -->
+  <!-- Dummy timeline -->
   <!-- <section class="timeline">
     <div class="timeline-bar">
-      <span class="timeline-label">
-        Calendar view of performances across Amsterdam, Copenhagen, Paris, and New Orleans.
-      </span>
+      <span class="timeline-label">Timeline (placeholder – genre trends over time)</span>
     </div>
   </section> -->
 
   <section class="viz-info">
-  <div class="chip">Performance Calendar</div>
-  <h1>Global Theatre Calendar</h1>
-</section>
+  <div class="chip">Genre Composition</div>
+  <h1>Genre Trends Across Time</h1>
 
+  <p>
+    Explore how comedy, drama, ballet, and other genres evolved across different
+    theatre cultures. The diverging bars visualize contrasting artistic priorities
+    between traditions.
+  </p>
+
+  <ul class="keypoints">
+    <li>Compare genre balance between Danish and French theatres.</li>
+    <li>Identify years with strong domination of a single genre.</li>
+    <li>Hover for exact genre percentages per year.</li>
+  </ul>
+</section>
 
   <!-- Interactive visualization -->
   <section class="viz-frame">
     <iframe
       src={notebookUrl}
-      title="Global Theatre Calendar Visualization"
+      title="Genres Across Cities Visualization"
       loading="lazy"
     ></iframe>
   </section>
 
-  <!-- Text below visualization
+  <!-- Text below visualization -->
   <section class="below-text">
     <p>
-      This calendar visualization lets you browse performances day by day across multiple cities.
-      You can adjust the date range, switch between monthly, weekly, or daily views, and filter by
-      venue and dataset. Overlays for major historical events provide additional context for shifts
-      in theatrical activity. It is designed to make it easier to see moments of intensive
-      performance, periods of silence, and how New Orleans enters the transatlantic theatre network.
+      This visualization highlights the balance of genres—such as comedy, drama, tragedy, and ballet—
+      across each dataset. By comparing cities over time, you can see how tastes shift, when certain
+      genres surge in popularity, and which repertoires foreground particular kinds of performance.
     </p>
-  </section> -->
+  </section>
 </main>
 
 <style>
