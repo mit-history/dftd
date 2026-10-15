@@ -32,7 +32,7 @@
 
   <section class="viz-info">
   <div class="chip">Annual Performance Comparison</div>
-  <h1>Annual Performance Counts</h1>
+  <h1>Annual Days with Performances</h1>
 </section>
 
 

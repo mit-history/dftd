@@ -21,7 +21,7 @@
 
   <section class="viz-info">
   <div class="chip">Annual Performance Comparison</div>
-  <h1>Animated Line Chart Showing Annual Performance Totals</h1>
+  <h1>Animated Line Chart Showing Annual Days with Performances</h1>
 </section>
 
   <!-- Interactive visualization -->

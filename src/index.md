@@ -567,9 +567,18 @@ const formatted_data = combined_data.filter(d => {
 ```
 
 ```js
+function countPerformanceDays(data) {
+  return d3.rollup(
+    data,
+    rows => new Set(rows.map(row => asDate(row.date).toISOString().slice(0, 10))).size,
+    row => asDate(row.date).getUTCFullYear(),
+    row => row.origin
+  );
+}
+
 function compareYearsChart(data) {
   const years = d3.range(start_date.getUTCFullYear(), end_date.getUTCFullYear() + 1);
-  const counts = d3.rollup(data, rows => rows.length, row => Number(row.year), row => row.origin);
+  const counts = countPerformanceDays(data);
   const yearCounts = years.flatMap(year => origins.map(origin => ({
     year,
     origin,
@@ -583,10 +592,10 @@ function compareYearsChart(data) {
   const yearTicks = years.filter((_, i) => i % step === 0);
 
   return Plot.plot({
-    title: `Compare performances per year, ${start_date.getFullYear()}–${end_date.getFullYear()}`,
+    title: `Compare days with performances per year, ${start_date.getUTCFullYear()}–${end_date.getUTCFullYear()}`,
     fx: { label: null, padding: 0.1, domain: d3.range(start_date.getUTCFullYear(), end_date.getUTCFullYear() + 1) },
     x: { axis: null, paddingOuter: 0.2 },
-    y: { grid: true, label: "Performances", domain: [0, 366] },
+    y: { grid: true, label: "Days with performances", domain: [0, 366] },
     color: {
       domain: Object.keys(color_map),
       range: Object.values(color_map),
@@ -732,21 +741,10 @@ import {
 // sort by year first for ltr visualization
 genre_data.sort((a, b) => a.year - b.year);
 
-// When dataset === "All", group each dataset into performance counts by year
-// summarize only what’s in the current date window
 function summarize(dataset, label) {
-  const map = new Map();
-  dataset.forEach(d => {
-    const dt = asDate(d.date);
-    if (!dt) return;
-    if (dt < start_date || dt > end_date) return; // 👈 clamp to filter
-    const year = d.year ?? dt.getUTCFullYear();
-    if (!map.has(year)) map.set(year, new Set());
-    map.get(year).add(dt.toISOString().slice(0, 10)); // day-level uniqueness
-  });
-  const summary = Array.from(map, ([year, dates]) => ({
+  const summary = Array.from(countPerformanceDays(dataset), ([year, counts]) => ({
     year,
-    count: dates.size,
+    count: counts.get(label) ?? 0,
   })).sort((a, b) => a.year - b.year);
   return { label, data: summary };
 }
