@@ -24,13 +24,13 @@
     },
     {
       name: 'Covent Garden (London)',
-      link: 'https://londonstagedatabase.uoregon.edu/',
+      link: base + '/london-affiliates',
       ranges: data.ranges.coventGarden ? [data.ranges.coventGarden] : [],
       color: '#4DA011'
     },
     {
       name: 'Drury Lane (London)',
-      link: 'https://www.theatronomics.com/',
+      link: base + '/london-affiliates',
       ranges: data.ranges.druryLane ? [data.ranges.druryLane] : [],
       color: '#DF789A'
     },
@@ -104,8 +104,15 @@
 
       <div class="lines" style="height: {projects.length * 50}px">
         {#each projects as project, index}
+          {@const isExternal = project.link?.startsWith('https://')}
           <div class="label" style="top: {index * 50}px;">
-            <a href={project.link} target="_blank">{project.name} &#8599;</a>
+            <a
+              href={project.link}
+              target={isExternal ? '_blank' : undefined}
+              rel={isExternal ? 'noopener noreferrer' : undefined}
+            >
+              {project.name}{#if project.link} ↗{/if}
+            </a>
           </div>
           {#each project.ranges as range}
             <div
