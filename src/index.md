@@ -339,12 +339,8 @@ const opt = [
   "NOLA Genre Bubble",
 ];
 
-// Read ?viz=... from the URL if we’re in a browser
-let vizParam = null;
-if (typeof window !== "undefined") {
-  const params = new URLSearchParams(window.location.search);
-  vizParam = params.get("viz");
-}
+const urlParams = new URLSearchParams(typeof window === "undefined" ? "" : window.location.search);
+const vizParam = urlParams.get("viz");
 
 // If vizParam matches one of our IDs, lock to that one; otherwise use the checkbox
 let viz;
@@ -406,16 +402,20 @@ import { rangeInput } from "./components/range_input.js";
 
 
 ```js
-  const start_date_input = Inputs.date({label: "Start", value: `${minGraphYear}-01-01`})
-  const end_date_input = Inputs.date({label: "End", value: `${maxGraphYear}-12-31`})
+  const rangeMinYear = Math.max(minGraphYear, Number(urlParams.get("startYear")) || minGraphYear);
+  const rangeMaxYear = Math.min(maxGraphYear, Number(urlParams.get("endYear")) || maxGraphYear);
+  const rangeStart = `${rangeMinYear}-01-01`;
+  const rangeEnd = `${rangeMaxYear}-12-31`;
+  const start_date_input = Inputs.date({label: "Start", min: rangeStart, max: rangeEnd, value: rangeStart})
+  const end_date_input = Inputs.date({label: "End", min: rangeStart, max: rangeEnd, value: rangeEnd})
   const date_range = rangeInput({
-    min: minGraphYear,
-    max: maxGraphYear,
+    min: rangeMinYear,
+    max: rangeMaxYear,
     step: 1,
-    value: [minGraphYear, maxGraphYear],
+    value: [rangeMinYear, rangeMaxYear],
     enableTextInput: true
   });
-  const defaultDateRange = [minGraphYear, maxGraphYear];
+  const defaultDateRange = [rangeMinYear, rangeMaxYear];
   display(activeFilters.yearRange? html`<span style="margin-right: 1rem">Year Range</span>`:html`<span hidden></span>`)
   const date_range_val = activeFilters.yearRange
     ? view(date_range)
@@ -442,8 +442,7 @@ const datasetToOrigin = {
   coventGarden: 'covent garden', druryLane: 'drury lane',
   saintDomingue: 'saint-domingue', newOrleans: 'new orleans'
 };
-const requestedOrigins = typeof window === "undefined" ? [] :
-  (new URLSearchParams(window.location.search).get("origins") || "").split(",");
+const requestedOrigins = (urlParams.get("origins") || "").split(",");
 const initialOrigins = [...new Set(requestedOrigins.map(key => datasetToOrigin[key] ?? key)
   .filter(origin => originOptions.includes(origin)))];
 const reactiveOrigins = Inputs.input(initialOrigins.length ? initialOrigins : ["danish", "dutch", "french"]);

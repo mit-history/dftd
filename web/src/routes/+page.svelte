@@ -21,6 +21,15 @@
     madrid: ['madridCruz', 'madridPrincipe'], london: ['coventGarden', 'druryLane'],
     'saint-domingue': ['saintDomingue'], 'new orleans': ['newOrleans']
   };
+  function visualizationLink(city) {
+    const datasets = cityToDatasets[city];
+    const params = new URLSearchParams({
+      origins: datasets.join(','),
+      startYear: String(Math.min(...datasets.map(key => ranges[key].start))),
+      endYear: String(Math.max(...datasets.map(key => ranges[key].end)))
+    });
+    return `${base}/data/?${params}`;
+  }
   const startYears = Object.fromEntries(markers.map(marker => [
     marker.id, Math.min(...cityToDatasets[marker.id].map(key => ranges[key].start))
   ]));
@@ -229,7 +238,7 @@
                 {/each}
               </span></h2>
             <p class="description-text">{popupContent[selectedMarker.id]?.description || `Content for ${selectedMarker.name} coming soon.`}</p>
-            <a class="panel-link" data-sveltekit-reload href="{base}/data/?origins={encodeURIComponent(cityToDatasets[selectedMarker.id].join(','))}">Check Out Visualizations</a>
+            <a class="panel-link" data-sveltekit-reload href={visualizationLink(selectedMarker.id)}>Check Out Visualizations</a>
             <p class="panel-hint"><i>Click anywhere on the map to zoom out.</i></p>
             </div>
           </aside>
