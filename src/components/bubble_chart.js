@@ -35,8 +35,14 @@ export function BubbleChart(data, {
   if (G && groups === undefined) groups = I.map(i => G[i]);
   groups = G && new d3.InternSet(groups);
 
+  const ascii = [];
+
+  for (var i = 1; i <= 127; i++) {
+    ascii.push(i);
+  }
+
   // Construct scales.
-  const color = G && d3.scaleOrdinal(groups, colors);
+  const color = G && d3.scaleOrdinal(ascii, colors); //changed first arg from groups to the alphabet
 
   // Compute labels and titles.
   const L = label == null ? null : d3.map(data, label);
@@ -123,11 +129,33 @@ export function authorBubble(data, origin, season = 0, threshold = [0,0], season
 
   const percent = mode == "percentage";
 
+  const labelFunc = d => {
+
+      if(d.indexOf(' ') === -1)
+        return d;
+      if (d.indexOf('(') !== -1)
+        return d.substring(0, d.indexOf('('));
+      if (d.indexOf(',') !== -1)
+        return d.substring(0, d.indexOf(','));
+      return d.substring(d.lastIndexOf(' ')+1);
+    };
+
+  const getId = a => {
+    const label = labelFunc(a);
+    if (a.includes("Molière"))
+      return 1;
+    if(a.includes("Shakespeare"))
+      return 2;
+    // console.log(label)
+    // console.log(label.charCodeAt(0))
+    return label.charCodeAt(0);
+  };
+
   //filter unwanted data; convert to list of {author: str, count: number} objects
   let authors = Object.entries(data.filter(d => (d.origin == origin) && (Number(d.year) <= season_end) && (Number(d.year) >= season_start)).reduce((acc, d) => {
       acc[d.author] = (acc[d.author] || 0) + 1;
       return acc;
-  }, {})).map(c => {return {author: c[0], count: c[1]}});
+  }, {})).map(c => {return {author: c[0], count: c[1], id: getId(c[0])}});
   const performance_count = percent?authors.reduce((count, author) => {return count + author.count}, 0):1;
   authors = percent?authors.filter(c => (100*c.count/performance_count >= threshold[0] && 100*c.count/performance_count <= threshold[1])):authors.filter(c => c.count >= threshold[0] && c.count <= threshold[1]);
 
@@ -135,21 +163,18 @@ export function authorBubble(data, origin, season = 0, threshold = [0,0], season
   const percentage_sign = percent?"%":"";
   const percentage_multiplier = percent?100:1;
   //make actual chart
+
+
+
+  const authorsWithId = authors.map(d => {
+
+  });
   return BubbleChart(authors, {
     //attempt to filter out first names for readability
-    label: d => {
-      const author = d.author||'unknown'
-      if(author.indexOf(' ') === -1)
-        return author;
-      if (author.indexOf('(') !== -1)
-        return author.substring(0, author.indexOf('('));
-      if (author.indexOf(',') !== -1)
-        return author.substring(0, author.indexOf(','));
-      return author.substring(author.lastIndexOf(' ')+1);
-    },
+    label: d => labelFunc(d.author||'unknown'),
     value: d => (d.count/performance_count)*percentage_multiplier,
     title: d => `${d.author||'unknown'} - ${parseFloat(((d.count/performance_count)*percentage_multiplier).toPrecision(3))}${percentage_sign}`,
-    group: d => d.author[0],
+    group: d => d.id,
     width: 700,
     fontSize: 10
   })

@@ -44,7 +44,7 @@ export async function load() {
                 });
             }
             return acc;
-        }, []).filter(d => d.title);
+        }, []).filter(d => d.title||d.author||d.genre);
     }
 
     return madrid;

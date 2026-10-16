@@ -811,11 +811,11 @@ const CoventGardenRaw = LondonRaw.filter(d=>d.place=='Covent Garden').map(d=>({.
 const DruryLaneRaw = LondonRaw.filter(d=>d.place=='Drury Lane').map(d=>({...d, origin: 'drury lane'}));
 const nolaCsv   = await FileAttachment("data/new_orleans/new_o_frequent_performances.csv").csv({typed: false});
 const MadridRaw = await FileAttachment("data/madrid-performances.json").json();
-const TeatroDeLaCruzRaw = MadridRaw['Teatro de la Cruz'].filter(d => d.title).map(d => {
+const TeatroDeLaCruzRaw = MadridRaw['Teatro de la Cruz'].map(d => {
   d.origin = 'teatro de la cruz';
   return d;
 });
-const TeatroDelPrincipeRaw = MadridRaw['Teatro del Príncipe'].filter(d => d.title).map(d => {
+const TeatroDelPrincipeRaw = MadridRaw['Teatro del Príncipe'].map(d => {
   d.origin = 'teatro del principe';
   return d;
 });
@@ -908,19 +908,20 @@ const TeatroDeLaCruz = TeatroDeLaCruzRaw.map((r,i) => {
   return {
     id: r.id ?? r.ID ?? `Teatro-de-la-Cruz-${i}`,
     date: d, year: d ? d.getUTCFullYear() : (r.year ?? r.Year ?? null),
-    title: r.title ?? r.Title ?? r.play ?? r.Play ?? "Untitled",
+    title: r.title ?? r.Title ?? r.play ?? r.Play ?? `Untitled ${r.genre? r.genre.toLowerCase():""}`,
     origin: "teatro de la cruz",
     theater: r.theater ?? r.Theater ?? r.venue ?? r.Venue ?? r.place ?? r.Place ?? "Unknown venue",
     city: r.city ?? r.City ?? null
   };
 }).filter(d => d.date);
+console.log(TeatroDeLaCruz);
 
 const TeatroDelPrincipe = TeatroDelPrincipeRaw.map((r,i) => {
   const d = asDate(r.date ?? r.Date ?? r.performance_date ?? r.start_date);
   return {
     id: r.id ?? r.ID ?? `Teatro-del-Principe-${i}`,
     date: d, year: d ? d.getUTCFullYear() : (r.year ?? r.Year ?? null),
-    title: r.title ?? r.Title ?? r.play ?? r.Play ?? "Untitled",
+    title: r.title ?? r.Title ?? r.play ?? r.Play ?? `Untitled ${r.genre? r.genre.toLowerCase():""}`,
     origin: "teatro del principe",
     theater: r.theater ?? r.Theater ?? r.venue ?? r.Venue ?? r.place ?? r.Place ?? "Unknown venue",
     city: r.city ?? r.City ?? null
