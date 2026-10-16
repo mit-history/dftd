@@ -1,46 +1,51 @@
 <svelte:head>
-  <title>Days with Performances • Explore the Data</title>
+  <title>Performances Over Time • Explore the Data</title>
 </svelte:head>
 
 <script>
-  const baseNotebookUrl = "https://transnationalstages.net/data";
-  const notebookUrl = `${baseNotebookUrl}?viz=days`;
+  import { dev } from "$app/environment";
+  const baseNotebookUrl = dev ? "/data/" : "https://transnationalstages.net/data";
+  const notebookUrl = `${baseNotebookUrl}?viz=over-time`;
 </script>
 
 
 <main class="viz-page">
-  <!-- <h1 class="title">Days with Performances</h1> -->
+  <!-- Title -->
+  <!-- <h1 class="title">Performances Over Time</h1> -->
 
   <!-- Dummy timeline -->
   <!-- <section class="timeline">
     <div class="timeline-bar">
-      <span class="timeline-label">Timeline (placeholder – performance activity across the calendar)</span>
+      <span class="timeline-label">Timeline (placeholder – 1748 → 1798)</span>
     </div>
+  </section> -->
+
+  <!-- Text below visualization
+  <section class="below-text">
+    <p>
+      This view focuses on how performance counts change over time in each city’s repertoire.
+      Use the filters in the visualization to narrow the date range, toggle cities, and explore
+      periods of growth, decline, or disruption. This is especially useful for spotting shifts
+      around major historical events or theatre reforms.
+    </p>
   </section> -->
 
   <section class="viz-info">
   <div class="chip">Annual Performance Comparison</div>
-  <h1>Animated Line Chart Showing Annual Performance Totals</h1>
+  <h1>Annual Days with Performances</h1>
 </section>
+
 
   <!-- Interactive visualization -->
   <section class="viz-frame">
     <iframe
       src={notebookUrl}
-      title="Days with Performances Visualization"
+      title="Performances Over Time Visualization"
       loading="lazy"
     ></iframe>
   </section>
 
-  <!-- Text below visualization
-  <section class="below-text">
-    <p>
-      This visualization focuses on the calendar rhythm of performances: which parts of the year are
-      most active, how seasons differ between cities, and where there are gaps in the record. It is
-      especially useful for examining holidays, theatrical seasons, and long-term patterns in when
-      performances actually take place.
-    </p>
-  </section> -->
+
 </main>
 
 <style>

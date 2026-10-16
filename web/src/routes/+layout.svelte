@@ -14,7 +14,7 @@
       <ul>
         <li><a href={base + '/'} class:active={$page.url.pathname === base + '/'}>Home</a></li>
         <li><a href={base + '/about'} class:active={$page.url.pathname === base + '/about'}>About</a></li>
-        <li><a href={base + '/data'} class:active={$page.url.pathname === base + '/data'}>Explore the Data</a></li>
+        <li><a href={base + '/explore'} class:active={$page.url.pathname === base + '/explore'}>Explore the Data</a></li>
         <li><a href={base + '/timeline'} class:active={$page.url.pathname === base + '/timeline'}>Dataset Timelines</a></li>
         <li><a href={base + '/affiliates'} class:active={$page.url.pathname === base + '/affiliates'}>Affiliated Projects</a></li>
       </ul>

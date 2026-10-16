@@ -121,7 +121,7 @@
 
     <!-- <section class="menu-grid">
       {#each visualizations as viz}
-        <a href={base + "/data/" + viz.id} class="card">
+        <a href={base + "/explore/" + viz.id} class="card">
           <h3>{viz.title}</h3>
           <p>{viz.description}</p>
           <span class="arrow">Open visualization →</span>
@@ -139,7 +139,7 @@
         </button>
         {#each visualizations.filter(d => d.category === cat.name) as viz}
           <div class="visualization-link">
-            <a href={base + "/data/" + viz.id}>
+            <a href={base + "/explore/" + viz.id}>
               <img class="viz-icon" src={base + '/images/' + viz.icon} alt="Icon"/>
               <h3>{viz.title}
               <span class="arrow">→</span></h3>

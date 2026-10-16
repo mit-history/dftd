@@ -3,7 +3,8 @@
 </svelte:head>
 
 <script>
-  const baseNotebookUrl = "https://transnationalstages.net/data";
+  import { dev } from "$app/environment";
+  const baseNotebookUrl = dev ? "/data/" : "https://transnationalstages.net/data";
   const notebookUrl = `${baseNotebookUrl}?viz=calendar`;
 </script>
 

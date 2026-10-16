@@ -1,50 +1,47 @@
 <svelte:head>
-  <title>Performances Over Time • Explore the Data</title>
+  <title>Author Bubble Map • Explore the Data</title>
 </svelte:head>
 
 <script>
-  const baseNotebookUrl = "https://transnationalstages.net/data";
-  const notebookUrl = `${baseNotebookUrl}?viz=over-time`;
+  import { dev } from "$app/environment";
+  const baseNotebookUrl = dev ? "/data/" : "https://transnationalstages.net/data";
+  const notebookUrl = `${baseNotebookUrl}?viz=author-bubble`;
 </script>
 
 
 <main class="viz-page">
-  <!-- Title -->
-  <!-- <h1 class="title">Performances Over Time</h1> -->
+  <!-- <h1 class="title">Authors by Location</h1> -->
 
-  <!-- Dummy timeline -->
   <!-- <section class="timeline">
     <div class="timeline-bar">
-      <span class="timeline-label">Timeline (placeholder – 1748 → 1798)</span>
+      <span class="timeline-label">
+        Bubble visualization showing where authors appear across cities and time.
+      </span>
     </div>
   </section> -->
 
-  <!-- Text below visualization
-  <section class="below-text">
-    <p>
-      This view focuses on how performance counts change over time in each city’s repertoire.
-      Use the filters in the visualization to narrow the date range, toggle cities, and explore
-      periods of growth, decline, or disruption. This is especially useful for spotting shifts
-      around major historical events or theatre reforms.
-    </p>
-  </section> -->
-
   <section class="viz-info">
-  <div class="chip">Annual Performance Comparison</div>
-  <h1>Annual Performance Counts</h1>
+  <div class="chip">Authors</div>
+  <h1>Author Presence in Repertories - Bubble Graph</h1>
 </section>
 
 
-  <!-- Interactive visualization -->
   <section class="viz-frame">
     <iframe
       src={notebookUrl}
-      title="Performances Over Time Visualization"
+      title="Author Bubble Visualization"
       loading="lazy"
     ></iframe>
   </section>
 
-
+  <!-- <section class="below-text">
+    <p>
+      This tool visualizes authors across Amsterdam, Copenhagen, and Paris using bubbles whose
+      size corresponds to performance frequency. Adjustable time ranges and thresholds make it
+      easy to identify which authors dominate a given city, which ones overlap across regions,
+      and which appear only locally.
+    </p>
+  </section> -->
 </main>
 
 <style>

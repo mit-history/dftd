@@ -1,47 +1,34 @@
 <svelte:head>
-  <title>Performances by Author • Explore the Data</title>
+  <title>Days with Performances • Explore the Data</title>
 </svelte:head>
 
 <script>
-  const baseNotebookUrl = "https://transnationalstages.net/data";
-  const notebookUrl = `${baseNotebookUrl}?viz=authors`;
+  import { dev } from "$app/environment";
+  const baseNotebookUrl = dev ? "/data/" : "https://transnationalstages.net/data";
+  const notebookUrl = `${baseNotebookUrl}?viz=days`;
 </script>
 
 
 <main class="viz-page">
-  <!-- <h1 class="title">Performances by Author</h1> -->
+  <!-- <h1 class="title">Days with Performances</h1> -->
 
   <!-- Dummy timeline -->
   <!-- <section class="timeline">
     <div class="timeline-bar">
-      <span class="timeline-label">Timeline (placeholder – author presence across years)</span>
+      <span class="timeline-label">Timeline (placeholder – performance activity across the calendar)</span>
     </div>
   </section> -->
 
   <section class="viz-info">
-  <div class="chip">Performances by Author</div>
-
-  <h1>Comparing Author Influence Across Theatre Traditions</h1>
-
-  <p>
-    This visualization highlights how frequently different playwrights appear in the
-    Danish, French, and Dutch repertoires. Use it to trace patterns of influence,
-    measure the reach of major writers, and uncover how cultural preferences shift
-    across time and geographical regions.
-  </p>
-
-  <ul class="keypoints">
-    <li>Select an author to examine their annual performance presence across cities.</li>
-    <li>Explore percentages and absolute counts to understand cultural dominance or decline.</li>
-    <li>View geographic patterns of performances to see where authors gained popularity.</li>
-  </ul>
+  <div class="chip">Annual Performance Comparison</div>
+  <h1>Animated Line Chart Showing Annual Days with Performances</h1>
 </section>
 
   <!-- Interactive visualization -->
   <section class="viz-frame">
     <iframe
       src={notebookUrl}
-      title="Performances by Author Visualization"
+      title="Days with Performances Visualization"
       loading="lazy"
     ></iframe>
   </section>
@@ -49,10 +36,10 @@
   <!-- Text below visualization
   <section class="below-text">
     <p>
-      This view helps you trace how often individual authors appear in each repertoire over time.
-      You might use it to compare local playwrights with international figures, identify periods
-      when a particular author dominates the stage, or see how long an author’s works persist in
-      a given city’s repertoire.
+      This visualization focuses on the calendar rhythm of performances: which parts of the year are
+      most active, how seasons differ between cities, and where there are gaps in the record. It is
+      especially useful for examining holidays, theatrical seasons, and long-term patterns in when
+      performances actually take place.
     </p>
   </section> -->
 </main>

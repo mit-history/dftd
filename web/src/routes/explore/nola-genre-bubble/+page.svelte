@@ -3,8 +3,8 @@
 </svelte:head>
 
 <script>
-  const baseNotebookUrl = "https://transnationalstages.net/data";
-  // const baseNotebookUrl = "http://127.0.0.1:3000/";
+  import { dev } from "$app/environment";
+  const baseNotebookUrl = dev ? "/data/" : "https://transnationalstages.net/data";
 
   const notebookUrl = `${baseNotebookUrl}?viz=nola-genre-bubble`;
 </script>

@@ -16,13 +16,22 @@
   import { popupContent, datasetColors } from './popup_config.js';
   import { ranges } from './timeline/range-cache.json';
 
-  const markerDatasets = {
+  const cityToDatasets = {
     paris: ['french'], amsterdam: ['dutch'], copenhagen: ['danish'],
     madrid: ['madridCruz', 'madridPrincipe'], london: ['coventGarden', 'druryLane'],
     'saint-domingue': ['saintDomingue'], 'new orleans': ['newOrleans']
   };
+  function visualizationLink(city) {
+    const datasets = cityToDatasets[city];
+    const params = new URLSearchParams({
+      origins: datasets.join(','),
+      startYear: String(Math.min(...datasets.map(key => ranges[key].start))),
+      endYear: String(Math.max(...datasets.map(key => ranges[key].end)))
+    });
+    return `${base}/data/?${params}`;
+  }
   const startYears = Object.fromEntries(markers.map(marker => [
-    marker.id, Math.min(...markerDatasets[marker.id].map(key => ranges[key].start))
+    marker.id, Math.min(...cityToDatasets[marker.id].map(key => ranges[key].start))
   ]));
   let shownThroughYear = -Infinity;
   const markerRevealLeadYears = 3;
@@ -45,7 +54,7 @@
   }));
 
   function markerHighlight(id) {
-    const colors = markerDatasets[id].map(dataset => datasetColors[dataset]);
+    const colors = cityToDatasets[id].map(dataset => datasetColors[dataset]);
     if (colors.length === 1) return colors[0];
     const stops = colors.map((color, index) =>
       `${color} ${index / colors.length * 100}% ${(index + 1) / colors.length * 100}%`
@@ -87,8 +96,8 @@
 
   $: selectedMarker = displayMarkers.find(m => m.id === selectedMarkerId);
   $: selectedRange = selectedMarker ? {
-    start: Math.min(...markerDatasets[selectedMarker.id].map(key => ranges[key].start)),
-    end: Math.max(...markerDatasets[selectedMarker.id].map(key => ranges[key].end))
+    start: Math.min(...cityToDatasets[selectedMarker.id].map(key => ranges[key].start)),
+    end: Math.max(...cityToDatasets[selectedMarker.id].map(key => ranges[key].end))
   } : null;
   $: popupTitle = selectedMarker ? popupContent[selectedMarker.id]?.title || selectedMarker.name : '';
   $: if (selectedMarker) isRightSide = parseFloat(selectedMarker.left) > 50;
@@ -224,12 +233,12 @@
             transition:slidingDoor|global>
             <div class="panel-content">
               <h2 id="marker-panel-title">{popupTitle}<span class="dataset-dots" aria-hidden="true">
-                {#each markerDatasets[selectedMarker.id] as dataset}
+                {#each cityToDatasets[selectedMarker.id] as dataset}
                   <span class="dataset-dot" style="background-color: {datasetColors[dataset]};"></span>
                 {/each}
               </span></h2>
             <p class="description-text">{popupContent[selectedMarker.id]?.description || `Content for ${selectedMarker.name} coming soon.`}</p>
-            <a class="panel-link" href="{base}/data">Check Out Visualizations</a>
+            <a class="panel-link" data-sveltekit-reload href={visualizationLink(selectedMarker.id)}>Check Out Visualizations</a>
             <p class="panel-hint"><i>Click anywhere on the map to zoom out.</i></p>
             </div>
           </aside>
@@ -244,7 +253,7 @@
       <p class="intro">
         In the eighteenth-century Atlantic World, plays and performers often moved from one polity to the next across land and sea,
         creating new meanings and audience expectations as they did so.
-        <strong>Transnational Stages</strong> offers users the opportunity <a href="{base}/data" class="link">to study national performance datasets via comparative visualization tools</a>,
+        <strong>Transnational Stages</strong> offers users the opportunity <a href="{base}/explore" class="link">to study national performance datasets via comparative visualization tools</a>,
         thereby creating new insights into international theatrical trends in the Early Modern and Modern periods.
         Our project relies on the foundational work of our <a href="{base}/affiliates" class="link">affiliated project</a> partners. Learn more about our work <a href="{base}/about" class="link">here</a>.
       </p>
