@@ -144,10 +144,20 @@ export function authorBubble(data, origin, season = 0, threshold = [0,0], season
     const label = labelFunc(a);
     if (a.includes("Molière"))
       return 1;
-    if(a.includes("Shakespeare"))
+    if(a.includes("Voltaire"))
       return 2;
-    // console.log(label)
-    // console.log(label.charCodeAt(0))
+    if(a.includes("Shakespeare"))
+      return 3;
+    if(a.includes("Centlivre"))
+      return 4;
+    if(a.includes("Holberg"))
+      return 5;
+    if(a.includes("Calderón de la Barca"))
+      return 6;
+    if(a.includes("Vega"))
+      return 7;
+    if(a.includes("Kotzebue"))
+      return 8;
     return label.charCodeAt(0);
   };
 

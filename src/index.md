@@ -11,6 +11,8 @@ function withinGraphBounds(row) {
   const year = row.year ?? asDate(row.date)?.getUTCFullYear();
   return year >= minGraphYear && year <= maxGraphYear;
 }
+
+//TODO: move to data_loaders file in data/ and import combined data
 const french = await FileAttachment("data/french-performances.json").json();
 const french_dates = new Set(french.filter(d=> d.year === 1775).map(d=> d.date))
 const dutch = await FileAttachment("data/dutch-performances.csv").csv({typed: true});
@@ -42,7 +44,7 @@ const teatroDelPrincipe = madrid['Teatro del Príncipe'].filter(d => d.title).ma
 });
 
 
-
+//TODO: move to utilities file in components/ and import
 const color_map = {
   'french': '#FF725C',
   'dutch': '#EFB119',
@@ -68,6 +70,7 @@ const name_map = {
   'teatro del principe': 'Teatro del Príncipe (Madrid)'
 };
 
+//TODO: move to data_loaders file
 // Load & normalize the Danish performances directly from the raw JSON
 const danish_raw = await FileAttachment("data/danish-performances.json").json();
 
@@ -143,6 +146,7 @@ const danish = danish_raw.map((perf) => {
   };
 });
 
+console.log(`danish: ${danish.filter(d=> d.author.includes('Holberg')).length}`)
 ```
 
 <!-- handles date formatting -->
@@ -252,6 +256,7 @@ const combined_data = [
 
 
 ```js
+//TODO: delete
 function processPerformanceGenres(fullData, comedyData, dramaData, tragedyData, balletData, origin) {
   const allYears = d3.rollup(fullData, v => v.length, d => d.year);
   const comedyYears = d3.rollup(comedyData, v => v.length, d => d.year);
@@ -307,6 +312,7 @@ function genreLegend() {
 ```js
 
 // Map route IDs / query params -> internal labels in the toggle list
+//TODO: move to utilities file
 const vizLabelById = {
   "over-time": "Over Time",
   "genres": "Diverging Genres",
@@ -566,7 +572,9 @@ const formatted_data = combined_data.filter(d => {
 });
 ```
 
+
 ```js
+//TODO: move to separate file in components/ and import
 function countPerformanceDays(data) {
   return d3.rollup(
     data,
@@ -729,6 +737,7 @@ const genre_data = formatted_data
 </div>
 
 ```js
+//TODO: remove unused imports
 import {
   createAnimatedLineChart,
   createMultipleAnimatedLines,
@@ -802,6 +811,7 @@ if(heatMap){
 ```
 
 ```js
+//TODO: use first set of loaded data
 // Heading for the calendar section – only when calendar viz is active
 
 import { injectCalendarStyles, buildEvents, renderCalendar, ORIGIN_COLOR } from "./components/calendar.js";
@@ -957,6 +967,7 @@ const allRowsUnfiltered = [
 const allRows = allRowsUnfiltered.filter(d=> origins.includes(d.origin))
 
 
+//TODO: use original color map
 // Color map + legend colors (keys match origin values now)
 const COLOR = new Map([
   ["danish",         color_map["danish"]],
@@ -1133,7 +1144,7 @@ if (calendar) {
 // -----------------------------
 // NOLA Genre Bubble Chart
 // -----------------------------
-
+//TODO: move to separate file, import DOM node
 display(nolaBubble ? html`<h2>New Orleans Genre Bubble Chart</h2>` : html`<div></div>`);
 
 if (nolaBubble) {
