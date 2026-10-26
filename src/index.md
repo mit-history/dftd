@@ -34,12 +34,12 @@ const madrid = await FileAttachment("data/madrid-performances.json").json();
 console.log(madrid);
 const teatroDeLaCruz = madrid['Teatro de la Cruz'].filter(d => d.title).map(d => {
   d.origin = 'teatro de la cruz';
-  d.author = d.author||'unkown';
+  d.author = d.author||'unknown';
   return d;
 });
 const teatroDelPrincipe = madrid['Teatro del Príncipe'].filter(d => d.title).map(d => {
   d.origin = 'teatro del principe';
-  d.author = d.author||'unkown';
+  d.author = d.author||'unknown';
   return d;
 });
 
@@ -504,7 +504,7 @@ const originsInput = Inputs.checkbox(originOptions, {
     label: !overTime? "Origin": "Origin (max 3)",
     value: reactiveOrigins,
     format:  d => html`<span class="cal-key"><span class="cal-dot" style="background:${color_map[d] || '#999'}"></span>${name_map[d] || d}</span>`,
-    disabled: originOptions.filter((o) => (['teatro de la cruz', 'teatro del principe'].includes(o) && (bubble || authorShare))?true:(!overTime? false:(3 <= react.length) && !react.includes(o)))
+    disabled: originOptions.filter((o) => (!overTime? false:(3 <= react.length) && !react.includes(o)))
   })
 const bindedInput = Inputs.bind(
   originsInput,
@@ -722,6 +722,8 @@ if(bubble){
     document.getElementById("bubbleContainer").appendChild(newDiv)
   }
 }
+console.log(`madrid: ${teatroDeLaCruz.filter(p=>(p.author != 'Unknown')).length}`)
+console.log(teatroDeLaCruz)
 ```
 
 
