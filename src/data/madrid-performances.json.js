@@ -37,7 +37,7 @@ export async function load() {
             for (let i = 1; i < 4; i++){
                 acc.push({
                     title: getVal(p[`Play ${i} Title`]),
-                    author: getVal(p[`Author ${i} Name`]),
+                    author: getVal(p[`Author 1 Play ${i} Name`])+(p[`Author 2 Play ${i} Name`]?', '+p[`Author 1 Play ${i} Name`]:''),
                     genre: getVal(p[`Play ${i} Genre`]),
                     date: dateString? new Date(Number(dateString[2]), MONTHS[dateString[1]], Number(dateString[0])):null,
                     year: dateString? dateString[2]:null
