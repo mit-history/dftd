@@ -597,14 +597,18 @@ function countPerformances(data) {
   );
 }
 
-function compareYearsChart(data) {
+function annualPerformanceCounts(data) {
   const years = d3.range(start_date.getUTCFullYear(), end_date.getUTCFullYear() + 1);
   const counts = countPerformances(data);
-  const yearCounts = years.flatMap(year => origins.map(origin => ({
+  return years.flatMap(year => origins.map(origin => ({
     year,
     origin,
     count: counts.get(year)?.get(origin) ?? 0
   })));
+}
+
+function compareYearsChart(yearCounts) {
+  const years = d3.range(start_date.getUTCFullYear(), end_date.getUTCFullYear() + 1);
   const n = years.length;
   const step =
     n > 60 ? 10 :
@@ -648,16 +652,41 @@ function compareYearsChart(data) {
   });
 }
 
+function downloadCsv(rows, filename) {
+  const blob = new Blob([d3.csvFormat(rows)], { type: "text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  link.click();
+  setTimeout(() => URL.revokeObjectURL(url), 0);
+}
+
 
 
 ```
 
 ```js
 if (overTime) {
+  const yearCounts = annualPerformanceCounts(formatted_data);
+  const frenchIsDisplayed = formatted_data.some(d => d.origin === "french");
+  const saveCsvButton = frenchIsDisplayed
+    ? html`<button type="button">Save CSV</button>`
+    : html`<span hidden></span>`;
+  saveCsvButton.addEventListener("click", () => {
+    downloadCsv(
+      yearCounts
+        .filter(d => d.origin === "french")
+        .map(({year, origin, count}) => ({year, origin, performances: count})),
+      "french-performances-by-year.csv"
+    );
+  });
+
   display(
     formatted_data.length > 0
       ? html`<div class="full-bleed" id="french-graph-container">
-          ${compareYearsChart(formatted_data)}
+          ${compareYearsChart(yearCounts)}
+          ${saveCsvButton}
         </div>`
       : html`<i>No data.</i>`
   );
