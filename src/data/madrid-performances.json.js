@@ -1,5 +1,5 @@
 import * as XLSX from 'xlsx';
-import { readFileSync } from 'fs';
+import { readFileSync, writeFile } from 'fs';
 
 const MONTHS = {
     Enero: 0,
@@ -35,15 +35,25 @@ export async function load() {
         madrid[theater] = XLSX.utils.sheet_to_json(workbook.Sheets[theater]).reduce((acc, p) => {
             const dateString = getVal(p['Performance Date'])?.split(' ');
             for (let i = 1; i < 4; i++){
-                acc.push({
+                const g = {
                     title: getVal(p[`Play ${i} Title`]),
-                    author: getVal(p[`Author 1 Play ${i} Name`])+(p[`Author 2 Play ${i} Name`]?', '+p[`Author 1 Play ${i} Name`]:''),
+                    author: getVal(p[`Author 1 Play ${i} Name`]),
                     genre: getVal(p[`Play ${i} Genre`]),
                     date: dateString? new Date(Number(dateString[2]), MONTHS[dateString[1]], Number(dateString[0])):null,
                     year: dateString? dateString[2]:null
-                });
+                };
+
+                if (p[`Author 2 Play ${i} Name`])
+                    g.author += ', '+p[`Author 2 Play ${i} Name`]
+
+                acc.push(g)
+                // if(g.author == "Francisco de Rojas Zorrilla, Francisco de Rojas Zorrilla"){
+                //     console.log(theater)
+                //     console.log(g)
+                // }
+                return acc;
             }
-            return acc;
+
         }, []).filter(d => d.title||d.author||d.genre);
     }
 
@@ -52,5 +62,13 @@ export async function load() {
 
 const plays = await load();
 // console.log(plays)
+
+// writeFile(`madrid_authors.json`, JSON.stringify([...new Set(plays['Teatro de la Cruz'].map(d=>d.author), plays['Teatro del Príncipe'].map(d=>d.author))], null, 4), 'utf8', e =>{
+//     if (e){
+//         console.error('error writing to file', e);
+//     }else{
+//         console.log(`done`);
+//     }
+// });
 
 process.stdout.write(JSON.stringify(plays));

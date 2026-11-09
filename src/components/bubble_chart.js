@@ -125,7 +125,7 @@ export function genreBubble(formatted_data, author){
   }, {})).map(c => ({genre: c[0], count: c[1]}));
 }
 
-export function authorBubble(data, origin, season = 0, threshold = [0,0], season_start, season_end, mode){
+export function authorBubble(data, origin, season = 0, threshold = [0,0], season_start, season_end, mode, hide_unknown){
 
   const percent = mode == "percentage";
 
@@ -179,7 +179,7 @@ export function authorBubble(data, origin, season = 0, threshold = [0,0], season
   const authorsWithId = authors.map(d => {
 
   });
-  return BubbleChart(authors, {
+  return BubbleChart(authors.filter(d => hide_unknown?d.author != 'unknown':true), {
     //attempt to filter out first names for readability
     label: d => labelFunc(d.author||'unknown'),
     value: d => (d.count/performance_count)*percentage_multiplier,

@@ -31,12 +31,13 @@ const druryLane = london.filter(d => d.place == "Drury Lane").map(d =>{
 });
 const newOrleans = await FileAttachment("data/new_orleans/new_o_frequent_performances.csv").csv({typed: false});
 const madrid = await FileAttachment("data/madrid-performances.json").json();
-console.log(madrid);
+// console.log(madrid);
 const teatroDeLaCruz = madrid['Teatro de la Cruz'].filter(d => d.title).map(d => {
   d.origin = 'teatro de la cruz';
   d.author = d.author||'unknown';
   return d;
 });
+console.log(teatroDeLaCruz.filter(d=>d.author==='1778'))
 const teatroDelPrincipe = madrid['Teatro del Príncipe'].filter(d => d.title).map(d => {
   d.origin = 'teatro del principe';
   d.author = d.author||'unknown';
@@ -708,14 +709,15 @@ if(bubble){
     const title = document.createElement("h2");
     title.innerHTML = name_map[origin]
     const bubble = authorBubble(
-            combined_data.filter(p=>(hideNull?p.author != 'unknown':true)),
-            origin,
-            0,
-          threshold_val,
-            date_range_val[0],
-            date_range_val[1],
-            percent_absolute_val
-          )
+      combined_data,
+      origin,
+      0,
+      threshold_val,
+      date_range_val[0],
+      date_range_val[1],
+      percent_absolute_val,
+      hideNull
+    )
     newDiv.appendChild(title);
     newDiv.appendChild(bubble);
 
