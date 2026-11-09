@@ -573,64 +573,6 @@ const formatted_data = combined_data.filter(d => {
 });
 ```
 
-
-```js
-//TODO: move to separate file in components/ and import
-function countPerformanceDays(data) {
-  return d3.rollup(
-    data,
-    rows => new Set(rows.map(row => asDate(row.date).toISOString().slice(0, 10))).size,
-    row => asDate(row.date).getUTCFullYear(),
-    row => row.origin
-  );
-}
-
-function compareYearsChart(data) {
-  const years = d3.range(start_date.getUTCFullYear(), end_date.getUTCFullYear() + 1);
-  const counts = countPerformanceDays(data);
-  const yearCounts = years.flatMap(year => origins.map(origin => ({
-    year,
-    origin,
-    count: counts.get(year)?.get(origin) ?? 0
-  })));
-  const n = years.length;
-  const step =
-    n > 60 ? 10 :
-    n > 40 ? 5 :
-    n > 25 ? 2 : 1;
-  const yearTicks = years.filter((_, i) => i % step === 0);
-
-  return Plot.plot({
-    title: `Compare days with performances per year, ${start_date.getUTCFullYear()}–${end_date.getUTCFullYear()}`,
-    fx: { label: null, padding: 0.1, domain: d3.range(start_date.getUTCFullYear(), end_date.getUTCFullYear() + 1) },
-    x: { axis: null, paddingOuter: 0.2 },
-    y: { grid: true, label: "Days with performances", domain: [0, 366] },
-    color: {
-      domain: Object.keys(color_map),
-      range: Object.values(color_map),
-      tickFormat: d => name_map[d] || d,
-      legend: true
-    },
-    width: window.innerWidth,
-    marginBottom: 60,
-    marks: [
-      Plot.axisY({facetAnchor: "left"}),
-      Plot.barY(yearCounts, {y: "count", x: "origin", fx: "year", fill: "origin", tip: true}),
-      Plot.ruleY([0]),
-      // 👇 labels below instead of above
-      Plot.axisFx({
-        ticks: yearTicks,
-        tickFormat: d => String(d),
-        anchor: "bottom"
-      })
-    ]
-  });
-}
-
-
-
-```
-
 ```js
 const unique_formatted_data = []
 for (const origin of originOptions){
@@ -642,12 +584,110 @@ for (const origin of originOptions){
     }
   }
 }
+```
 
+
+```js
+//TODO: move to separate file in components/ and import
+function countPerformances(data) {
+  return d3.rollup(
+    data,
+    rows => rows.length,
+    row => asDate(row.date).getUTCFullYear(),
+    row => row.origin
+  );
+}
+
+function annualPerformanceCounts(data) {
+  const years = d3.range(start_date.getUTCFullYear(), end_date.getUTCFullYear() + 1);
+  const counts = countPerformances(data);
+  return years.flatMap(year => origins.map(origin => ({
+    year,
+    origin,
+    count: counts.get(year)?.get(origin) ?? 0
+  })));
+}
+
+function compareYearsChart(yearCounts) {
+  const years = d3.range(start_date.getUTCFullYear(), end_date.getUTCFullYear() + 1);
+  const n = years.length;
+  const step =
+    n > 60 ? 10 :
+    n > 40 ? 5 :
+    n > 25 ? 2 : 1;
+  const yearTicks = years.filter((_, i) => i % step === 0);
+
+  return Plot.plot({
+    title: `Compare performances per year, ${start_date.getUTCFullYear()}–${end_date.getUTCFullYear()}`,
+    fx: { label: "Year", tickFormat: d => String(d), padding: 0.1, domain: d3.range(start_date.getUTCFullYear(), end_date.getUTCFullYear() + 1) },
+    x: { axis: null, paddingOuter: 0.2 },
+    y: { grid: true, label: "Performances" },
+    color: {
+      domain: Object.keys(color_map),
+      range: Object.values(color_map),
+      tickFormat: d => name_map[d] || d,
+      legend: true
+    },
+    width: window.innerWidth,
+    marginBottom: 60,
+    marks: [
+      Plot.axisY({facetAnchor: "left"}),
+      Plot.barY(yearCounts, {
+        y: "count",
+        x: "origin",
+        fx: "year",
+        fill: { value: "origin", label: "Origin" },
+        tip: {
+          channels: { Year: "year", Performances: "count" },
+          format: { Year: value => String(value), x: false, y: false }
+        }
+      }),
+      Plot.ruleY([0]),
+      // 👇 labels below instead of above
+      Plot.axisFx({
+        ticks: yearTicks,
+        tickFormat: d => String(d),
+        anchor: "bottom"
+      })
+    ]
+  });
+}
+
+function downloadCsv(rows, filename) {
+  const blob = new Blob([d3.csvFormat(rows)], { type: "text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  link.click();
+  setTimeout(() => URL.revokeObjectURL(url), 0);
+}
+
+
+
+```
+
+```js
 if (overTime) {
+  const yearCounts = annualPerformanceCounts(formatted_data);
+  const frenchIsDisplayed = formatted_data.some(d => d.origin === "french");
+  const saveCsvButton = frenchIsDisplayed
+    ? html`<button type="button">Save CSV</button>`
+    : html`<span hidden></span>`;
+  saveCsvButton.addEventListener("click", () => {
+    downloadCsv(
+      yearCounts
+        .filter(d => d.origin === "french")
+        .map(({year, origin, count}) => ({year, origin, performances: count})),
+      "french-performances-by-year.csv"
+    );
+  });
+
   display(
-    unique_formatted_data.length > 0
+    formatted_data.length > 0
       ? html`<div class="full-bleed" id="french-graph-container">
-          ${compareYearsChart(unique_formatted_data)}
+          ${compareYearsChart(yearCounts)}
+          ${saveCsvButton}
         </div>`
       : html`<i>No data.</i>`
   );
@@ -755,9 +795,18 @@ import {
 genre_data.sort((a, b) => a.year - b.year);
 
 function summarize(dataset, label) {
-  const summary = Array.from(countPerformanceDays(dataset), ([year, counts]) => ({
+  const map = new Map();
+  dataset.forEach(d => {
+    const dt = asDate(d.date);
+    if (!dt) return;
+    if (dt < start_date || dt > end_date) return;
+    const year = d.year ?? dt.getUTCFullYear();
+    if (!map.has(year)) map.set(year, new Set());
+    map.get(year).add(dt.toISOString().slice(0, 10));
+  });
+  const summary = Array.from(map, ([year, dates]) => ({
     year,
-    count: counts.get(label) ?? 0,
+    count: dates.size,
   })).sort((a, b) => a.year - b.year);
   return { label, data: summary };
 }
