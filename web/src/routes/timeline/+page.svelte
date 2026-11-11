@@ -54,7 +54,7 @@
     },
     {
       name: 'New Orleans (All theaters)',
-      // link: '',
+      link: base + '/nola-affiliate',
       ranges: data.ranges.newOrleans ? [data.ranges.newOrleans] : [],
       color: '#A855F7'
     },
