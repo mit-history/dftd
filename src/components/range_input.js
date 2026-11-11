@@ -105,17 +105,24 @@ export function rangeInput(options = {}) {
   const scope = randomScope();
   const clamp = (a, b, v) => (v < a ? a : v > b ? b : v);
 
-  const inputMin = createEl('input', { props: { type: "number", id: "min-input",  min, max: defaultValue[1], step, value: defaultValue[0] } })
+  const inputMin = createEl('input', { props: { type: "number", id: `${scope}-min`, "aria-label": "Range start", min, max: defaultValue[1], step, value: defaultValue[0] } })
   inputMin.style = "width:5em";
-  const inputMax = createEl('input', {props: { type: "number", id: "max-input", min: defaultValue[0], max, step, value: defaultValue[1]}})
+  const inputMax = createEl('input', {props: { type: "number", id: `${scope}-max`, "aria-label": "Range end", min: defaultValue[0], max, step, value: defaultValue[1]}})
   inputMax.style = "width:5em";
 
   // Will be used to sanitize values while avoiding floating point issues.
   const input = createEl('input', {props: {type: "range", min, max, step}});
 
-const dom = createEl('span', {})
+const dom = createEl('span', { styles: {
+  display: 'grid',
+  gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)',
+  alignItems: 'center',
+  gap: '.65rem',
+  width: '100%',
+  minWidth: '0'
+} })
 
-const rangeSlider = createEl('div', {props: {className: `${scope} range-slider`}, style: {color, width: cssLength(width)}});
+const rangeSlider = createEl('div', {props: {className: `${scope} range-slider`}, styles: {color, width: cssLength(width) || "100%", minWidth: "0", gridColumn: "1 / -1", boxSizing: "border-box", margin: "0"}});
 const rangeTrack = (controls.track = createEl('div', {props: {className: "range-track"}}));
 
 const rangeTrackZone = (controls.zone = createEl('div', {props: {className: "range-track-zone"}}));
@@ -130,7 +137,12 @@ rangeSelect.append(thumbMin, thumbMax);
 rangeTrackZone.append(rangeSelect);
 rangeTrack.append(rangeTrackZone);
 rangeSlider.append(rangeTrack, style);
-dom.append(enableTextInput?inputMin:"", rangeSlider, enableTextInput?inputMax:"");
+if (enableTextInput) {
+  inputMin.style.cssText = "width:100%;min-width:0;box-sizing:border-box;";
+  inputMax.style.cssText = "width:100%;min-width:0;box-sizing:border-box;";
+  dom.append(inputMin, inputMax);
+}
+dom.append(rangeSlider);
 
 
 

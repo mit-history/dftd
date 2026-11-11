@@ -5,6 +5,7 @@ document.head.insertAdjacentHTML(
   "beforeend",
   `
   <style data-author-share-fix>
+    .origin-chart [class*="-swatch"]::before { border-radius: 50%; }
     .card[style*="position:sticky"] {
       background: var(--theme-background, #111) !important;
       z-index: 10 !important;
@@ -289,7 +290,7 @@ function makeAuthorLabels(labels, fontScale) {
 /* =============================================================================
    Main chart
 ============================================================================= */
-export function authorShareChart(author, formatted_data, colorMap = {}, nameMap = {}) {
+export function authorShareChart(author, formatted_data, colorMap = {}, nameMap = {}, { width } = {}) {
 
   const totalDaysByYear = d3.rollup(
     formatted_data,
@@ -326,7 +327,7 @@ export function authorShareChart(author, formatted_data, colorMap = {}, nameMap 
     .domain(origins)
     .range(origins.map((o, i) => colorMap[o] || d3.schemeObservable10[i % 10]));
 
-  const chartWidth = Math.max(1000, Math.floor(window.innerWidth * 0.92));
+  const chartWidth = width ?? Math.max(1000, Math.floor(window.innerWidth * 0.92));
 
   const sharedPlotConfig = {
     width: chartWidth,
@@ -782,6 +783,7 @@ export function authorShareChart(author, formatted_data, colorMap = {}, nameMap 
       },
       marks,
     });
+    plot.classList.add("origin-chart");
     chartHost.append(plot);
 
     plot.style.fontSize = `${11 * fontScale}px`;

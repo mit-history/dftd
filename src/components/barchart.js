@@ -5,6 +5,7 @@ export function createAnimatedLineChart(
   data,
   { width = 900, height = 500, duration = 100 } = {}
 ) {
+  const chartHost = d3.create("div");
   const computedWidth = width;
   const baseFontSize = Math.max(12, computedWidth * 0.015);
   const baseRadius = Math.max(2, computedWidth * 0.01);
@@ -100,15 +101,18 @@ export function createAnimatedLineChart(
     .ease(d3.easeLinear)
     .attr("stroke-dashoffset", 0);
 
-  const tooltip = d3
-    .select("body")
+  const tooltip = chartHost
     .append("div")
-    .style("position", "absolute")
+    .attr("class", "chart-tooltip")
+    .style("position", "fixed")
+    .style("pointer-events", "none")
+    .style("z-index", 2000)
+    .style("max-width", "180px")
     .style("background", "white")
     .style("border", "1px solid black")
     .style("padding", "5px")
     .style("border-radius", "5px")
-    .style("opacity", 0);
+    .style("display", "none");
 
   const circles = svg
     .append("g")
@@ -122,12 +126,12 @@ export function createAnimatedLineChart(
     .attr("opacity", 0)
     .on("mouseover", (event, d) => {
       tooltip
-        .style("opacity", 1)
+        .style("display", "block")
         .html(`Year: ${d.year}<br>Performances: ${d.count}`)
-        .style("left", event.pageX + 10 + "px")
-        .style("top", event.pageY - 10 + "px");
+        .style("left", Math.max(8, Math.min(event.clientX + 10, window.innerWidth - 200)) + "px")
+        .style("top", Math.max(8, Math.min(event.clientY + 10, window.innerHeight - 100)) + "px");
     })
-    .on("mouseout", () => tooltip.style("opacity", 0));
+    .on("mouseout", () => tooltip.style("display", "none"));
 
   circles
     .transition()
@@ -135,12 +139,14 @@ export function createAnimatedLineChart(
     .duration(100)
     .attr("opacity", 1);
 
-  return svg.node();
+  chartHost.node().append(svg.node());
+  return chartHost.node();
 }
 
 
 // for all lines at once
 export function createMultipleAnimatedLines(groups, { width = 900, height = 500, duration = 100, colorMap = {}, nameMap = {} } = {}) {
+  const chartHost = d3.create("div");
   const baseFontSize = Math.max(12, width * 0.015);
   const baseRadius = Math.max(2, width * 0.01);
 
@@ -201,14 +207,18 @@ export function createMultipleAnimatedLines(groups, { width = 900, height = 500,
     .style("fill", "#333")
     .style("font-size", `${baseFontSize}px`);
 
-  const tooltip = d3.select("body")
+  const tooltip = chartHost
     .append("div")
-    .style("position", "absolute")
+    .attr("class", "chart-tooltip")
+    .style("position", "fixed")
+    .style("pointer-events", "none")
+    .style("z-index", 2000)
+    .style("max-width", "180px")
     .style("background", "white")
     .style("padding", "6px")
     .style("border", "1px solid #ccc")
     .style("border-radius", "5px")
-    .style("opacity", 0);
+    .style("display", "none");
 
   groups.forEach(({ label, data }) => {
     const sorted = data.sort((a, b) => a.year - b.year);
@@ -241,12 +251,12 @@ export function createMultipleAnimatedLines(groups, { width = 900, height = 500,
       .attr("opacity", 0)
       .on("mouseover", (event, d) => {
         tooltip
-          .style("opacity", 1)
+          .style("display", "block")
           .html(`${nameMap[label] || label}<br>Year: ${d.year}<br>Count: ${d.count}`)
-          .style("left", event.pageX + 10 + "px")
-          .style("top", event.pageY - 10 + "px");
+          .style("left", Math.max(8, Math.min(event.clientX + 10, window.innerWidth - 200)) + "px")
+          .style("top", Math.max(8, Math.min(event.clientY + 10, window.innerHeight - 100)) + "px");
       })
-      .on("mouseout", () => tooltip.style("opacity", 0))
+      .on("mouseout", () => tooltip.style("display", "none"))
       .transition()
       .delay((d, i) => i * 30)
       .duration(100)
@@ -257,15 +267,17 @@ export function createMultipleAnimatedLines(groups, { width = 900, height = 500,
   const legend = svg.append("g").attr("transform", `translate(${width - 250}, 30)`);
   groups.forEach(({ label }, i) => {
     const g = legend.append("g").attr("transform", `translate(0, ${i * 20})`);
-    g.append("rect").attr("width", 12).attr("height", 12).attr("fill", color(label));
+    g.append("circle").attr("cx", 6).attr("cy", 6).attr("r", 6).attr("fill", color(label));
     g.append("text").attr("x", 18).attr("y", 10).text(nameMap[label] || label).style("font-size", `${baseFontSize}px`).style("fill", "#333");
   });
 
-  return svg.node();
+  chartHost.node().append(svg.node());
+  return chartHost.node();
 }
 
 
 export function createHeatmap(data, { width = 900, height = 500 } = {}) {
+  const chartHost = d3.create("div");
   const container = document.getElementById("map-container");
   const computedWidth = width || container.clientWidth || 900;
 
@@ -351,16 +363,16 @@ export function createHeatmap(data, { width = 900, height = 500 } = {}) {
     .on("mouseover", function (event, d) {
       d3.select(this).attr("stroke", "#FFFFFF").attr("stroke-width", 4);
       tooltip
-        .style("opacity", 1)
+        .style("display", "block")
         .html(
           `Year: ${d.year}<br>Month: ${d.month}<br>Performances: ${d.count}`
         )
-        .style("left", event.pageX + 10 + "px")
-        .style("top", event.pageY - 10 + "px");
+        .style("left", Math.max(8, Math.min(event.clientX + 10, window.innerWidth - 200)) + "px")
+        .style("top", Math.max(8, Math.min(event.clientY + 10, window.innerHeight - 100)) + "px");
     })
     .on("mouseout", function () {
       d3.select(this).attr("stroke", "none");
-      tooltip.style("opacity", 0);
+      tooltip.style("display", "none");
     });
 
   // X-Axis (Years)
@@ -388,15 +400,18 @@ export function createHeatmap(data, { width = 900, height = 500 } = {}) {
     .style("fill", "#333333");
 
   // Tooltip
-  const tooltip = d3
-    .select("body")
+  const tooltip = chartHost
     .append("div")
-    .style("position", "absolute")
+    .attr("class", "chart-tooltip")
+    .style("position", "fixed")
+    .style("pointer-events", "none")
+    .style("z-index", 2000)
+    .style("max-width", "180px")
     .style("background", "#FFFFFF")
     .style("border", "1px solid #666")
     .style("padding", "5px")
     .style("border-radius", "5px")
-    .style("opacity", 0);
+    .style("display", "none");
 
   // color legend
   const legendWidth = 300;
@@ -462,7 +477,8 @@ export function createHeatmap(data, { width = 900, height = 500 } = {}) {
 
 
 
-  return svg.node();
+  chartHost.node().append(svg.node());
+  return chartHost.node();
 }
 
 export function createGenreProportionChart(data, { width = 400, height = 400 } = {}) {
