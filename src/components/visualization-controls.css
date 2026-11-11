@@ -4,11 +4,12 @@
   max-width: none;
   min-width: 0;
   min-height: 0;
-  margin: 0;
+  margin: 0 0 0 27rem;
   padding: 1rem;
 }
 body:has(.controls-workspace[data-panel="none"]) #observablehq-main {
   width: calc(100% - 5rem);
+  margin-left: 5rem;
 }
 body:has(.controls-workspace [data-empty-selection]) #observablehq-main {
   min-height: 32rem;
@@ -17,11 +18,11 @@ body:has(.controls-workspace [data-empty-selection]) #observablehq-main {
 .controls-rail {
   position: fixed;
   z-index: 1001;
-  inset: 0 0 0 auto;
+  inset: 0 auto 0 0;
   width: 5rem;
   box-sizing: border-box;
   padding: .75rem .25rem;
-  border-left: 1px solid #d6d3c8;
+  border-right: 1px solid #d6d3c8;
   background: #faf9f3;
   display: flex;
   flex-direction: column;
@@ -45,12 +46,12 @@ body:has(.controls-workspace [data-empty-selection]) #observablehq-main {
 .controls-popup {
   position: fixed;
   z-index: 1000;
-  inset: 0 5rem 0 auto;
+  inset: 0 auto 0 5rem;
   width: 22rem;
   display: flex;
   flex-direction: column;
   background: #fff;
-  border-left: 1px solid #d6d3c8;
+  border-right: 1px solid #d6d3c8;
 }
 .controls-workspace[data-panel="none"] .controls-popup { display: none; }
 .controls-panel-header {
@@ -74,8 +75,8 @@ body:has(.controls-workspace [data-empty-selection]) #observablehq-main {
 .controls-workspace[data-panel="visualizations"] [data-controls-panel="filters"],
 .controls-workspace[data-panel="filters"] [data-controls-panel="visualizations"] { display: none; }
 @media (max-width: 760px) {
-  #observablehq-main { width: calc(100% - 5rem); }
-  .controls-popup { width: min(22rem, calc(100vw - 5rem)); box-shadow: -4px 0 16px #0002; }
+  #observablehq-main { width: calc(100% - 5rem); margin-left: 5rem; }
+  .controls-popup { width: min(22rem, calc(100vw - 5rem)); box-shadow: 4px 0 16px #0002; }
 }
 
 .controls-popup-content .observablehq--block { margin: 0; }

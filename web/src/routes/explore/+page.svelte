@@ -7,7 +7,7 @@
       id: "over-time",
       icon:"bar-chart.svg",
       category: "Annual Performance Comparison",
-      title: "Annual Performance Counts",
+      title: "Number of Performances",
       description:
         "Compare annual performance counts across Amsterdam, Copenhagen, and Paris within the selected date range."
     },
@@ -42,7 +42,7 @@
       id: "days",
       icon:"line-chart.svg",
       category: "Annual Performance Comparison",
-      title: "Animated Line Chart Showing Annual Performance Totals",
+      title: "Days with Performances",
       description:
         "View daily patterns of performances, highlighting seasonality and repertoire activity across the year."
     },

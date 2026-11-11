@@ -19,7 +19,7 @@ const visualizationGroups = [
   {
     label: "Annual Performance Comparison",
     options: [
-      ["over-time", "Over Time"],
+      ["over-time", "Number of Performances"],
       ["heat-map", "Heat Map"],
       ["days", "Days with Performances"]
     ]

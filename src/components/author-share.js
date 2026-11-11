@@ -1,3 +1,4 @@
+import { frenchDownloadButton } from "./french-download.js";
 import * as d3 from "npm:d3";
 import * as Plot from "npm:@observablehq/plot";
 
@@ -784,7 +785,10 @@ export function authorShareChart(author, formatted_data, colorMap = {}, nameMap 
       marks,
     });
     plot.classList.add("origin-chart");
-    chartHost.append(plot);
+    chartHost.append(plot, frenchDownloadButton(
+      segments.map(({year, author, origin, count, percent}) => ({year, author, origin, performance_days: count, percent})),
+      "french-author-performance-days.csv"
+    ));
 
     plot.style.fontSize = `${11 * fontScale}px`;
 

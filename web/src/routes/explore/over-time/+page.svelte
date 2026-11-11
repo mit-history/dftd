@@ -1,5 +1,5 @@
 <svelte:head>
-  <title>Performances Over Time • Explore the Data</title>
+  <title>Number of Performances • Explore the Data</title>
 </svelte:head>
 
 <script>
@@ -11,7 +11,7 @@
 
 <main class="viz-page">
   <!-- Title -->
-  <!-- <h1 class="title">Performances Over Time</h1> -->
+  <!-- <h1 class="title">Number of Performances</h1> -->
 
   <!-- Dummy timeline -->
   <!-- <section class="timeline">
@@ -32,7 +32,7 @@
 
   <section class="viz-info">
   <div class="chip">Annual Performance Comparison</div>
-  <h1>Annual Performance Counts</h1>
+  <h1>Number of Performances</h1>
 </section>
 
 
@@ -40,7 +40,7 @@
   <section class="viz-frame">
     <iframe
       src={notebookUrl}
-      title="Performances Over Time Visualization"
+      title="Number of Performances Visualization"
       loading="lazy"
     ></iframe>
   </section>

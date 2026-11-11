@@ -1,3 +1,4 @@
+import { frenchDownloadButton, frenchPerformanceDays } from "./french-download.js";
 import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 
 
@@ -6,6 +7,7 @@ export function createAnimatedLineChart(
   { width = 900, height = 500, duration = 100 } = {}
 ) {
   const chartHost = d3.create("div");
+  chartHost.append("h2").text("Days with Performances");
   const computedWidth = width;
   const baseFontSize = Math.max(12, computedWidth * 0.015);
   const baseRadius = Math.max(2, computedWidth * 0.01);
@@ -139,7 +141,7 @@ export function createAnimatedLineChart(
     .duration(100)
     .attr("opacity", 1);
 
-  chartHost.node().append(svg.node());
+  chartHost.node().append(svg.node(), frenchDownloadButton(frenchPerformanceDays(data), "french-performance-days-by-year.csv"));
   return chartHost.node();
 }
 
@@ -147,6 +149,7 @@ export function createAnimatedLineChart(
 // for all lines at once
 export function createMultipleAnimatedLines(groups, { width = 900, height = 500, duration = 100, colorMap = {}, nameMap = {} } = {}) {
   const chartHost = d3.create("div");
+  chartHost.append("h2").text("Days with Performances");
   const baseFontSize = Math.max(12, width * 0.015);
   const baseRadius = Math.max(2, width * 0.01);
 
@@ -271,7 +274,9 @@ export function createMultipleAnimatedLines(groups, { width = 900, height = 500,
     g.append("text").attr("x", 18).attr("y", 10).text(nameMap[label] || label).style("font-size", `${baseFontSize}px`).style("fill", "#333");
   });
 
-  chartHost.node().append(svg.node());
+  const frenchSummary = groups.filter(group => group.label.toLowerCase() === "french")
+    .flatMap(group => group.data.map(row => ({year: row.year, origin: "french", performance_days: row.count})));
+  chartHost.node().append(svg.node(), frenchDownloadButton(frenchSummary, "french-performance-days-by-year.csv"));
   return chartHost.node();
 }
 
@@ -477,7 +482,7 @@ export function createHeatmap(data, { width = 900, height = 500 } = {}) {
 
 
 
-  chartHost.node().append(svg.node());
+  chartHost.node().append(svg.node(), frenchDownloadButton(frenchPerformanceDays(data, "month"), "french-performance-days-by-month.csv"));
   return chartHost.node();
 }
 

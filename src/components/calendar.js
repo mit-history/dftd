@@ -1,3 +1,4 @@
+import { frenchDownloadButton, frenchCalendarRows } from "./french-download.js";
 // =============================================
 //  Calendar.js — Month/Week/Day visualization
 //  Global Theatre Calendar (Danish, French, Dutch, NOLA)
@@ -133,6 +134,9 @@ export function renderCalendar({ container, mode, anchor, events, overlays }) {
   else if (mode === "Week")  box.appendChild(renderWeek(anchor, events, overlays));
   else                       box.appendChild(renderDay(anchor, events, overlays));
 
+  box.append(frenchDownloadButton(frenchCalendarRows(events, mode, anchor)
+    .map(({id, date, title, origin, venue, city}) => ({id, date, title, origin, venue, city})),
+    "french-calendar-performances.csv"));
   root.appendChild(box);
 }
 

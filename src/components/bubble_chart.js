@@ -1,3 +1,4 @@
+import { frenchDownloadButton } from "./french-download.js";
 import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm"
 
 export function BubbleChart(data, {
@@ -179,7 +180,8 @@ export function authorBubble(data, origin, season = 0, threshold = [0,0], season
   const authorsWithId = authors.map(d => {
 
   });
-  return BubbleChart(authors.filter(d => hide_unknown?d.author != 'unknown':true), {
+  const displayedAuthors = authors.filter(d => hide_unknown ? d.author !== "unknown" : true);
+  const chart = BubbleChart(displayedAuthors, {
     //attempt to filter out first names for readability
     label: d => labelFunc(d.author||'unknown'),
     value: d => (d.count/performance_count)*percentage_multiplier,
@@ -187,5 +189,12 @@ export function authorBubble(data, origin, season = 0, threshold = [0,0], season
     group: d => d.id,
     width: 700,
     fontSize: 10
-  })
+  });
+  const host = document.createElement("div");
+  host.append(chart, frenchDownloadButton(displayedAuthors.map(d => ({
+    origin, author: d.author, performances: d.count,
+    value: d.count / performance_count * percentage_multiplier,
+    mode, start_year: season_start, end_year: season_end
+  })), "french-author-bubbles.csv"));
+  return host;
 }

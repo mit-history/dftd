@@ -324,7 +324,7 @@ function genreLegend() {
 // Map route IDs / query params -> internal labels in the toggle list
 //TODO: move to utilities file
 const vizLabelById = {
-  "over-time": "Over Time",
+  "over-time": "Number of Performances",
   "genres": "Diverging Genres",
   "authors": "By Author",
   "days": "Days with Performances",
@@ -353,7 +353,7 @@ const viz = view(vizInput);
 ```
 
 ```js
-const overTime = viz.includes("Over Time");
+const overTime = viz.includes("Number of Performances");
 // const divergingGenres = viz.includes("Diverging Genres");
 // const byAuthor = viz.includes("By Author");
 const performanceDays = viz.includes("Days with Performances");
@@ -364,7 +364,7 @@ const nolaBubble = viz.includes("NOLA Genre Bubble");
 const heatMap = viz.includes("Heat Map");
 
 const vizFilterConfig = {
-  "Over Time": { yearRange: true, origins: true },
+  "Number of Performances": { yearRange: true, origins: true },
   "Heat Map": { exactDateRange: true, origins: true },
   "Days with Performances": { yearRange: true, origins: true },
   "Author Share": { yearRange: true, origins: true },
@@ -657,7 +657,7 @@ function compareYearsChart(yearCounts) {
   const yearTicks = years.filter((_, i) => i % step === 0);
 
   const plot = Plot.plot({
-    title: `Compare performances per year, ${start_date.getUTCFullYear()}–${end_date.getUTCFullYear()}`,
+    title: `Number of Performances, ${start_date.getUTCFullYear()}–${end_date.getUTCFullYear()}`,
     fx: { label: "Year", tickFormat: d => String(d), padding: 0.1, round: false, domain: d3.range(start_date.getUTCFullYear(), end_date.getUTCFullYear() + 1) },
     x: { axis: null, domain: origins, paddingOuter: 0.2, round: false },
     y: { grid: true, label: "Performances" },
