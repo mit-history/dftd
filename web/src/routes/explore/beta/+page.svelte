@@ -44,8 +44,7 @@
         <span class="loading-spinner" aria-hidden="true"></span>
         <p>Loading visualizations…</p>
         {#if loadingSlow}
-          <p class="loading-hint">The data is taking a little longer to load.</p>
-          <button type="button" onclick={() => { loading = false; }}>Show visualizations</button>
+          <p class="loading-hint">Visualization taking too long to load.</p>
         {/if}
       </div>
     {/if}
@@ -136,14 +135,6 @@
 
   .loading-overlay p { margin: 0; }
   .loading-hint { font-size: .85rem; }
-  .loading-overlay button {
-    padding: .5rem .75rem;
-    border: 1px solid #d6d3c8;
-    border-radius: 4px;
-    background: #fff;
-    color: inherit;
-    cursor: pointer;
-  }
   .loading-spinner {
     width: 2rem;
     height: 2rem;
