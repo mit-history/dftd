@@ -8,6 +8,7 @@
   import { onMount } from 'svelte';
   import mapSvg from './assets/world_map_expanded_2.svg';
   import MapTimeline from '$lib/map-timeline.svelte';
+  import ScrambleTitle from '$lib/scramble-title.svelte';
   import TravelDots from '$lib/travel-dots.svelte';
   import MarkerHitbox from '$lib/marker-hitbox.svelte';
   import { markers } from './markers_config.js';
@@ -248,7 +249,7 @@
     </div>
 
     <div class="hero-text" bind:this={heroText}>
-      <h1>Transnational Stages</h1>
+      <h1 aria-label="Transnational Stages"><ScrambleTitle /></h1>
       <h3 class="subtitle">Theatrical Circulation and Exchange in the Eighteenth-Century Atlantic World</h3>
       <p class="intro">
         In the eighteenth-century Atlantic World, plays and performers often moved from one polity to the next across land and sea,
@@ -304,7 +305,6 @@
     box-sizing: border-box;
     z-index: 1;
     border-radius: 0;
-    box-shadow: 0px 20px 50px -20px rgba(0, 0, 0, 0.3);
     overflow: hidden;
   }
 
